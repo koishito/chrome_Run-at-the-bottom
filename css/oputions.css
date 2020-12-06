@@ -1,0 +1,35 @@
+form{
+    background-color: #eaeaea;
+    padding:10px 20px;
+}
+
+form dl dt{
+    width: 50px;
+    padding:10px 0;
+    float:left;
+    clear:both;
+}
+
+form dl dd{
+    padding:10px 0;
+}
+
+span{
+    border: 1px solid #333333;
+    padding: 0px 5px;
+}
+
+dl textarea{
+    resize: vertical;
+    height: 200px;
+    width: 600px;
+}
+
+.button{
+    text-align:center;
+}
+
+.buttons{
+    display:inline-block;
+    background-color: yellowgreen;
+}

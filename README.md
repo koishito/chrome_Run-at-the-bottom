@@ -1,4 +1,7 @@
-# Chrome_Expansion
+# Run at the bottom
+When you reach the bottom of the page by scrolling, the preset JavaScript is executed.  
+
+# Remarks
 Ｃｈｒｏｍｅ拡張機能の作成の記録。  
 - バックグラウンドページは機能拡張のロードとともに読み込まれ、常に裏で実行されている。（＝常にメモリに駐在し続ける。）  
 - バックグラウンドページは、現在表示しているページのDOM要素やコンテンツスクリプトとは隔絶されています。  
@@ -12,23 +15,72 @@
 - コンテンツスクリプトに送信するときだけchrome.tabs.sendMessageを使います。  
 - chrome.storage APIなら保存したデータを相互にやり取りできます。  
 - コンテンツスクリプトを利用して、現在表示中のページを構成しているDOM要素を読み込んだり、変更したりできます。  
-## ActTab_Extention
-ページ最下部に到達すると、事前に設定したJavaScriptを実行する。  
-- chrome.tabs.onActivated.addListener にて、アクティブタブ切り替え毎にJavaScriptの実行が可能。
 
-## Test01 - content_scripts：
-ページ新規・移動時にのみ`content_scripts`が実行されて、アラート表示。windows.onLoadが後に表示される。
-- タブ遷移時ごとにJSを実行するには？
+以下、参考
+# DEMO
 
-## Test02 - browser_action：
-アイコンの指定＆アイコンclick時に`popup.html`を表示。htmlのテキストボックス要素のいろいろ。
+You can learn how to making cute physics simulations (looks retro game).
 
-## Test03 - page_action：
-Test02の`browser_action`を`page_action`に変えたもの。`popup.html`のトリガーの指定を設定しないと、タスクバー上のアイコンは無効となり色はグレイスケールとなる。  
-トリガー指定のため、イベントページを用いる。`background.js`に定義を記述する。
+![](https://cpp-learning.com/wp-content/uploads/2019/05/pyxel-190505-161951.gif)
 
-## Test04 - background-EventPage：
-- chrome.runtime.onInstalled：拡張機能がインストールされた時に呼ばれるイベント
-- chrome.runtime.onStartup.addListener：ブラウザ起動時に呼ばれるイベント
+This animation is a "Cat playing on trampoline"!
+You can get basic skills for making physics simulations.
 
-## Test05 - ページの最下部でアラート.html(JQueryを使用)
+# Features
+
+Physics_Sim_Py used [pyxel](https://github.com/kitao/pyxel) only.
+
+```python
+import pyxel
+```
+[Pyxel](https://github.com/kitao/pyxel) is a retro game engine for Python.
+You can feel free to enjoy making pixel art style physics simulations.
+
+# Requirement
+
+* Python 3.6.5
+* pyxel 1.0.2
+
+Environments under [Anaconda for Windows](https://www.anaconda.com/distribution/) is tested.
+
+```bash
+conda create -n pyxel pip python=3.6 Anaconda
+activate pyxel
+```
+
+# Installation
+
+Install Pyxel with pip command.
+
+```bash
+pip install pyxel
+```
+
+# Usage
+
+Please create python code named "demo.py".
+And copy &amp; paste [Day4 tutorial code](https://cpp-learning.com/pyxel_physical_sim4/).
+
+Run "demo.py"
+
+```bash
+python demo.py
+```
+
+# Note
+
+I don't test environments under Linux and Mac.
+
+# Author
+
+* Hayabusa
+* R&D Center
+* Twitter : https://twitter.com/Cpp_Learning
+
+# License
+
+"Physics_Sim_Py" is under [MIT license](https://en.wikipedia.org/wiki/MIT_License).
+
+Enjoy making cute physics simulations!
+
+Thank you!

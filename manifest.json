@@ -1,11 +1,12 @@
 {
      "manifest_version": 2,
-     "name": "ActTab",
+     "name": "Run at the bottom",
      "version": "0.1",
      "background": {
           "scripts": ["background.js"],
           "persistent": false
         },
+     "options_page": "options.html",
      "permissions":["tabs", "declarativeContent"],
      "content_scripts": [
          {
