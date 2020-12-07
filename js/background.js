@@ -14,3 +14,29 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
     ]
   }]);
 });
+
+// scriptの初期値の入力
+window.onload = function () {
+  var jstext = `//test01
+  test01`
+  savescript(jstext);
+    // sleep(2000);
+    var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+    chrome.storage.local.get([jstitle], function(items) {
+    // itemsの値は、例えば{'hoge': 'hogeValue'}のようになる。
+    alert(items[jstitle]);
+  });
+}
+
+function savescript(jstext){
+  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+  chrome.storage.local.set({[jstitle] : jstext}, function () {
+    // alert("Value is set to " + jstext);
+  });
+}
+function sleep(waitMsec) {
+  var startMsec = new Date();
+ 
+  // 指定ミリ秒間だけループさせる（CPUは常にビジー状態）
+  while (new Date() - startMsec < waitMsec);
+}

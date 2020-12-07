@@ -5,63 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Run at the bottom options</title>
     <link rel="stylesheet" href="../css/oputions.css">
+    <script type="text/javascript" src="../js/options.js"></script>
 </head>
 <body>
-    <h1>Run at the bottom</h1>
-    <hr>
     <form>
-        <dl id="input">
-            <span><b>Current(Editable)</b></span>
-            <br>
-            <dt>title</dt>
-            <dd><input type="text" style="width: 300px;"></dd>
-            <dt>script</dt>
-            <dd><textarea></textarea></dd>
-        </dl>
+        <h1>Run at the bottom</h1>
+        <hr>
+        <b>Current(Editable)</b>    *Add commented title on the first line
+        <br>
+        <textarea id="input"></textarea>
+        <br>
         <div class="button">
-            <!-- <button>↓ Save</button>
-            <button>↑ Load</button>
-            <button>Reserve Delete</button> -->
             <input class="buttons" type="button" value="↓ Save" onclick="OnSaveButtonClick();"/>
             <input class="buttons" type="button" value="↑ Load" onclick="OnLodeButtonClick();"/>
             <input class="buttons" type="button" value="Reserve Delete" onclick="OnRsvDelButtonClick();"/>
             <button class="buttons" type="reset" id="input">Current Clear</button>
         </div>
         <br>
-        <dl>
-            <span><b>Reserve(Unable to edit)</b></span>
-            <br>
-            <dt>title</dt> 
-            <dd><select name="month" id="month" style="width: 300px;"></select></dt>
-            <dt>script</dt>
-            <dd><textarea id="readonly"></textarea></dd>
+        <b>Reserve(Unable to edit)</b> *If the first line is the same, it will be overwritten
+        <br>
+        <select name="month" id="month"></select>
+        <br>
+        <textarea id="readonly"></textarea>
         </dl>
     </form>
-    <script type="text/javascript">
-        function OnSaveButtonClick() {alert("OnSaveButtonClick");
-        }
-
-        function OnLodeButtonClick() {alert("OnLodeButtonClick");
-        }
-
-        function OnRsvDelButtonClick() {alert("OnRsvDelButtonClick");
-        }
-
-        function setSelectItem() {
-                let month = document.getElementById('month');
-            document.createElement('option')
-            for(let i = 1; i <= 12; i++){
-                let option = document.createElement('option');
-                option.setAttribute('value', i);
-                option.innerHTML = i + '月';
-                month.appendChild(option);
-            };
-        }
-        
-        setSelectItem();
-
-        const target = document.getElementById('readonly');
-        target.readOnly = true;
-    </script>
 </body>
 </html>
