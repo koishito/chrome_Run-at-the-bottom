@@ -19,24 +19,60 @@ chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
 window.onload = function () {
   var jstext = `//test01
   test01`
-  savescript(jstext);
-    // sleep(2000);
-    var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-    chrome.storage.local.get([jstitle], function(items) {
+  savejstext(jstext);
+    // var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+    // chrome.storage.local.get([jstitle], function(items) {
     // itemsの値は、例えば{'hoge': 'hogeValue'}のようになる。
-    alert(items[jstitle]);
-  });
+    // alert(items[jstitle]);
+  // });
 }
 
-function savescript(jstext){
+function savejstext(jstext){
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-  chrome.storage.local.set({[jstitle] : jstext}, function () {
+  chrome.storage.sync.set({[jstitle] : jstext}, function () {
     // alert("Value is set to " + jstext);
   });
 }
-function sleep(waitMsec) {
-  var startMsec = new Date();
- 
-  // 指定ミリ秒間だけループさせる（CPUは常にビジー状態）
-  while (new Date() - startMsec < waitMsec);
-}
+
+chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
+
+  var srckey = jstext.split(/\r\n|\r|\n/)[0];
+
+  if (request.command == "Save") {
+    savejstext(request.jstext);
+    alert("saved '"+ srckey + "'");
+    var curvalue = jstext;
+  }
+
+  if (request.command == "Remove") {
+    chrome.storage.sync.remove(srckey, function() {
+      alert("removed '" + srckey + "'");
+    });
+  }
+
+  //key一覧を取得
+  chrome.storage.sync.get(null, function(items) {
+  var allvalue = Object.keys(items);
+  alert(allvalue);
+  });
+
+  if (request.command <> "save") {
+    curvalue = allvalue[0];
+  }
+  
+  sendResponse( {curvalue: [curvalue], allvalue: [allvalue]} );
+
+
+  // if( request.greeting === "GetURL" )
+  // {
+  //     var tabURL = "Not set yet";
+  //     chrome.tabs.query({active:true},function(tabs){
+  //         if(tabs.length === 0) {
+  //             sendResponse({});
+  //             return;
+  //         }
+  //         tabURL = tabs[0].url;
+  //         sendResponse( {navURL:tabURL} );
+  //     });        
+  // }
+})
