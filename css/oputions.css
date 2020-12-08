@@ -1,7 +1,7 @@
 form{
     width: 600px;
     background-color: #eaeaea;
-    padding:20px 20px;
+    padding:10px 20px;
     margin: 0 auto;
 }
 
@@ -23,5 +23,5 @@ select{
 
 .buttons{
     display:inline-block;
-    background-color: yellowgreen;
+    background-color: silver;
 }

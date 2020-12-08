@@ -9,25 +9,17 @@
 </head>
 <body>
     <form>
-        <h1>Run at the bottom</h1>
-        <hr>
-        <b>Current(Editable)</b>    *Add commented title on the first line
-        <br>
-        <textarea id="input"></textarea>
-        <br>
-        <div class="button">
-            <input class="buttons" type="button" value="↓ Save" onclick="OnSaveButtonClick();"/>
-            <input class="buttons" type="button" value="↑ Load" onclick="OnLodeButtonClick();"/>
-            <input class="buttons" type="button" value="Reserve Delete" onclick="OnRsvDelButtonClick();"/>
-            <button class="buttons" type="reset" id="input">Current Clear</button>
-        </div>
-        <br>
-        <b>Reserve(Unable to edit)</b> *If the first line is the same, it will be overwritten
-        <br>
+        <h2><u>Run at the bottom</u></h2>
+        <b>Select(=Load)</b>
         <select name="month" id="month"></select>
-        <br>
-        <textarea id="readonly"></textarea>
-        </dl>
+        <b>Current</b>  <font size="2">(Editable) *Add commented title on the first line</font>
+        <textarea id="input"></textarea>
+        <div class="button">
+            <input class="buttons" type="button" value="Save" onclick="OnSaveButtonClick();"/>
+            <font size="2">*If the first line is the same, it will be overwritten</font>&emsp;&emsp;
+            <input class="buttons" type="button" value="Delete" onclick="OnRsvDelButtonClick();"/>&emsp;&emsp;
+            <button class="buttons" type="reset" id="input">Clear</button>
+        </div>
     </form>
 </body>
 </html>

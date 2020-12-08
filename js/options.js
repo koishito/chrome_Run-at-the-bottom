@@ -18,7 +18,4 @@ window.onload = function () {
         option.innerHTML = i + '月';
         month.appendChild(option);
     };
-
-    let target = document.getElementById('readonly');
-    target.readOnly = true;
 };
