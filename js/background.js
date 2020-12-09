@@ -1,7 +1,7 @@
 // 機能拡張のインストール・アップデート時に実行
 chrome.runtime.onInstalled.addListener(function (details) {
   console.log("onInstalled: " + details.reason);
-  chrome.storage.sync.clear();
+  // chrome.storage.sync.clear();
   // storageが空の場合に、jstextの初期値を設定
   chrome.storage.sync.get(null, function(items) {
     if (Object.keys(items).length === 0){

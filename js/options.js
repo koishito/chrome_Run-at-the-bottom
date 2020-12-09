@@ -14,7 +14,7 @@ window.onload = function () {
 
     for (var i in keys) {
       srckey = keys[i];
-      console.log(i, srckey));
+      console.log(i, srckey);
       if (srckey == `current`) {
         document.getElementById("cur_js").value = items[srckey];
       }
@@ -38,10 +38,9 @@ function saveCurrentjstext(jstext){
   chrome.storage.sync.set({[`current`]: jstext}, function () {});
 }
 
-// slice(1)は、先頭のchr(6)を削除するために必要。
 function savejstext(jstext){
   console.log(jstext);
-  var jstitle = jstext.slice(1).split(/\r\n|\r|\n/)[0];
+  var jstitle = String.fromCharCode(6) + jstext.split(/\r\n|\r|\n/)[0];
   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
 }
 
