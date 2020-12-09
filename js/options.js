@@ -1,73 +1,75 @@
-function OnSaveButtonClick() {
-    // alert("OnSaveButtonClick");
-    ret = OnButtonClick("Save");
-    if (ret == 0) {return;}
+window.onload = function () {
+  // let month = document.getElementById('month');
+  // document.createElement('option')
+  // for(let i = 1; i <= 12; i++){
+  //   let option = document.createElement('option');
+  //   option.setAttribute('value', i);
+  //   option.innerHTML = i + '月';
+  //   month.appendChild(option);
+  // };
 
+  chrome.storage.sync.get(null, function(items) {
+    var keys = Object.keys(items);
+    let SelectItem = document.getElementById('Select');
+    option = document.createElement('option');
+
+    for (var i in keys) {
+      srckey = keys[i];
+      let option = document.createElement('option');
+      console.log(i, srckey);
+      if (srckey.charCodeAt(0) == 6){
+        document.getElementById("cur_js").value = items[srckey].replace(srckey + '\n', '');
+      }
+      else{
+        option.setAttribute('value', srckey);
+        option.innerHTML = '<xmp>' + srckey + '</xmp>';
+        SelectItem.appendChild(option);
+      }
+    }
+  });
+
+  document.getElementById('Select').addEventListener('change', OnSelectMenuChange);
+  document.getElementById('Save').addEventListener('click', OnSaveButtonClick);
+  document.getElementById('Remove').addEventListener('click', OnRemoveButtonClick);
+}
+
+function getStorageItems() {
+
+
+
+}
+
+function OnSelectMenuChange() {
+  ret = sendCommand("Change");
+  if (ret == 0) {return;}
+}
+
+function OnSaveButtonClick() {
+  // alert("OnSaveButtonClick");
+  ret = sendCommand("Save");
+  if (ret == 0) {return;}
 }
 
 function OnRemoveButtonClick() {
-    // alert("OnSaveButtonClick");
-    ret = OnButtonClick("Remove");
-    if (ret == 0) {return;}
-
+  // alert("OnSaveButtonClick");
+  ret = sendCommand("Remove");
+  if (ret == 0) {return;}
 }
 
-function OnButtonClick(command) {
-    // alert("OnSaveButtonClick");
-    var jstext = document.getElementById("cur_js").value;
-    if (!jstext) {
-        alert("No Scripts!");
-        return 0;
+function sendCommand(command) {
+
+  var jstext = document.getElementById("cur_js").value;
+  if (!jstext) {
+    alert("No Scripts!");
+    return 0;
+  }
+
+  chrome.runtime.sendMessage({command: [command], jstext: [jstext]},
+    function (response) {
+      var ret = response.allvalue;
+      console.log(ret);
     }
-    // savescript(jstext);
-    chrome.runtime.sendMessage({command: [command], jstext: [jstext]},
-        function (response) {
-            tabURL = response.navURL;
-            $("#tabURL").text(tabURL);
-        });
-    // alert("No return");
+  );
+  return ret;
 }
 
-function OnDeleteButtonClick() {
-    alert("OnDeleteButtonClick");
-}
-
-window.onload = function () {
-    document.getElementById('Save').addEventListener('click', OnSaveButtonClick);
-    document.getElementById('Remove').addEventListener('click', OnRemoveButtonClick);
-
-    let month = document.getElementById('month');
-    document.createElement('option')
-    for(let i = 1; i <= 12; i++){
-        let option = document.createElement('option');
-        option.setAttribute('value', i);
-        option.innerHTML = i + '月';
-        month.appendChild(option);
-    };
-
-    initalscript();
-
-    // alert("onload");
-};
-
-function savescript(jstext){
-    var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-    chrome.storage.local.set({[jstitle] : jstext}, function () {
-    });
-    chrome.storage.local.get([jstitle], function(items) {
-        // itemsの値は、例えば{'hoge': 'hogeValue'}のようになる。
-        alert(items[jstitle]);
-    });
-}
-
-function initalscript{
-
-    var jstext = `//test01
-    let's test01`
-    savescript(jstext);
-
-    var jstext = `//test02
-    let's test02`
-    savescript(jstext);
-
-}
