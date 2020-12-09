@@ -10,19 +10,18 @@ window.onload = function () {
 
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
-    let SelectItem = document.getElementById('Select');
-    option = document.createElement('option');
+    const SelectItem = document.getElementById('Select');
 
     for (var i in keys) {
       srckey = keys[i];
-      let option = document.createElement('option');
-      console.log(i, srckey);
-      if (srckey.charCodeAt(0) == 6){
-        document.getElementById("cur_js").value = items[srckey].replace(srckey + '\n', '');
+      console.log(i, srckey));
+      if (srckey == `current`) {
+        document.getElementById("cur_js").value = items[srckey];
       }
       else{
+        const option = document.createElement('option');
         option.setAttribute('value', srckey);
-        option.innerHTML = '<xmp>' + srckey + '</xmp>';
+        option.innerHTML = '<xmp>' + srckey.slice(1) + '</xmp>';
         SelectItem.appendChild(option);
       }
     }
@@ -33,10 +32,17 @@ window.onload = function () {
   document.getElementById('Remove').addEventListener('click', OnRemoveButtonClick);
 }
 
-function getStorageItems() {
+// 現在有効のjstextのkeyは、`current`とし、登録用のkeyは１文字目がキーボード入力が不可能なchr(6)とした。
+// それにより、現在有効とそれ以外を区別する。
+function saveCurrentjstext(jstext){
+  chrome.storage.sync.set({[`current`]: jstext}, function () {});
+}
 
-
-
+// slice(1)は、先頭のchr(6)を削除するために必要。
+function savejstext(jstext){
+  console.log(jstext);
+  var jstitle = jstext.slice(1).split(/\r\n|\r|\n/)[0];
+  chrome.storage.sync.set({[jstitle]: jstext}, function () {});
 }
 
 function OnSelectMenuChange() {
@@ -45,9 +51,17 @@ function OnSelectMenuChange() {
 }
 
 function OnSaveButtonClick() {
+  var jstext = document.getElementById("cur_js").value;
+  if (!jstext) {
+    alert("No Scripts!");
+    return 0;
+  }
+  saveCurrentjstext(jstext);
+  savejstext(jstext);
+  // console.log("saved '"+ srckey + "'");
   // alert("OnSaveButtonClick");
-  ret = sendCommand("Save");
-  if (ret == 0) {return;}
+  // ret = sendCommand("Save");
+  // if (ret == 0) {return;}
 }
 
 function OnRemoveButtonClick() {
@@ -55,6 +69,51 @@ function OnRemoveButtonClick() {
   ret = sendCommand("Remove");
   if (ret == 0) {return;}
 }
+
+function savejstext(jstext){
+  console.log(jstext);
+  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+  chrome.storage.sync.set({[jstitle]: jstext}, function () {});
+  // chrome.storage.sync.get([jstitle], function(items) {
+  //   console.log("get: " + items[jstitle]);
+  // });
+}
+/*// options.html からの指示を受け取る
+chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
+
+  var srcCommand = request.command
+  var srcValue = request.jstext;
+  var srckey = srcValue.split(/\r\n|\r|\n/)[0];
+
+  if (srcCommand == "Change") {
+    savejstext(String.fromCharCode(6)+`\n` + srcValue);
+    console.log("set curent : '"+ srckey + "'");
+  }
+
+  if (srcCommand == "Save") {
+  }
+
+  if (srcCommand == "Remove") {
+    chrome.storage.sync.remove(srckey, function() {
+      console.log("removed '" + srckey + "'");
+    });
+    // 最初の要素をデフォルトに設定する
+    chrome.storage.sync.get(null, function(items) {
+      firstKey = Object.keys(items)[0];
+      firstValue = items[firstKey];
+      savejstext(String.fromCharCode(6)+`\n` + firstValue );
+      console.log("set curent : '"+ firstKey + "'");
+    });
+  }
+
+  //一覧を戻す
+  chrome.storage.sync.get(null, function(items) {
+    sendResponse( {allvalue: [items]} );
+    // var allkeys = Object.keys(items);
+    // console.log(allkeys);
+  });
+
+})*/
 
 function sendCommand(command) {
 
@@ -72,4 +131,3 @@ function sendCommand(command) {
   );
   return ret;
 }
-
