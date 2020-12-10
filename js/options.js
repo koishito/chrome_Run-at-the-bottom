@@ -15,16 +15,25 @@ window.onload = function () {
     for (var i in keys) {
       srckey = keys[i];
       console.log(i, srckey);
-      if (srckey == `current`) {
-        document.getElementById("cur_js").value = items[srckey];
+      if (srckey == String.fromCharCode(189)) {
+        var curkey = items[srckey];
       }
-      else{
+    }
+
+    for (var i in keys) {
+      srckey = keys[i];
+      console.log(i, srckey);
+      if (srckey != String.fromCharCode(189)) {
         const option = document.createElement('option');
         option.setAttribute('value', srckey);
-        option.innerHTML = '<xmp>' + srckey.slice(1) + '</xmp>';
+        if (srckey == curkey) {
+        option.setAttribute('selected', srckey);
+        }
+        option.innerHTML = '<xmp>' + srckey + '</xmp>';
         SelectItem.appendChild(option);
       }
     }
+    SelectItem.value = curkey;
   });
 
   document.getElementById('Select').addEventListener('change', OnSelectMenuChange);
@@ -32,15 +41,15 @@ window.onload = function () {
   document.getElementById('Remove').addEventListener('click', OnRemoveButtonClick);
 }
 
-// 現在有効のjstextのkeyは、`current`とし、登録用のkeyは１文字目がキーボード入力が不可能なchr(6)とした。
-// それにより、現在有効とそれ以外を区別する。
+// 現在有効のjstextの key : value は、null : jstitleとした。
 function saveCurrentjstext(jstext){
-  chrome.storage.sync.set({[`current`]: jstext}, function () {});
+  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+  chrome.storage.sync.set({[String.fromCharCode(189)]: jstitle}, function () {});
 }
 
 function savejstext(jstext){
-  console.log(jstext);
-  var jstitle = String.fromCharCode(6) + jstext.split(/\r\n|\r|\n/)[0];
+  // console.log(jstext);
+  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
 }
 
@@ -50,6 +59,7 @@ function OnSelectMenuChange() {
 }
 
 function OnSaveButtonClick() {
+  alert("OnSaveButtonClick");
   var jstext = document.getElementById("cur_js").value;
   if (!jstext) {
     alert("No Scripts!");
@@ -69,14 +79,14 @@ function OnRemoveButtonClick() {
   if (ret == 0) {return;}
 }
 
-function savejstext(jstext){
-  console.log(jstext);
-  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-  chrome.storage.sync.set({[jstitle]: jstext}, function () {});
+// function savejstext(jstext){
+//   console.log(jstext);
+//   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+//   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
   // chrome.storage.sync.get([jstitle], function(items) {
   //   console.log("get: " + items[jstitle]);
   // });
-}
+// }
 /*// options.html からの指示を受け取る
 chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
 
@@ -129,4 +139,24 @@ function sendCommand(command) {
     }
   );
   return ret;
+}
+
+window.onscroll = function() {
+  const scrollHeight = Math.max(
+    document.body.scrollHeight, document.documentElement.scrollHeight,
+    document.body.offsetHeight, document.documentElement.offsetHeight,
+    document.body.clientHeight, document.documentElement.clientHeight
+  );
+  var scrollTop =
+  document.documentElement.scrollTop || // IE、Firefox、Opera
+  document.body.scrollTop;              // Chrome、Safari
+
+  console.log("scrollHeight : " + scrollHeight);
+  console.log("window.innerHeight : " + window.innerHeight);
+  console.log("bottom : " + (scrollHeight - window.innerHeight));
+  console.log("currrent : " + document.documentElement.scrollTop);
+  console.log("Difference : " + parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop));
+  if(parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop) == 0) {
+    alert("bottom");
+  };
 }

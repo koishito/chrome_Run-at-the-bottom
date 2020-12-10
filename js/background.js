@@ -1,13 +1,13 @@
 // 機能拡張のインストール・アップデート時に実行
 chrome.runtime.onInstalled.addListener(function (details) {
   console.log("onInstalled: " + details.reason);
-  // chrome.storage.sync.clear();
+  chrome.storage.sync.clear();
   // storageが空の場合に、jstextの初期値を設定
   chrome.storage.sync.get(null, function(items) {
     if (Object.keys(items).length === 0){
       var jstext1 = `//test01\n01`
       var jstext2 = `//test02\n02`
-      saveCurrentjstext(jstext1); //Default
+      saveCurrentjstext(jstext2); //Default
       savejstext(jstext1);
       savejstext(jstext2);
     }
@@ -15,12 +15,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
 });
 
 function saveCurrentjstext(jstext){
-  chrome.storage.sync.set({[`current`]: jstext}, function () {});
+  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+  chrome.storage.sync.set({[String.fromCharCode(189)]: jstitle}, function () {});
 }
 
 function savejstext(jstext){
-  console.log(jstext);
-  var jstitle = String.fromCharCode(6) + jstext.split(/\r\n|\r|\n/)[0];
+  // console.log(jstext);
+  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
 }
 
