@@ -13,25 +13,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
     }
   });
 
-  document.addEventListener('scroll',function() {
-    const scrollHeight = Math.max(
-      document.body.scrollHeight, document.documentElement.scrollHeight,
-      document.body.offsetHeight, document.documentElement.offsetHeight,
-      document.body.clientHeight, document.documentElement.clientHeight
-    );
-    var scrollTop =
-    document.documentElement.scrollTop || // IE、Firefox、Opera
-    document.body.scrollTop;              // Chrome、Safari
-  
-    console.log("scrollHeight : " + scrollHeight);
-    console.log("window.innerHeight : " + window.innerHeight);
-    console.log("bottom : " + (scrollHeight - window.innerHeight));
-    console.log("currrent : " + document.documentElement.scrollTop);
-    console.log("Difference : " + parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop));
-    if(parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop) == 0) {
-      alert("bottom");
-    };
-  }, {passive: true});
+
   
 });
 
