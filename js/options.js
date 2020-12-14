@@ -1,84 +1,125 @@
+const curkey = String.fromCharCode(189);
+
 window.onload = function () {
-  // let month = document.getElementById('month');
-  // document.createElement('option')
-  // for(let i = 1; i <= 12; i++){
-  //   let option = document.createElement('option');
-  //   option.setAttribute('value', i);
-  //   option.innerHTML = i + '月';
-  //   month.appendChild(option);
-  // };
 
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
-    const SelectItem = document.getElementById('Select');
-
+    // make items of listbox
+    var SelectItem = document.getElementById('select');
+    var curvalue = items[curkey]; //curvalue format is key format
+    console.log(curkey, curvalue);
     for (var i in keys) {
       srckey = keys[i];
-      console.log(i, srckey);
-      if (srckey == String.fromCharCode(189)) {
-        var curkey = items[srckey];
-      }
-    }
-
-    for (var i in keys) {
-      srckey = keys[i];
-      console.log(i, srckey);
-      if (srckey != String.fromCharCode(189)) {
-        const option = document.createElement('option');
+      if (srckey != curkey) {
+        var option = document.createElement('option');
         option.setAttribute('value', srckey);
-        if (srckey == curkey) {
+        if (srckey == curvalue) {
         option.setAttribute('selected', srckey);
         }
         option.innerHTML = '<xmp>' + srckey + '</xmp>';
         SelectItem.appendChild(option);
       }
     }
-    SelectItem.value = curkey;
+    // Paste current jstext
+    const textarea = document.getElementById('cur_js');
+    textarea.value = items[curvalue];
+
   });
 
-  document.getElementById('Select').addEventListener('change', OnSelectMenuChange);
-  document.getElementById('Save').addEventListener('click', OnSaveButtonClick);
-  document.getElementById('Remove').addEventListener('click', OnRemoveButtonClick);
+  document.getElementById('select').addEventListener('change', {command: 'select', handleEvent: onClick});
+  document.getElementById('save').addEventListener('click', {command: 'save', handleEvent: onClick});
+  document.getElementById('remove').addEventListener('click', {command: 'remove', handleEvent: onClick});
 
 }
 
 // 現在有効のjstextの key : value は、null : jstitleとした。
 function saveCurrentjstext(jstext){
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-  chrome.storage.sync.set({[String.fromCharCode(189)]: jstitle}, function () {});
+  chrome.storage.sync.set({[curkey]: jstitle}, function () {});
+  console.log("save as current '" + jstitle + "'");
+  var SelectItem = document.getElementById('select');
+  SelectItem.value = jstitle;
 }
 
 function savejstext(jstext){
-  // console.log(jstext);
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
+  console.log("save '" + jstitle + "'");
 }
 
-function OnSelectMenuChange() {
-  ret = sendCommand("Change");
-  if (ret == 0) {return;}
+function onClick() {
+  var command = this.command
+  chrome.storage.sync.get(null, function(items) {
+    var keys = Object.keys(items);
+    var SelectItem = document.getElementById('select');
+    var textarea = document.getElementById('cur_js');
+    var jstitle = SelectItem.value;
+
+    if (command == 'select') {
+      var jstext = items[jstitle];
+      textarea.value = jstext;
+      saveCurrentjstext(jstext);
+      console.log("select '" + jstitle + "'");
+
+    } else if (command == 'save') {
+      var jstext = textarea.value;
+      if (!jstext) {
+        alert("No Scripts!");
+      } else {
+        savejstext(jstext);
+        saveCurrentjstext(jstext);
+      }
+
+    } else if (command == 'remove') {
+      chrome.storage.sync.remove(jstitle, function() {
+        console.log("removed '" + jstitle + "'");
+      });
+      // current以外の最初の要素をcurrentに設定する
+      for (var i in keys) {
+        var jstitle = keys[i];
+        if (jstitle != curkey) {
+          var jstext = items[jstitle];
+          saveCurrentjstext(jstext);
+          console.log("select '" + jstitle + "'");
+          break;
+        }
+      }
+    }
+  });
 }
 
-function OnSaveButtonClick() {
-  alert("OnSaveButtonClick");
-  var jstext = document.getElementById("cur_js").value;
-  if (!jstext) {
-    alert("No Scripts!");
-    return 0;
-  }
-  saveCurrentjstext(jstext);
-  savejstext(jstext);
-  // console.log("saved '"+ srckey + "'");
-  // alert("OnSaveButtonClick");
-  // ret = sendCommand("Save");
-  // if (ret == 0) {return;}
-}
 
-function OnRemoveButtonClick() {
-  // alert("OnSaveButtonClick");
-  ret = sendCommand("Remove");
-  if (ret == 0) {return;}
-}
+
+
+
+// function OnSelectMenuChange() {
+//   const SelectItem = document.getElementById('Select');
+//   const textarea = document.getElementById('cur_js');
+//   textarea.value = items[SelectItem.value];
+// ret = sendCommand("Change");
+//   if (ret == 0) {return;}
+// }
+
+// function OnSaveButtonClick() {
+//   alert("OnSaveButtonClick");
+//   var jstext = document.getElementById("cur_js").value;
+//   if (!jstext) {
+//     alert("No Scripts!");
+//     return 0;
+//   }
+//   saveCurrentjstext(jstext);
+//   savejstext(jstext);
+//   // console.log("saved '"+ srckey + "'");
+//   // alert("OnSaveButtonClick");
+//   // ret = sendCommand("Save");
+//   // if (ret == 0) {return;}
+// }
+
+// function OnRemoveButtonClick() {
+//   // alert("OnSaveButtonClick");
+//   ret = sendCommand("Remove");
+//   if (ret == 0) {return;}
+// }
 
 // function savejstext(jstext){
 //   console.log(jstext);
@@ -125,22 +166,22 @@ chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
 
 })*/
 
-function sendCommand(command) {
+// function sendCommand(command) {
 
-  var jstext = document.getElementById("cur_js").value;
-  if (!jstext) {
-    alert("No Scripts!");
-    return 0;
-  }
+//   var jstext = document.getElementById("cur_js").value;
+//   if (!jstext) {
+//     alert("No Scripts!");
+//     return 0;
+//   }
 
-  chrome.runtime.sendMessage({command: [command], jstext: [jstext]},
-    function (response) {
-      var ret = response.allvalue;
-      console.log(ret);
-    }
-  );
-  return ret;
-}
+//   chrome.runtime.sendMessage({command: [command], jstext: [jstext]},
+//     function (response) {
+//       var ret = response.allvalue;
+//       console.log(ret);
+//     }
+//   );
+//   return ret;
+// }
 
 document.addEventListener('scroll',  function() {
   const scrollHeight = Math.max(
