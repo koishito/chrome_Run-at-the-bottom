@@ -32,7 +32,7 @@ window.onload = function () {
 
 }
 
-// 現在有効のjstextの key : value は、null : jstitleとした。
+// 現在有効のjstextの key : value は、String.fromCharCode(189) : jstitleとした。
 function saveCurrentjstext(jstext){
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
   chrome.storage.sync.set({[curkey]: jstitle}, function () {});
@@ -46,6 +46,58 @@ function savejstext(jstext){
   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
   console.log("save '" + jstitle + "'");
 }
+
+// From here, single function processing for each button
+function onSaveButtonClick() {
+  var textarea = document.getElementById('cur_js');
+  var jstext = textarea.value;
+  if (!jstext) {
+    alert("No Scripts!");
+  } else {
+    savejstext(jstext);
+    saveCurrentjstext(jstext);
+  }
+}
+
+function onSellectMenuChange() {
+  chrome.storage.sync.get(null, function(items) {
+    var keys = Object.keys(items);
+    var SelectItem = document.getElementById('select');
+    var textarea = document.getElementById('cur_js');
+    var jstitle = SelectItem.value;
+
+    var jstext = items[jstitle];
+    textarea.value = jstext;
+    saveCurrentjstext(jstext);
+    console.log("select '" + jstitle + "'");
+  });
+}
+
+function onRemoveButtonClick() {
+  var SelectItem = document.getElementById('select');
+  var jstitle = SelectItem.value;
+  chrome.storage.sync.remove(jstitle, function() {
+    console.log("removed '" + jstitle + "'");
+  });
+
+  chrome.storage.sync.get(null, function(items) {
+    var keys = Object.keys(items);
+    var textarea = document.getElementById('cur_js');
+
+    for (var i = 0; i < keys.length; i++) {
+      var jstitle = keys[i];
+      if (jstitle == curkey) {
+        var i = (i == 0) ? 1 : i - 1
+        var jstitle = keys[i];
+        var jstext = items[jstitle];
+        saveCurrentjstext(jstext);
+        console.log("select '" + jstitle + "'");
+        break;
+      }
+    }
+  });
+}
+// Up to this point, single function processing for each button
 
 function onClick() {
   var command = this.command
