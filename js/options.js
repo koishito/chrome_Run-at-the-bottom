@@ -1,7 +1,7 @@
 const curkey = String.fromCharCode(189);
 
 window.onload = function () {
-
+  console.log("onload");
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
     // When there is no element other than the current element, the remove button is disabled
