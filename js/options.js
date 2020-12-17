@@ -1,7 +1,7 @@
 const curkey = String.fromCharCode(189);
 
 window.onload = function () {
-
+  console.log("onload");
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
     // make items of listbox
