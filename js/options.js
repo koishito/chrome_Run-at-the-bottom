@@ -1,9 +1,16 @@
 const curkey = String.fromCharCode(189);
 
 window.onload = function () {
-  console.log("onload");
+
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
+    // When there is no element other than the current element, the remove button is disabled
+    const nodata = (keys.length == 1) ? true : false;
+    const select = document.getElementById("select");
+    select.disabled = nodata;
+    const button = document.getElementById("remove");
+    button.disabled = nodata;
+
     // make items of listbox
     var SelectItem = document.getElementById('select');
     var curvalue = items[curkey]; //curvalue format is key format
@@ -18,17 +25,17 @@ window.onload = function () {
         }
         option.innerHTML = '<xmp>' + srckey + '</xmp>';
         SelectItem.appendChild(option);
+        // Paste current jstext
+        const textarea = document.getElementById('cur_js');
+        textarea.value = items[curvalue];
       }
     }
-    // Paste current jstext
-    const textarea = document.getElementById('cur_js');
-    textarea.value = items[curvalue];
 
   });
 
-  document.getElementById('select').addEventListener('change', {command: 'select', handleEvent: onClick});
-  document.getElementById('save').addEventListener('click', {command: 'save', handleEvent: onClick});
-  document.getElementById('remove').addEventListener('click', {command: 'remove', handleEvent: onClick});
+  document.getElementById('select').addEventListener('change', onSellectMenuChange);
+  document.getElementById('save').addEventListener('click', onSaveButtonClick);
+  document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
 
 }
 
@@ -37,186 +44,68 @@ function saveCurrentjstext(jstext){
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
   chrome.storage.sync.set({[curkey]: jstitle}, function () {});
   console.log("save as current '" + jstitle + "'");
-  var SelectItem = document.getElementById('select');
-  SelectItem.value = jstitle;
-}
-
-function savejstext(jstext){
-  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-  chrome.storage.sync.set({[jstitle]: jstext}, function () {});
-  console.log("save '" + jstitle + "'");
-}
-
-// From here, single function processing for each button
-function onSaveButtonClick() {
-  var textarea = document.getElementById('cur_js');
-  var jstext = textarea.value;
-  if (!jstext) {
-    alert("No Scripts!");
-  } else {
-    savejstext(jstext);
-    saveCurrentjstext(jstext);
+  if (jstext.split(/\r\n|\r|\n/)[1] != undefined) {
+    chrome.storage.sync.set({[jstitle]: jstext}, function () {});
+    console.log("save '" + jstitle + "'");
+    var SelectItem = document.getElementById('select');
+    SelectItem.value = jstitle;
+    var textarea = document.getElementById('cur_js');
+    textarea.value = jstext;
   }
 }
 
+// function savejstext(jstext){
+//   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
+//   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
+//   console.log("save '" + jstitle + "'");
+// }
+
+// From here, single function processing for each button
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, function(items) {
-    var keys = Object.keys(items);
+    // var keys = Object.keys(items);
     var SelectItem = document.getElementById('select');
-    var textarea = document.getElementById('cur_js');
     var jstitle = SelectItem.value;
-
     var jstext = items[jstitle];
-    textarea.value = jstext;
+
     saveCurrentjstext(jstext);
     console.log("select '" + jstitle + "'");
   });
 }
 
-function onRemoveButtonClick() {
-  var SelectItem = document.getElementById('select');
-  var jstitle = SelectItem.value;
-  chrome.storage.sync.remove(jstitle, function() {
-    console.log("removed '" + jstitle + "'");
-  });
-
-  chrome.storage.sync.get(null, function(items) {
-    var keys = Object.keys(items);
-    var textarea = document.getElementById('cur_js');
-
-    for (var i = 0; i < keys.length; i++) {
-      var jstitle = keys[i];
-      if (jstitle == curkey) {
-        var i = (i == 0) ? 1 : i - 1
-        var jstitle = keys[i];
-        var jstext = items[jstitle];
-        saveCurrentjstext(jstext);
-        console.log("select '" + jstitle + "'");
-        break;
-      }
-    }
-  });
+function onSaveButtonClick() {
+  var textarea = document.getElementById('cur_js');
+  var jstext = textarea.value;
+  if (!jstext) {
+    alert("There is no script.");
+  } else {
+    // savejstext(jstext);
+    saveCurrentjstext(jstext);
+  }
 }
-// Up to this point, single function processing for each button
 
-function onClick() {
-  var command = this.command
+function onRemoveButtonClick() {
   chrome.storage.sync.get(null, function(items) {
-    var keys = Object.keys(items);
     var SelectItem = document.getElementById('select');
-    var textarea = document.getElementById('cur_js');
     var jstitle = SelectItem.value;
 
-    if (command == 'select') {
-      var jstext = items[jstitle];
-      textarea.value = jstext;
-      saveCurrentjstext(jstext);
-      console.log("select '" + jstitle + "'");
-
-    } else if (command == 'save') {
-      var jstext = textarea.value;
-      if (!jstext) {
-        alert("No Scripts!");
-      } else {
-        savejstext(jstext);
-        saveCurrentjstext(jstext);
-      }
-
-    } else if (command == 'remove') {
-      chrome.storage.sync.remove(jstitle, function() {
-        console.log("removed '" + jstitle + "'");
-      });
-      // current以外の最初の要素をcurrentに設定する
-      for (var i in keys) {
-        var jstitle = keys[i];
-        if (jstitle != curkey) {
-          var jstext = items[jstitle];
-          saveCurrentjstext(jstext);
-          console.log("select '" + jstitle + "'");
-          break;
+    var keys = Object.keys(items);
+    for (var i = 0; i < keys.length; i++) {
+      console.log(nextcurtext);
+      if (keys[i] == jstitle) {
+        for (var j = i + 1; i < keys.length; i++) {
+          var nextcurtext = ((nextcurtext == undefined) && (keys[j] != curkey)) ? items[keys[j]] : nextcurtext;
         }
+        break;
       }
+      var nextcurtext = (keys[i] == curkey) ? nextcurtext : items[keys[i]];
     }
+    chrome.storage.sync.remove(jstitle, function() {
+    console.log("removed '" + jstitle + "'");
+    });
+    saveCurrentjstext(nextcurtext);
   });
 }
-
-
-
-
-
-// function OnSelectMenuChange() {
-//   const SelectItem = document.getElementById('Select');
-//   const textarea = document.getElementById('cur_js');
-//   textarea.value = items[SelectItem.value];
-// ret = sendCommand("Change");
-//   if (ret == 0) {return;}
-// }
-
-// function OnSaveButtonClick() {
-//   alert("OnSaveButtonClick");
-//   var jstext = document.getElementById("cur_js").value;
-//   if (!jstext) {
-//     alert("No Scripts!");
-//     return 0;
-//   }
-//   saveCurrentjstext(jstext);
-//   savejstext(jstext);
-//   // console.log("saved '"+ srckey + "'");
-//   // alert("OnSaveButtonClick");
-//   // ret = sendCommand("Save");
-//   // if (ret == 0) {return;}
-// }
-
-// function OnRemoveButtonClick() {
-//   // alert("OnSaveButtonClick");
-//   ret = sendCommand("Remove");
-//   if (ret == 0) {return;}
-// }
-
-// function savejstext(jstext){
-//   console.log(jstext);
-//   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-//   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
-  // chrome.storage.sync.get([jstitle], function(items) {
-  //   console.log("get: " + items[jstitle]);
-  // });
-// }
-/*// options.html からの指示を受け取る
-chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
-
-  var srcCommand = request.command
-  var srcValue = request.jstext;
-  var srckey = srcValue.split(/\r\n|\r|\n/)[0];
-
-  if (srcCommand == "Change") {
-    savejstext(String.fromCharCode(6)+`\n` + srcValue);
-    console.log("set curent : '"+ srckey + "'");
-  }
-
-  if (srcCommand == "Save") {
-  }
-
-  if (srcCommand == "Remove") {
-    chrome.storage.sync.remove(srckey, function() {
-      console.log("removed '" + srckey + "'");
-    });
-    // 最初の要素をデフォルトに設定する
-    chrome.storage.sync.get(null, function(items) {
-      firstKey = Object.keys(items)[0];
-      firstValue = items[firstKey];
-      savejstext(String.fromCharCode(6)+`\n` + firstValue );
-      console.log("set curent : '"+ firstKey + "'");
-    });
-  }
-
-  //一覧を戻す
-  chrome.storage.sync.get(null, function(items) {
-    sendResponse( {allvalue: [items]} );
-    // var allkeys = Object.keys(items);
-    // console.log(allkeys);
-  });
-
-})*/
 
 // function sendCommand(command) {
 
