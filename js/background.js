@@ -5,7 +5,11 @@ chrome.runtime.onInstalled.addListener(function (details) {
   // storageが空の場合に、jstextの初期値を設定
   chrome.storage.sync.get(null, function(items) {
     if (Object.keys(items).length === 0){
-      var jstext1 = `//test01\n01`
+      var jstext1 = { 
+        name : `Excluded URL pattern`,
+        regPattUrl : `List below`,
+        script : `/^chrome:\/\/.+$//n/^.+google.+$/`
+      }
       var jstext2 = `//test02\n02`
       saveCurrentjstext(jstext2); //Default
       savejstext(jstext1);
@@ -16,6 +20,31 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
   
 });
+
+class storageProcess {
+
+
+
+  
+}
+
+(function(){
+  const regPattUrl = /^https:\/\/ncode.syosetu.com\/n\d{4}\u{2}\//;
+  const path = location.href.match(regPattUrl);
+  const linkText= `次へ >>`;
+  const dlinks = document.links;
+  const dlink = dlinks.find(dlink => dlink.textContent === linkText);
+  // document.links.forEach( function( dlinks ) {
+    console.log(dlink.textContent,(dlinks.textContent == linkText));
+    // if(('textContent' in dlinks ) && (dlinks.textContent == linkText) &&
+    //   (dlinks.href.match(regPattUrl) == path)) {
+    // // location.href = dlinks.href;
+    // }
+  // }
+})();
+
+
+
 
 function saveCurrentjstext(jstext){
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];

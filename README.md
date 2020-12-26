@@ -5,6 +5,16 @@ Register the JavaScript to be executed at the bottom of the page with the URL th
 - データ項目：呼称名、合致URLパターン、JavaScript CODE 
 - 禁止URLのパターンが登録できる
 
+
+
+
+### Version history
+- ver 0.2 : Specification change to operation specification method at URL pattern matching.
+- ver 0.1 : Single function selection method.
+
+
+
+
 以下、参考
 # DEMO
 

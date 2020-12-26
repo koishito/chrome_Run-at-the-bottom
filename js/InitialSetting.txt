@@ -1,0 +1,32 @@
+Excluded URL pattern
+List below
+/^chrome:\/\/.+$/
+/^.+google.+$/
+
+カクヨム's next article
+/^https:\/\/kakuyomu.jp\/works\/\d+\/episodes\//
+//(function(){
+//  const regPattUrl = /^https:\/\/kakuyomu.jp\/works\/\d+\/episodes\//;
+//  const path = location.href.match(regPattUrl)[0];
+  const id = 'contentMain-readNextEpisode';
+  const targetElement = document.getElementById(id);
+  if(('href' in targetElement ) && (targetElement.href.match(regPattUrl)[0] == path)) {
+    location.href = targetElement.href;
+  }
+//})();
+
+小説家になろう's next article
+/^https:\/\/ncode.syosetu.com\/n\d{4}\u{2}\//
+//(function(){
+//  const regPattUrl = /^https:\/\/ncode.syosetu.com\/n\d{4}\u{2}\//;
+//  const path = location.href.match(regPattUrl);
+  const linkText= `次へ >>`;
+  const dlinks = document.links;
+  for (var i = dlinks.length-1; i >= 0; i--){
+    console.log(dlinks[i].textContent,(dlinks[i].textContent == linkText));
+    if(('textContent' in dlinks[i] ) && (dlinks[i].textContent == linkText) &&
+      (dlinks[i].href.match(regPattUrl) == path)) {
+    location.href = dlinks[i].href;
+    }
+  }
+//})();
