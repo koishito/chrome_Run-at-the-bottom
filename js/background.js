@@ -1,24 +1,90 @@
+const splitter = String.fromCharCode(189);
+const excludedURLsName = ` Regular expression pattern for excluded URLs`;
+
+chrome.tabs.onActivated.addListener(function (activeInfo) {
+  // console.log(activeInfo.tabId);
+  chrome.storage.sync.get(null, function(items) {
+    var keys = Object.keys(items);
+    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+      var url = tabs[0].url;
+      console.log(url);
+      var excludedURLs = items[excludedURLsName].script.split(/\r\n|\r|\n/)
+      for (i = 0; i < excludedURLs.length; i++) {
+        var excludedURL = excludedURLs[i];
+        console.log(excludedURL, excludedURL.substr( 1, excludedURL.length - 2 ));
+        if (/.+/.test(excludedURL)) {
+          if (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url)) {
+            console.log(url + ` is match`)
+          }
+
+        }
+      }
+
+    });
+  });
+});
+
 // 機能拡張のインストール・アップデート時に実行
 chrome.runtime.onInstalled.addListener(function (details) {
   console.log("onInstalled: " + details.reason);
   chrome.storage.sync.clear();
   // storageが空の場合に、jstextの初期値を設定
   chrome.storage.sync.get(null, function(items) {
-    if (Object.keys(items).length === 0){
-      var jstext1 = { 
-        name : `Excluded URL pattern`,
-        regPattUrl : `List below`,
-        script : `/^chrome:\/\/.+$//n/^.+google.+$/`
-      }
-      var jstext2 = `//test02\n02`
-      saveCurrentjstext(jstext2); //Default
-      savejstext(jstext1);
-      savejstext(jstext2);
+    var keys = Object.keys(items);
+    if (keys.length === 0){
+      initialLoad();
     }
   });
 
+  function initialLoad() {
+    const arr = [
+      {
+        name : excludedURLsName,
+        regPattUrl : ``,
+        script : 
+`/^chrome.+$/
+/^.+google.+$/`
+      },
+      {
+        name : `カクヨム's next article`,
+        regPattUrl : `/^https:\\/\\/kakuyomu.jp\\/works\\/\d+\\/episodes\\//`,
+        script : 
+`//(function(){
+//  const regPattUrl = /^https:\\/\\/kakuyomu.jp\\/works\\/\d+\\/episodes\\//;
+//  const path = location.href.match(regPattUrl)[0];
+  const id = 'contentMain-readNextEpisode';
+  const targetElement = document.getElementById(id);
+  if(('href' in targetElement ) && (targetElement.href.match(regPattUrl)[0] == path)) {
+    location.href = targetElement.href;
+  }
+//})();`
+      },
+      {
+        name : `小説家になろう's next article`,
+        regPattUrl : `/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\\u{2}\\//`,
+        script : 
+`//(function(){
+//  const regPattUrl = /^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\\u{2}\\//;
+//  const path = location.href.match(regPattUrl);
+  const linkText= "次へ >>";
+  const dlinks = document.links;
+  for (var i = dlinks.length-1; i >= 0; i--){
+    console.log(dlinks[i].textContent,(dlinks[i].textContent == linkText));
+    if(('textContent' in dlinks[i] ) && (dlinks[i].textContent == linkText) &&
+      (dlinks[i].href.match(regPattUrl) == path)) {
+    location.href = dlinks[i].href;
+    }
+  }
+//})();`
+      }
+    ];
+    for (var i = 0; i < arr.length; i++) {
+      var json = {[arr[i].name]: {regPattUrl: arr[i].regPattUrl, script: arr[i].script}};
+      chrome.storage.sync.set(json, function () {});
+    }
+    chrome.storage.sync.get(null, function (data) { console.info(data) });
+  }
 
-  
 });
 
 class storageProcess {
@@ -27,24 +93,6 @@ class storageProcess {
 
   
 }
-
-(function(){
-  const regPattUrl = /^https:\/\/ncode.syosetu.com\/n\d{4}\u{2}\//;
-  const path = location.href.match(regPattUrl);
-  const linkText= `次へ >>`;
-  const dlinks = document.links;
-  const dlink = dlinks.find(dlink => dlink.textContent === linkText);
-  // document.links.forEach( function( dlinks ) {
-    console.log(dlink.textContent,(dlinks.textContent == linkText));
-    // if(('textContent' in dlinks ) && (dlinks.textContent == linkText) &&
-    //   (dlinks.href.match(regPattUrl) == path)) {
-    // // location.href = dlinks.href;
-    // }
-  // }
-})();
-
-
-
 
 function saveCurrentjstext(jstext){
   var jstitle = jstext.split(/\r\n|\r|\n/)[0];

@@ -1,43 +1,44 @@
-const curkey = String.fromCharCode(189);
+const splitter = String.fromCharCode(189);
+const excludedURLsName = ` Regular expression pattern for excluded URLs`;
 
 window.onload = function () {
-
+  // console.log(excludedURLsName);
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
+    console.log(keys);
     // When there is no element other than the current element, the remove button is disabled
-    const nodata = (keys.length == 1) ? true : false;
-    const select = document.getElementById("select");
-    select.disabled = nodata;
-    const button = document.getElementById("remove");
-    button.disabled = nodata;
+    // const select = document.getElementById("select");
+    // select.disabled = nodata;
+    // const button = document.getElementById("remove");
+    // button.disabled = nodata;
 
     // make items of listbox
     var SelectItem = document.getElementById('select');
-    var curvalue = items[curkey]; //curvalue format is key format
-    console.log(curkey, curvalue);
-    for (var i in keys) {
-      srckey = keys[i];
-      if (srckey != curkey) {
-        var option = document.createElement('option');
-        option.setAttribute('value', srckey);
-        if (srckey == curvalue) {
-        option.setAttribute('selected', srckey);
-        }
-        option.innerHTML = '<xmp>' + srckey + '</xmp>';
-        SelectItem.appendChild(option);
-        // Paste current jstext
-        const textarea = document.getElementById('cur_js');
-        textarea.value = items[curvalue];
-      }
+    // var curvalue = items[excludedURLsName]; //curvalue format is key format
+    for (var i = 0; i < keys.length; i++) {
+      // console.log(keys[i]);
+      // srckey = keys[key];
+      var option = document.createElement('option');
+      option.setAttribute('value', keys[i]);
+      option.innerHTML = '<xmp>' + keys[i] + '</xmp>';
+      // if (keys[i] == excludedURLsName) {
+      //   option.setAttribute('selected', keys[i]);
+      // }
+      SelectItem.appendChild(option);
     }
+    SelectItem.value = excludedURLsName;
+    // SelectItem.setAttribute('selected', excludedURLsName);
+
+    // Paste current jstext
+    onSellectMenuChange();
+    document.getElementById('select').addEventListener('change', onSellectMenuChange);
+    document.getElementById('save').addEventListener('click', onSaveButtonClick);
+    document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
 
   });
 
-  document.getElementById('select').addEventListener('change', onSellectMenuChange);
-  document.getElementById('save').addEventListener('click', onSaveButtonClick);
-  document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
+};
 
-}
 
 // 現在有効のjstextの key : value は、String.fromCharCode(189) : jstitleとした。
 function saveCurrentjstext(jstext){
@@ -64,12 +65,24 @@ function saveCurrentjstext(jstext){
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, function(items) {
     // var keys = Object.keys(items);
-    var SelectItem = document.getElementById('select');
-    var jstitle = SelectItem.value;
-    var jstext = items[jstitle];
 
-    saveCurrentjstext(jstext);
-    console.log("select '" + jstitle + "'");
+    var SelectItem = document.getElementById('select');
+    var item = items[SelectItem.value];
+    console.log("item : "+item);
+    const name = document.getElementById('name');
+    name.value = SelectItem.value;
+    const regPattUrl = document.getElementById('regPattUrl');
+    regPattUrl.value = item.regPattUrl;
+    console.log("item.regPattUrl : "+item.regPattUrl);
+    const script = document.getElementById('script');
+    script.value = item.script;
+    console.log("item.script : "+item.script);
+
+    // var jstitle = SelectItem.value;
+    // var jstext = items[jstitle];
+
+    // saveCurrentjstext(jstext);
+    // console.log("select '" + jstitle + "'");
   });
 }
 
