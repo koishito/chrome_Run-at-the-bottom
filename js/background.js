@@ -11,7 +11,6 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
       var excludedURLs = items[excludedURLsName].script.split(/\r\n|\r|\n/)
       for (i = 0; i < excludedURLs.length; i++) {
         var excludedURL = excludedURLs[i];
-        console.log(excludedURL, excludedURL.substr( 1, excludedURL.length - 2 ));
         if (/.+/.test(excludedURL)) {
           if (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url)) {
             console.log(url + ` is match`)
