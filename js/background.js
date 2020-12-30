@@ -1,5 +1,5 @@
-const splitter = String.fromCharCode(189);
-const excludedURLsName = ` Regular expression pattern for excluded URLs`;
+const curkey = String.fromCharCode(189);
+const excludedURLsName = `"Regular expression pattern for excluded URLs"`;
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   // console.log(activeInfo.tabId);
@@ -8,16 +8,36 @@ chrome.tabs.onActivated.addListener(function (activeInfo) {
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
       var url = tabs[0].url;
       console.log(url);
+      // Check Eexcluded URL
       var excludedURLs = items[excludedURLsName].script.split(/\r\n|\r|\n/)
+      var isEexcludedURL = "";
       for (i = 0; i < excludedURLs.length; i++) {
         var excludedURL = excludedURLs[i];
-        if (/.+/.test(excludedURL)) {
-          if (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url)) {
-            console.log(url + ` is match`)
-          }
-
-        }
+        if ((/\/.+\//.test(excludedURL)) && 
+          (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url))) { isEexcludedURL = url; break;}
       }
+      // Other than Eexcluded URL
+      if (!isEexcludedURL) {
+        var matchResult = "";
+        for (i = 0 ; i < keys.length; i++) {
+          var key = keys[i];
+          var item = items[key];
+          var curRegPattUrl = item.regPattUrl;
+          if ((key != curkey) && (key != excludedURLsName)) {
+            var regPattUrl =RegExp(curRegPattUrl.substr( 1, curRegPattUrl.length - 2 ));
+            var isMatch = regPattUrl.test(url);
+            if ((/\/.+\//.test(curRegPattUrl)) && (isMatch)) {
+              var matchResult = key;
+              console.log('matchResult :' + matchResult);
+              
+
+
+            }
+          }
+            // var matchResult =+ execOnMatch(items[keys[i]]) + '\n';
+        }
+        
+      } else { console.log(isEexcludedURL + " is Eexcluded URL.");}
 
     });
   });
@@ -46,10 +66,10 @@ chrome.runtime.onInstalled.addListener(function (details) {
       },
       {
         name : `カクヨム's next article`,
-        regPattUrl : `/^https:\\/\\/kakuyomu.jp\\/works\\/\d+\\/episodes\\//`,
+        regPattUrl : `/^https:\\/\\/kakuyomu.jp\\/works\\/\\d{19}\\/episodes\\//`,
         script : 
 `//(function(){
-//  const regPattUrl = /^https:\\/\\/kakuyomu.jp\\/works\\/\d+\\/episodes\\//;
+//  const regPattUrl = /^https:\\/\\/kakuyomu.jp\\/works\\/\\d{19}\\/episodes\\//;
 //  const path = location.href.match(regPattUrl)[0];
   const id = 'contentMain-readNextEpisode';
   const targetElement = document.getElementById(id);
@@ -60,23 +80,26 @@ chrome.runtime.onInstalled.addListener(function (details) {
       },
       {
         name : `小説家になろう's next article`,
-        regPattUrl : `/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\\u{2}\\//`,
+        regPattUrl : `/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//`,
         script : 
 `//(function(){
-//  const regPattUrl = /^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\\u{2}\\//;
+//  const regPattUrl = /^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//;
 //  const path = location.href.match(regPattUrl);
   const linkText= "次へ >>";
   const dlinks = document.links;
   for (var i = dlinks.length-1; i >= 0; i--){
     console.log(dlinks[i].textContent,(dlinks[i].textContent == linkText));
     if(('textContent' in dlinks[i] ) && (dlinks[i].textContent == linkText) &&
-      (dlinks[i].href.match(regPattUrl) == path)) {
+    (dlinks[i].href.match(regPattUrl) == path)) {
     location.href = dlinks[i].href;
     }
   }
 //})();`
       }
     ];
+
+    chrome.storage.sync.set({[curkey]: excludedURLsName}, function () {});
+
     for (var i = 0; i < arr.length; i++) {
       var json = {[arr[i].name]: {regPattUrl: arr[i].regPattUrl, script: arr[i].script}};
       chrome.storage.sync.set(json, function () {});
@@ -91,17 +114,6 @@ class storageProcess {
 
 
   
-}
-
-function saveCurrentjstext(jstext){
-  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-  chrome.storage.sync.set({[String.fromCharCode(189)]: jstitle}, function () {});
-}
-
-function savejstext(jstext){
-  // console.log(jstext);
-  var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-  chrome.storage.sync.set({[jstitle]: jstext}, function () {});
 }
 
 // 現時点でのruleをクリア(removeRules)して

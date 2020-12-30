@@ -1,31 +1,31 @@
 form{
-    width: 600px;
+    width: 700px;
     background-color: #eaeaea;
     padding:10px 20px;
     margin: 0 auto;
-    font-family: Sans-serif;
+    font-family: Verdana;
 }
 
 select{
-    width: 600px;
+    width: 700px;
     box-sizing:border-box;
-    font-family: Sans-serif;
+    font-family: Verdana;
 }
 
 input{
-    width: 600px;
+    width: 700px;
     box-sizing: border-box;
     ime-mode: inactive;
-    font-family: Sans-serif;
+    font-family: Verdana;
 }
 
 textarea{
     resize: vertical;
-    height: 200px;
-    width: 600px;
+    height: 250px;
+    width: 700px;
     box-sizing: border-box;
     ime-mode: inactive;
-    font-family: Sans-serif;
+    font-family: Verdana;
 }
 
 .button{
