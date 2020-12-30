@@ -3,17 +3,20 @@ form{
     background-color: #eaeaea;
     padding:10px 20px;
     margin: 0 auto;
+    font-family: Sans-serif;
 }
 
 select{
     width: 600px;
     box-sizing:border-box;
+    font-family: Sans-serif;
 }
 
 input{
     width: 600px;
     box-sizing: border-box;
     ime-mode: inactive;
+    font-family: Sans-serif;
 }
 
 textarea{
@@ -22,6 +25,7 @@ textarea{
     width: 600px;
     box-sizing: border-box;
     ime-mode: inactive;
+    font-family: Sans-serif;
 }
 
 .button{

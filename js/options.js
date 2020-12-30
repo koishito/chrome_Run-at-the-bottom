@@ -72,10 +72,10 @@ function onSellectMenuChange() {
     const name = document.getElementById('name');
     name.value = SelectItem.value;
     const regPattUrl = document.getElementById('regPattUrl');
-    regPattUrl.value = item.regPattUrl;
+    regPattUrl.value = item.regPattUrl.replace(/\\/g, '\\$&');
     console.log("item.regPattUrl : "+item.regPattUrl);
     const script = document.getElementById('script');
-    script.value = item.script;
+    script.value = item.script.replace(/\\/g, '\\$&');
     console.log("item.script : "+item.script);
 
     // var jstitle = SelectItem.value;
