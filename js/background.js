@@ -1,113 +1,182 @@
 const curkey = String.fromCharCode(189);
-const excludedURLsName = `"Regular expression pattern for excluded URLs"`;
+const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
+const ScriptTemplate = `"Script template"`;
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   // console.log(activeInfo.tabId);
-  chrome.storage.sync.get(null, function(items) {
-    var keys = Object.keys(items);
-    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-      var url = tabs[0].url;
-      console.log(url);
-      // Check Eexcluded URL
-      var excludedURLs = items[excludedURLsName].script.split(/\r\n|\r|\n/)
-      var isEexcludedURL = "";
-      for (i = 0; i < excludedURLs.length; i++) {
-        var excludedURL = excludedURLs[i];
-        if ((/\/.+\//.test(excludedURL)) && 
-          (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url))) { isEexcludedURL = url; break;}
-      }
-      // Other than Eexcluded URL
-      if (!isEexcludedURL) {
-        var matchResult = "";
-        for (i = 0 ; i < keys.length; i++) {
-          var key = keys[i];
-          var item = items[key];
-          var curRegPattUrl = item.regPattUrl;
-          if ((key != curkey) && (key != excludedURLsName)) {
-            var regPattUrl =RegExp(curRegPattUrl.substr( 1, curRegPattUrl.length - 2 ));
-            var isMatch = regPattUrl.test(url);
-            if ((/\/.+\//.test(curRegPattUrl)) && (isMatch)) {
-              var matchResult = key;
-              console.log('matchResult :' + matchResult);
-              
+  onActivatedTab();
+});
 
-
-            }
-          }
-            // var matchResult =+ execOnMatch(items[keys[i]]) + '\n';
-        }
-        
-      } else { console.log(isEexcludedURL + " is Eexcluded URL.");}
-
-    });
-  });
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if (changeInfo.status == "complete" && tab.active) {
+    onActivatedTab();
+  }
 });
 
 // 機能拡張のインストール・アップデート時に実行
 chrome.runtime.onInstalled.addListener(function (details) {
   console.log("onInstalled: " + details.reason);
   chrome.storage.sync.clear();
-  // storageが空の場合に、jstextの初期値を設定
+  onActivatedTab();
+
+});
+
+function onActivatedTab(){
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
+    // storageが空の場合に、jstextの初期値を設定
     if (keys.length === 0){
       initialLoad();
+      onActivatedTab();
+    } else {
+      chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+        var url = tabs[0].url;
+        console.log(url);
+        // Check Eexcluded URL
+        var excludedURLs = items[excludedURLsList].script.split(/\r\n|\r|\n/)
+        var isEexcludedURL = "";
+        for (i = 0; i < excludedURLs.length; i++) {
+          var excludedURL = excludedURLs[i];
+          if ((/\/.+\//.test(excludedURL)) && (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url)))
+            { isEexcludedURL =+ '\n' + excludedURL;}
+        }
+        // Other than Eexcluded URL
+        setIcon(`unset`, `Unmatched` );
+        if (!isEexcludedURL) {
+        var matchName = "";
+          for (i = 0 ; i < keys.length; i++) {
+            var key = keys[i];
+            var item = items[key];
+            var curRegPattUrl = item.regPattUrl;
+            if ((key != curkey) && (key != excludedURLsList) && (key != ScriptTemplate)) {
+              var regPattUrl =RegExp(curRegPattUrl.substr( 1, curRegPattUrl.length - 2 ));
+              var isMatch = regPattUrl.test(url);
+              if ((/\/.+\//.test(curRegPattUrl)) && (isMatch)) {
+                var matchName = key;
+                console.log('matchName :' + matchName);
+                var execScript = items[ScriptTemplate].script;
+                var execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curRegPattUrl);
+                var execScript = execScript.replace(/\*\*script\*\*/, item.script);
+                // console.log(`execScript : ` + execScript);
+                var response = executeScript(tabs[0].id, execScript);
+                var matchName =+ `\n` + key;
+              }
+            }
+          }
+          if (matchName != ``) {
+            setIcon(`set`, matchName.slice(1));
+          }
+
+        } else {
+          setIcon(`except`, isEexcludedURL.slice(1));
+        }
+      });
     }
   });
+}
 
-  function initialLoad() {
-    const arr = [
-      {
-        name : excludedURLsName,
-        regPattUrl : ``,
-        script : 
+function setIcon(BadgeText, Title) {
+  chrome.browserAction.setBadgeText({ text: BadgeText });
+  chrome.browserAction.setTitle({ title: Title });
+}
+
+function executeScript(tabId, execScript) {
+  chrome.tabs.executeScript(
+    tabId,
+    {
+      code: execScript,
+    },
+    function (response) {
+      // console.log(`typeof(response) :"` + typeof(response) + `"`);
+      // console.log(`response[0] :"` + response[0] + `"`);
+      // console.log(`response :"` + response + `"`);
+      // console.log(`response.toString() :"` + response.toString() + `"`);
+      // return response.toString();
+    }
+  );
+}
+
+
+function initialLoad() {
+  const arr = [
+    {
+      name : excludedURLsList,
+      regPattUrl : ``,
+      script : 
 `/^chrome.+$/
-/^.+google.+$/`
-      },
-      {
-        name : `カクヨム's next article`,
-        regPattUrl : `/^https:\\/\\/kakuyomu.jp\\/works\\/\\d{19}\\/episodes\\//`,
-        script : 
+/^.+google.+$/
+/^.+github.+$/`
+    },
+    {
+      name : ScriptTemplate,
+      regPattUrl : ``,
+      script : 
+`// The part enclosed in ** is replaced.
+(function(){
+document.addEventListener('scroll',  function() {
+  const scrollHeight = Math.max(
+    document.body.scrollHeight, document.documentElement.scrollHeight,
+    document.body.offsetHeight, document.documentElement.offsetHeight,
+    document.body.clientHeight, document.documentElement.clientHeight
+  );
+  var scrollTop =
+  document.documentElement.scrollTop || // IE、Firefox、Opera
+  document.body.scrollTop;              // Chrome、Safari
+
+  if(parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop) < 1) {
+    mainScript();
+  };
+});
+
+function mainScript() {
+  const regPattUrl = **regular expression pattern for url matching**;
+  const path = location.href.match(regPattUrl)[0];
+  **script**
+}
+})();`
+    },
+    {
+      name : `カクヨム's next article`,
+      regPattUrl : `/^https:\\/\\/kakuyomu.jp\\/works\\/\\d{19}\\/episodes\\//`,
+      script : 
 `//(function(){
 //  const regPattUrl = /^https:\\/\\/kakuyomu.jp\\/works\\/\\d{19}\\/episodes\\//;
 //  const path = location.href.match(regPattUrl)[0];
-  const id = 'contentMain-readNextEpisode';
-  const targetElement = document.getElementById(id);
-  if(('href' in targetElement ) && (targetElement.href.match(regPattUrl)[0] == path)) {
-    location.href = targetElement.href;
-  }
+const id = 'contentMain-readNextEpisode';
+const targetElement = document.getElementById(id);
+if(('href' in targetElement ) && (targetElement.href.match(regPattUrl)[0] == path)) {
+  location.href = targetElement.href;
+}
 //})();`
-      },
-      {
-        name : `小説家になろう's next article`,
-        regPattUrl : `/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//`,
-        script : 
+    },
+    {
+      name : `小説家になろう's next article`,
+      regPattUrl : `/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//`,
+      script : 
 `//(function(){
 //  const regPattUrl = /^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//;
 //  const path = location.href.match(regPattUrl);
-  const linkText= "次へ >>";
-  const dlinks = document.links;
-  for (var i = dlinks.length-1; i >= 0; i--){
-    console.log(dlinks[i].textContent,(dlinks[i].textContent == linkText));
-    if(('textContent' in dlinks[i] ) && (dlinks[i].textContent == linkText) &&
-    (dlinks[i].href.match(regPattUrl) == path)) {
-    location.href = dlinks[i].href;
-    }
+const linkText= "次へ >>";
+const dlinks = document.links;
+for (var i = dlinks.length-1; i >= 0; i--){
+  console.log(dlinks[i].textContent,(dlinks[i].textContent == linkText));
+  if(('textContent' in dlinks[i] ) && (dlinks[i].textContent == linkText) &&
+  (dlinks[i].href.match(regPattUrl) == path)) {
+  location.href = dlinks[i].href;
   }
+}
 //})();`
-      }
-    ];
-
-    chrome.storage.sync.set({[curkey]: excludedURLsName}, function () {});
-
-    for (var i = 0; i < arr.length; i++) {
-      var json = {[arr[i].name]: {regPattUrl: arr[i].regPattUrl, script: arr[i].script}};
-      chrome.storage.sync.set(json, function () {});
     }
-    chrome.storage.sync.get(null, function (data) { console.info(data) });
-  }
+  ];
 
-});
+  chrome.storage.sync.set({[curkey]: excludedURLsList}, function () {});
+
+  for (var i = 0; i < arr.length; i++) {
+    var json = {[arr[i].name]: {regPattUrl: arr[i].regPattUrl, script: arr[i].script}};
+    chrome.storage.sync.set(json, function () {});
+  }
+  chrome.storage.sync.get(null, function (data) { console.info(data) });
+}
 
 class storageProcess {
 

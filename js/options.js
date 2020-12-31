@@ -1,8 +1,9 @@
 const curkey = String.fromCharCode(189);
-const excludedURLsName = `"Regular expression pattern for excluded URLs"`;
+const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
+const ScriptTemplate = `"Script template"`;
 
 window.onload = function () {
-  // console.log(excludedURLsName);
+  // console.log(excludedURLsList);
   chrome.storage.sync.get(null, function(items) {
     const keys = Object.keys(items);
     console.log(keys);
@@ -30,68 +31,41 @@ window.onload = function () {
 
 };
 
-
-// 現在有効のjstextの key : value は、String.fromCharCode(189) : jstitleとした。
-// function saveCurrentjstext(jstext){
-//   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-//   chrome.storage.sync.set({[curkey]: jstitle}, function () {});
-//   console.log("save as current '" + jstitle + "'");
-//   if (jstext.split(/\r\n|\r|\n/)[1] != undefined) {
-//     chrome.storage.sync.set({[jstitle]: jstext}, function () {});
-//     console.log("save '" + jstitle + "'");
-//     var SelectItem = document.getElementById('select');
-//     SelectItem.value = jstitle;
-//     var textarea = document.getElementById('cur_js');
-//     textarea.value = jstext;
-//   }
-// }
-
-// function savejstext(jstext){
-//   var jstitle = jstext.split(/\r\n|\r|\n/)[0];
-//   chrome.storage.sync.set({[jstitle]: jstext}, function () {});
-//   console.log("save '" + jstitle + "'");
-// }
-
 // From here, single function processing for each button
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, function(items) {
     // var keys = Object.keys(items);
-    const SelectItem = document.getElementById('select');
-    const curvalue = SelectItem.value;
+    const curvalue = document.getElementById('select').value;
     const curitem = items[curvalue];
-    console.log("item : " + curitem);
-    const name = document.getElementById('name');
-    name.value = curvalue;
-    const regPattUrl = document.getElementById('regPattUrl');
-    regPattUrl.value = curitem.regPattUrl/*.replace(/\\/g, '\\$&')*/;
-    console.log("item.regPattUrl : "+curitem.regPattUrl);
-    const script = document.getElementById('script');
-    script.value = curitem.script/*.replace(/\\/g, '\\$&')*/;
-    console.log("item.script : " + curitem.script);
-
+    document.getElementById('name').value = curvalue;
+    document.getElementById('regPattUrl').value = curitem.regPattUrl/*.replace(/\\/g, '\\$&')*/;
+    document.getElementById('script').value = curitem.script/*.replace(/\\/g, '\\$&')*/;
     chrome.storage.sync.set({[curkey]: curvalue}, function () {console.log("set current '" + curvalue + "'")});
 
-    document.getElementById("remove").disabled = (curvalue == excludedURLsName);
+    document.getElementById("remove").disabled = 
+      ((curvalue == excludedURLsList) || (curvalue == ScriptTemplate));
 
   });
 }
 
 function onSaveButtonClick() {
-  const name = document.getElementById('name');
-  const namevalue = name.value;
-  const regPattUrl = document.getElementById('regPattUrl');
-  const script = document.getElementById('script');
-  const json = {[namevalue]: {regPattUrl: regPattUrl.value, script: script.value}};
-  chrome.storage.sync.set(json, function () {console.log("saved '" + namevalue + "'")});
-  chrome.storage.sync.set({[curkey]: namevalue}, function () {console.log("set current '" + namevalue + "'")});
-
+  const namevalue = document.getElementById('name').value;
+  const regPattUrlvalue = document.getElementById('regPattUrl').value;
+  const scriptvalue = document.getElementById('script').value;
+  if (namevalue == curkey) {
+    alert("This name cannot be used");
+  } else {
+    const json = {[namevalue]: {regPattUrl: regPattUrlvalue, script: scriptvalue}};
+    chrome.storage.sync.set(json, function () {console.log("saved '" + namevalue + "'")});
+    chrome.storage.sync.set({[curkey]: namevalue}, function () {console.log("set current '" + namevalue + "'")});
+  }
 }
 
 function onRemoveButtonClick() {
-  const name = document.getElementById('name');
-  const namevalue = name.value;
+  const namevalue = document.getElementById('name').value;
   chrome.storage.sync.remove(namevalue, function() {console.log("removed '" + namevalue + "'");});
-  chrome.storage.sync.set({[curkey]: excludedURLsName}, function () {console.log("set current '" + excludedURLsName + "'")});
+  chrome.storage.sync.set({[curkey]: excludedURLsList}, function () {console.log("set current '" + excludedURLsList + "'")});
+
 }
 
 // function sendCommand(command) {
