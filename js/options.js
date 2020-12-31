@@ -6,21 +6,19 @@ window.onload = function () {
   // console.log(excludedURLsList);
   chrome.storage.sync.get(null, function(items) {
     const keys = Object.keys(items);
-    console.log(keys);
+    // console.log(keys);
     // make items of listbox
     const SelectItem = document.getElementById('select');
     for (var i = 0; i < keys.length; i++) {
       var key = keys[i];
-      if (key == curkey) {
-        var curvalue = items[key];
-      } else {
+      if (key != curkey) {
         var option = document.createElement('option');
         option.setAttribute('value', key);
         option.innerHTML = '<xmp>' + key + '</xmp>';
         SelectItem.appendChild(option);
       }
     }
-    SelectItem.value = curvalue;
+    SelectItem.value = items[curkey];
 
     onSellectMenuChange();
     document.getElementById('select').addEventListener('change', onSellectMenuChange);
@@ -42,8 +40,9 @@ function onSellectMenuChange() {
     document.getElementById('script').value = curitem.script/*.replace(/\\/g, '\\$&')*/;
     chrome.storage.sync.set({[curkey]: curvalue}, function () {console.log("set current '" + curvalue + "'")});
 
-    document.getElementById("remove").disabled = 
-      ((curvalue == excludedURLsList) || (curvalue == ScriptTemplate));
+    const isSystemData = ((curvalue == excludedURLsList) || (curvalue == ScriptTemplate));
+    document.getElementById("name").disabled = isSystemData;
+    document.getElementById("remove").disabled = isSystemData;
 
   });
 }
@@ -85,22 +84,22 @@ function onRemoveButtonClick() {
 //   return ret;
 // }
 
-document.addEventListener('scroll',  function() {
-  const scrollHeight = Math.max(
-    document.body.scrollHeight, document.documentElement.scrollHeight,
-    document.body.offsetHeight, document.documentElement.offsetHeight,
-    document.body.clientHeight, document.documentElement.clientHeight
-  );
-  var scrollTop =
-  document.documentElement.scrollTop || // IE、Firefox、Opera
-  document.body.scrollTop;              // Chrome、Safari
+// document.addEventListener('scroll',  function() {
+//   const scrollHeight = Math.max(
+//     document.body.scrollHeight, document.documentElement.scrollHeight,
+//     document.body.offsetHeight, document.documentElement.offsetHeight,
+//     document.body.clientHeight, document.documentElement.clientHeight
+//   );
+//   var scrollTop =
+//   document.documentElement.scrollTop || // IE、Firefox、Opera
+//   document.body.scrollTop;              // Chrome、Safari
 
-  console.log("scrollHeight : " + scrollHeight);
-  console.log("window.innerHeight : " + window.innerHeight);
-  console.log("bottom : " + (scrollHeight - window.innerHeight));
-  console.log("currrent : " + document.documentElement.scrollTop);
-  console.log("Difference : " + parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop));
-  if(parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop) < 1) {
-    alert("bottom");
-  };
-});
+//   console.log("scrollHeight : " + scrollHeight);
+//   console.log("window.innerHeight : " + window.innerHeight);
+//   console.log("bottom : " + (scrollHeight - window.innerHeight));
+//   console.log("currrent : " + document.documentElement.scrollTop);
+//   console.log("Difference : " + parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop));
+//   if(parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop) < 1) {
+//     alert("bottom");
+//   };
+// });

@@ -21,6 +21,12 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 });
 
+// // 機能拡張の起動時に実行
+// chrome.runtime.onStartup.addListener(function () {
+//   console.log("onStartup");
+
+// });
+
 function onActivatedTab(){
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
@@ -43,7 +49,7 @@ function onActivatedTab(){
         // Other than Eexcluded URL
         setIcon(`unset`, `Unmatched` );
         if (!isEexcludedURL) {
-        var matchName = "";
+          var matchName = ``;
           for (i = 0 ; i < keys.length; i++) {
             var key = keys[i];
             var item = items[key];
@@ -52,18 +58,17 @@ function onActivatedTab(){
               var regPattUrl =RegExp(curRegPattUrl.substr( 1, curRegPattUrl.length - 2 ));
               var isMatch = regPattUrl.test(url);
               if ((/\/.+\//.test(curRegPattUrl)) && (isMatch)) {
-                var matchName = key;
-                console.log('matchName :' + matchName);
                 var execScript = items[ScriptTemplate].script;
                 var execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curRegPattUrl);
                 var execScript = execScript.replace(/\*\*script\*\*/, item.script);
                 // console.log(`execScript : ` + execScript);
                 var response = executeScript(tabs[0].id, execScript);
                 var matchName =+ `\n` + key;
+                console.log('matchName :' + matchName);
               }
             }
           }
-          if (matchName != ``) {
+          if (matchName) {
             setIcon(`set`, matchName.slice(1));
           }
 
@@ -178,72 +183,65 @@ for (var i = dlinks.length-1; i >= 0; i--){
   chrome.storage.sync.get(null, function (data) { console.info(data) });
 }
 
-class storageProcess {
+// class storageProcess {
 
 
 
   
-}
+// }
 
-// 現時点でのruleをクリア(removeRules)して
-chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-  // 新たなruleを追加する
-  chrome.declarativeContent.onPageChanged.addRules([{
-    conditions: [
-      // アクションを実行する条件
-      new chrome.declarativeContent.PageStateMatcher({
-        pageUrl: {schemes: ['https']}
-      })
-    ],
-    // 実行するアクション
-    actions: [
-      new chrome.declarativeContent.ShowPageAction()
-    ]
-  }]);
-});
+// // 現時点でのruleをクリア(removeRules)して
+// chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
+//   // 新たなruleを追加する
+//   chrome.declarativeContent.onPageChanged.addRules([{
+//     conditions: [
+//       // アクションを実行する条件
+//       new chrome.declarativeContent.PageStateMatcher({
+//         pageUrl: {schemes: ['https']}
+//       })
+//     ],
+//     // 実行するアクション
+//     actions: [
+//       new chrome.declarativeContent.ShowPageAction()
+//     ]
+//   }]);
+// });
 
-// 機能拡張の起動時に実行
-chrome.runtime.onStartup.addListener(function () {
-  console.log("onStartup");
+// // options.html からの指示を受け取る
+// chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
 
+//   var srcCommand = request.command
+//   var srcValue = request.jstext;
+//   var srckey = srcValue.split(/\r\n|\r|\n/)[0];
 
-});
+//   if (srcCommand == "Change") {
+//     savejstext(String.fromCharCode(6)+`\n` + srcValue);
+//     console.log("set curent : '"+ srckey + "'");
+//   }
 
-// options.html からの指示を受け取る
-chrome.runtime.onMessage.addListener( function(request,sender,sendResponse) {
+//   if (srcCommand == "Save") {
+//     savejstext(srcValue);
+//     console.log("saved '"+ srckey + "'");
+//   }
 
-  var srcCommand = request.command
-  var srcValue = request.jstext;
-  var srckey = srcValue.split(/\r\n|\r|\n/)[0];
+//   if (srcCommand == "Remove") {
+//     chrome.storage.sync.remove(srckey, function() {
+//       console.log("removed '" + srckey + "'");
+//     });
+//     // 最初の要素をデフォルトに設定する
+//     chrome.storage.sync.get(null, function(items) {
+//       firstKey = Object.keys(items)[0];
+//       firstValue = items[firstKey];
+//       savejstext(String.fromCharCode(6)+`\n` + firstValue );
+//       console.log("set curent : '"+ firstKey + "'");
+//     });
+//   }
 
-  if (srcCommand == "Change") {
-    savejstext(String.fromCharCode(6)+`\n` + srcValue);
-    console.log("set curent : '"+ srckey + "'");
-  }
+//   //一覧を戻す
+//   chrome.storage.sync.get(null, function(items) {
+//     sendResponse( {allvalue: [items]} );
+//     // var allkeys = Object.keys(items);
+//     // console.log(allkeys);
+//   });
 
-  if (srcCommand == "Save") {
-    savejstext(srcValue);
-    console.log("saved '"+ srckey + "'");
-  }
-
-  if (srcCommand == "Remove") {
-    chrome.storage.sync.remove(srckey, function() {
-      console.log("removed '" + srckey + "'");
-    });
-    // 最初の要素をデフォルトに設定する
-    chrome.storage.sync.get(null, function(items) {
-      firstKey = Object.keys(items)[0];
-      firstValue = items[firstKey];
-      savejstext(String.fromCharCode(6)+`\n` + firstValue );
-      console.log("set curent : '"+ firstKey + "'");
-    });
-  }
-
-  //一覧を戻す
-  chrome.storage.sync.get(null, function(items) {
-    sendResponse( {allvalue: [items]} );
-    // var allkeys = Object.keys(items);
-    // console.log(allkeys);
-  });
-
-})
+// })
