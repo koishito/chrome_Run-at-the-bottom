@@ -1,36 +1,26 @@
 // const curkey = String.fromCharCode(189);
-// const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
-// const ScriptTemplate = `"Script template"`;
+const excludedURLsList =  localStorage.getItem('excludedURLsList');
 
-  const background = chrome.extension.getBackgroundPage()
-  const globalObject = background.globalObject()
-  const excludedURLsList = globalObject.excludedURLsList;
-  const ScriptTemplate = globalObject.ScriptTemplate;
+chrome.storage.sync.get(null, function(items) {
+  const keys = Object.keys(items);
+  // console.log(keys);
+  // make items of listbox
+  const SelectItem = document.getElementById('select');
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var option = document.createElement('option');
+    option.setAttribute('value', key);
+    option.innerHTML = '<xmp>' + key + '</xmp>';
+    SelectItem.appendChild(option);
+  }
+  SelectItem.value = localStorage.getItem('curkey');
 
-// window.onload = function () {
-  // console.log(excludedURLsList);
-  chrome.storage.sync.get(null, function(items) {
-    const keys = Object.keys(items);
-    // console.log(keys);
-    // make items of listbox
-    const SelectItem = document.getElementById('select');
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      var option = document.createElement('option');
-      option.setAttribute('value', key);
-      option.innerHTML = '<xmp>' + key + '</xmp>';
-      SelectItem.appendChild(option);
-    }
-    SelectItem.value = localStorage.getItem('curkey');
+  onSellectMenuChange();
+  document.getElementById('select').addEventListener('change', onSellectMenuChange);
+  document.getElementById('save').addEventListener('click', onSaveButtonClick);
+  document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
 
-    onSellectMenuChange();
-    document.getElementById('select').addEventListener('change', onSellectMenuChange);
-    document.getElementById('save').addEventListener('click', onSaveButtonClick);
-    document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
-
-  });
-
-// };
+});
 
 // From here, single function processing for each button
 function onSellectMenuChange() {
@@ -44,7 +34,7 @@ function onSellectMenuChange() {
     localStorage.setItem('curkey', curvalue);
     console.log("set current '" + curvalue + "'");
 
-    const isSystemData = ((curvalue == excludedURLsList) || (curvalue == ScriptTemplate));
+    const isSystemData = (curvalue == excludedURLsList);
     document.getElementById("name").disabled = isSystemData;
     document.getElementById("remove").disabled = isSystemData;
 
