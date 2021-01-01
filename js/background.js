@@ -1,9 +1,9 @@
-const curkey = String.fromCharCode(189);
+// const curkey = String.fromCharCode(189);
 const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
 const ScriptTemplate = `"Script template"`;
 
 function globalObject() {
-  return {curkey, excludedURLsList, ScriptTemplate};
+  return {excludedURLsList, ScriptTemplate};
 }
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
@@ -60,7 +60,7 @@ function onActivatedTab(){
             var key = keys[i];
             var item = items[key];
             var curRegPattUrl = item.regPattUrl;
-            if ((key != curkey) && (key != excludedURLsList) && (key != ScriptTemplate)) {
+            if ((key != excludedURLsList) && (key != ScriptTemplate)) {
               var regPattUrl =RegExp(curRegPattUrl.substr( 1, curRegPattUrl.length - 2 ));
               var isMatch = regPattUrl.test(url);
               if ((/\/.+\//.test(curRegPattUrl)) && (isMatch)) {
@@ -180,8 +180,8 @@ for (var i = dlinks.length-1; i >= 0; i--){
     }
   ];
 
-  chrome.storage.sync.set({[curkey]: excludedURLsList}, function () {});
-
+  localStorage.setItem('curkey', excludedURLsList);
+  
   for (var i = 0; i < arr.length; i++) {
     var json = {[arr[i].name]: {regPattUrl: arr[i].regPattUrl, script: arr[i].script}};
     chrome.storage.sync.set(json, function () {});
