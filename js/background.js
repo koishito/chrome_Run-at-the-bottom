@@ -20,7 +20,9 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 // 機能拡張のインストール・アップデート時に実行
 chrome.runtime.onInstalled.addListener(function (details) {
   console.log("onInstalled: " + details.reason);
-  chrome.storage.sync.clear();
+  // if (details.reason = 'install') {
+    chrome.storage.sync.clear();
+  // }
   onActivatedTab();
 
 });

@@ -13,9 +13,6 @@
   chrome.storage.sync.get(null, function(items) {
     const keys = Object.keys(items);
     // console.log(keys);
-    console.log(curkey);
-    console.log(excludedURLsList);
-    console.log(ScriptTemplate);
     // make items of listbox
     const SelectItem = document.getElementById('select');
     for (var i = 0; i < keys.length; i++) {
