@@ -12,19 +12,25 @@ select{
     font-family: Verdana;
 }
 
-input{
+#name{
     width: 700px;
     box-sizing: border-box;
-    ime-mode: inactive;
     font-family: Verdana;
 }
 
-textarea{
+#regPattUrl{
     resize: vertical;
-    height: 250px;
+    height: 54px;
     width: 700px;
     box-sizing: border-box;
-    ime-mode: inactive;
+    font-family: Verdana;
+}
+
+#script{
+    resize: vertical;
+    height: 234px;
+    width: 700px;
+    box-sizing: border-box;
     font-family: Verdana;
 }
 

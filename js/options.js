@@ -1,12 +1,21 @@
-const curkey = String.fromCharCode(189);
-const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
-const ScriptTemplate = `"Script template"`;
+// const curkey = String.fromCharCode(189);
+// const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
+// const ScriptTemplate = `"Script template"`;
 
-window.onload = function () {
+  const background = chrome.extension.getBackgroundPage()
+  const globalObject = background.globalObject()
+  const curkey = globalObject.curkey;
+  const excludedURLsList = globalObject.excludedURLsList;
+  const ScriptTemplate = globalObject.ScriptTemplate;
+
+// window.onload = function () {
   // console.log(excludedURLsList);
   chrome.storage.sync.get(null, function(items) {
     const keys = Object.keys(items);
     // console.log(keys);
+    console.log(curkey);
+    console.log(excludedURLsList);
+    console.log(ScriptTemplate);
     // make items of listbox
     const SelectItem = document.getElementById('select');
     for (var i = 0; i < keys.length; i++) {
@@ -27,7 +36,7 @@ window.onload = function () {
 
   });
 
-};
+// };
 
 // From here, single function processing for each button
 function onSellectMenuChange() {

@@ -2,6 +2,10 @@ const curkey = String.fromCharCode(189);
 const excludedURLsList = `"Regular expression pattern list for excluded URLs"`;
 const ScriptTemplate = `"Script template"`;
 
+function globalObject() {
+  return {curkey, excludedURLsList, ScriptTemplate};
+}
+
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   // console.log(activeInfo.tabId);
   onActivatedTab();
@@ -36,15 +40,15 @@ function onActivatedTab(){
       onActivatedTab();
     } else {
       chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-        var url = tabs[0].url;
+        const url = tabs[0].url;
         console.log(url);
         // Check Eexcluded URL
-        var excludedURLs = items[excludedURLsList].script.split(/\r\n|\r|\n/)
+        const excludedURLs = items[excludedURLsList].script.split(/\r\n|\r|\n/)
         var isEexcludedURL = "";
         for (i = 0; i < excludedURLs.length; i++) {
           var excludedURL = excludedURLs[i];
           if ((/\/.+\//.test(excludedURL)) && (RegExp(excludedURL.substr( 1, excludedURL.length - 2 )).test(url)))
-            { isEexcludedURL =+ '\n' + excludedURL;}
+            { isEexcludedURL += '\n' + excludedURL;}
         }
         // Other than Eexcluded URL
         setIcon(`unset`, `Unmatched` );
@@ -59,11 +63,11 @@ function onActivatedTab(){
               var isMatch = regPattUrl.test(url);
               if ((/\/.+\//.test(curRegPattUrl)) && (isMatch)) {
                 var execScript = items[ScriptTemplate].script;
-                var execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curRegPattUrl);
-                var execScript = execScript.replace(/\*\*script\*\*/, item.script);
+                execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curRegPattUrl);
+                execScript = execScript.replace(/\*\*script\*\*/, item.script);
                 // console.log(`execScript : ` + execScript);
                 var response = executeScript(tabs[0].id, execScript);
-                var matchName =+ `\n` + key;
+                matchName += `\n` + key;
                 console.log('matchName :' + matchName);
               }
             }
@@ -183,12 +187,6 @@ for (var i = dlinks.length-1; i >= 0; i--){
   chrome.storage.sync.get(null, function (data) { console.info(data) });
 }
 
-// class storageProcess {
-
-
-
-  
-// }
 
 // // 現時点でのruleをクリア(removeRules)して
 // chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
