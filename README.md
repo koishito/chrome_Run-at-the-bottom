@@ -5,9 +5,9 @@ Register the JavaScript to be executed at the bottom of the page with the URL th
 - データ項目：呼称名、合致URLパターン、JavaScript CODE 
 - 禁止URLのパターンが登録できる
 - ~~正規表現パターンを文字列で運用するには、出力時に**replace(/\\/g, '\\$&')**にて、**\\**を補完しておく。~~
+- データ格納を個別storageへの格納から、json形式にまとめてstorageへ格納に変更。
 
 
-*
 
 ### Version history
 - ver 0.2 : Specification change to operation specification method at URL pattern matching.
