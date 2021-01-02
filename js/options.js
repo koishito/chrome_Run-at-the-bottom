@@ -1,12 +1,12 @@
 // const curkey = String.fromCharCode(189);
-const excludedURLsList =  localStorage.getItem('excludedURLsList');
+const systemDataKey =  localStorage.getItem('systemDataKey');
 
 chrome.storage.sync.get(null, function(items) {
   const keys = Object.keys(items);
   // console.log(keys);
   // make items of listbox
   const SelectItem = document.getElementById('select');
-  for (var i = 0; i < keys.length; i++) {
+  for (let i = 0; i < keys.length; i++) {
     var key = keys[i];
     var option = document.createElement('option');
     option.setAttribute('value', key);
@@ -26,26 +26,27 @@ chrome.storage.sync.get(null, function(items) {
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, function(items) {
     // var keys = Object.keys(items);
-    const curvalue = document.getElementById('select').value;
-    const curitem = items[curvalue];
-    document.getElementById('name').value = curvalue;
-    document.getElementById('regPattUrl').value = curitem.regPattUrl/*.replace(/\\/g, '\\$&')*/;
+    const curkey = document.getElementById('select').value;
+    const curitem = items[curkey];
+    document.getElementById('name').value = curkey;
+    document.getElementById('regPattForURL').value = curitem.regPattForURL/*.replace(/\\/g, '\\$&')*/;
     document.getElementById('script').value = curitem.script/*.replace(/\\/g, '\\$&')*/;
-    localStorage.setItem('curkey', curvalue);
-    console.log("set current '" + curvalue + "'");
+    localStorage.setItem('curkey', curkey);
+    console.log("set current '" + curkey + "'");
 
-    const isSystemData = (curvalue == excludedURLsList);
+    const isSystemData = (curkey == systemDataKey);
     document.getElementById("name").disabled = isSystemData;
     document.getElementById("remove").disabled = isSystemData;
 
   });
+
 }
 
 function onSaveButtonClick() {
   const namevalue = document.getElementById('name').value;
-  const regPattUrlvalue = document.getElementById('regPattUrl').value;
+  const regPattForURLvalue = document.getElementById('regPattForURL').value;
   const scriptvalue = document.getElementById('script').value;
-  const json = {[namevalue]: {regPattUrl: regPattUrlvalue, script: scriptvalue}};
+  const json = {[namevalue]: {regPattForURL: regPattForURLvalue, script: scriptvalue}};
   chrome.storage.sync.set(json, function () {console.log("saved '" + namevalue + "'")});
   localStorage.setItem('curkey', namevalue);
   console.log("set current '" + namevalue + "'");
@@ -55,44 +56,7 @@ function onSaveButtonClick() {
 function onRemoveButtonClick() {
   const namevalue = document.getElementById('name').value;
   chrome.storage.sync.remove(namevalue, function() {console.log("removed '" + namevalue + "'");});
-  localStorage.setItem('curkey', excludedURLsList);
-  console.log("set current '" + excludedURLsList + "'");
+  localStorage.setItem('curkey', systemDataKey);
+  console.log("set current '" + systemDataKey + "'");
 
 }
-
-// function sendCommand(command) {
-
-//   var jstext = document.getElementById("cur_js").value;
-//   if (!jstext) {
-//     alert("No Scripts!");
-//     return 0;
-//   }
-
-//   chrome.runtime.sendMessage({command: [command], jstext: [jstext]},
-//     function (response) {
-//       var ret = response.allvalue;
-//       console.log(ret);
-//     }
-//   );
-//   return ret;
-// }
-
-// document.addEventListener('scroll',  function() {
-//   const scrollHeight = Math.max(
-//     document.body.scrollHeight, document.documentElement.scrollHeight,
-//     document.body.offsetHeight, document.documentElement.offsetHeight,
-//     document.body.clientHeight, document.documentElement.clientHeight
-//   );
-//   var scrollTop =
-//   document.documentElement.scrollTop || // IE、Firefox、Opera
-//   document.body.scrollTop;              // Chrome、Safari
-
-//   console.log("scrollHeight : " + scrollHeight);
-//   console.log("window.innerHeight : " + window.innerHeight);
-//   console.log("bottom : " + (scrollHeight - window.innerHeight));
-//   console.log("currrent : " + document.documentElement.scrollTop);
-//   console.log("Difference : " + parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop));
-//   if(parseInt(scrollHeight - window.innerHeight - document.documentElement.scrollTop) < 1) {
-//     alert("bottom");
-//   };
-// });

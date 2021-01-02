@@ -1,15 +1,14 @@
 // const curkey = String.fromCharCode(189);
-const excludedURLsList = `"System data : excluded URLs & Script template"`;
-localStorage.setItem('excludedURLsList', excludedURLsList);
+const systemDataKey = `"System data : excluded URLs & Script template"`;
 
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   // console.log(activeInfo.tabId);
-  onActivatedTab();
+  onChangedActiveTab();
 });
 
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status == "complete" && tab.active) {
-    onActivatedTab();
+    onChangedActiveTab();
   }
 });
 
@@ -19,7 +18,7 @@ chrome.runtime.onInstalled.addListener(function (details) {
   // if (details.reason = 'install') {
     chrome.storage.sync.clear();
   // }
-  onActivatedTab();
+  onChangedActiveTab();
 
 });
 
@@ -29,13 +28,13 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 // });
 
-function onActivatedTab(){
+function onChangedActiveTab(){
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
     // storageが空の場合に、jstextの初期値を設定
     if (keys.length === 0){
       initialLoad();
-      onActivatedTab();
+      onChangedActiveTab();
     } else {
       chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         const tabId = tabs[0].id;
@@ -46,39 +45,39 @@ function onActivatedTab(){
         for (let i = 0 ; i < keys.length; i++) {
           var key = keys[i];
           var item = items[key];
-          var excludedURLs = item.regPattUrl.split(/\r\n|\r|\n/)
-          var inclmatchedURL = "";
-          for (let i = 0; i < excludedURLs.length; i++) {
-            var excludedURL = excludedURLs[i];
-            var matchUrl = url.match(RegExp(excludedURL.substr( 1, excludedURL.length - 2 )));
-            if ((/\/.+\//.test(excludedURL)) && (matchUrl)) {
-              inclmatchedURL += '\n' + excludedURL;
+          var regPattForURLArray = item.regPattForURL.split(/\r\n|\r|\n/)
+          var matchedRegPatts = "";
+          for (let i = 0; i < regPattForURLArray.length; i++) {
+            var regPattForURL = regPattForURLArray[i];
+            var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
+            if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {
+              matchedRegPatts += '\n' + regPattForURL;
             }
           }
-          item.match = (inclmatchedURL) ? `\n` + key + inclmatchedURL : ``;
+          item.match = (matchedRegPatts) ? `\n` + key + matchedRegPatts : ``;
         }
         // Processing based on the check result
-        var inclmatchedURL = "";
-        const excludedMatch = items[excludedURLsList].match;
+        const excludedMatch = items[systemDataKey].match;
         if (excludedMatch) {
           setIcon(`excpt`, excludedMatch.slice(1));
         } else {
+          var matchedRegPatts = "";
           for (let i = 0 ; i < keys.length; i++) {
             var key = keys[i];
             var item = items[key];
             var match = item.match;
-            if ((key != excludedURLsList) && (match)) {
-              inclmatchedURL += match;
-              var execScript = items[excludedURLsList].script;
-              var curRegPattUrl = item.regPattUrl.split(/\r\n|\r|\n/)[0];
-              execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curRegPattUrl);
+            if ((key != systemDataKey) && (match)) {
+              matchedRegPatts += match;
+              var execScript = items[systemDataKey].script;
+              var curregPattForURL = item.regPattForURL.split(/\r\n|\r|\n/)[0];
+              execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curregPattForURL);
               execScript = execScript.replace(/\*\*script\*\*/, item.script);
               // console.log(`execScript : ` + execScript);
               var response = executeScript(tabId, execScript);
             }
           }
-          if (inclmatchedURL) {
-            setIcon(`set`, inclmatchedURL.slice(1));
+          if (matchedRegPatts) {
+            setIcon(`set`, matchedRegPatts.slice(1));
           }
         }
       });
@@ -86,9 +85,9 @@ function onActivatedTab(){
   });
 }
 
-function setIcon(badgeText, title) {
+function setIcon(badgeText, toolTip) {
   chrome.browserAction.setBadgeText({ text: badgeText });
-  chrome.browserAction.setTitle({ title: title });
+  chrome.browserAction.setTitle({ title: toolTip });
 }
 
 function executeScript(tabId, execScript) {
@@ -111,8 +110,8 @@ function executeScript(tabId, execScript) {
 function initialLoad() {
   const arr = [
 {
-name : excludedURLsList,
-regPattUrl : 
+name : systemDataKey,
+regPattForURL : 
 `/^chrome.+$/
 /^.+google.+$/
 /^.+github.+$/`,
@@ -135,20 +134,20 @@ function onScroll() {
   });
 }
 
-const regPattUrl = **regular expression pattern for url matching**;
-const path = location.href.match(regPattUrl)[0];
+const regPattForURL = **regular expression pattern for url matching**;
+const matchedPartInURL = location.href.match(regPattForURL)[0];
 **script**
 })();`
 },
 {
-name : `カクヨム's next article`,
-regPattUrl : 
+name : `Open the link for the next article on カクヨム`,
+regPattForURL : 
 `/^https:\\/\\/kakuyomu.jp\\/works\\/\\d{19}\\/episodes\\//`,
 script : 
 `const id = 'contentMain-readNextEpisode';
 var nextArticle = '';
 const targetElement = document.getElementById(id);
-if(('href' in targetElement ) && (targetElement.href.match(regPattUrl)[0] == path)) {
+if(('href' in targetElement ) && (targetElement.href.match(regPattForURL)[0] == matchedPartInURL)) {
   nextArticle = targetElement.href;
   onScroll();
 }
@@ -158,19 +157,20 @@ function scriptAtBottom() {
 }`
 },
 {
-name : `「次」から始まる next article`,
-regPattUrl : 
+name : `Open the link for the next article starting with "次"`,
+regPattForURL : 
 `/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//`,
 script : 
-`const linkText= "次";
+`const linkTextStartingWith= "次";
 var nextArticle = '';
-console.log("path : " + path)
+console.log("matchedPartInURL : " + matchedPartInURL)
 const dlinks = document.links;
 for (var i = dlinks.length-1; i >= 0; i--){
-  console.log(dlinks[i].textContent, (('textContent' in dlinks[i] ) && (dlinks[i].textContent.indexOf(linkText) == 0)))
-  if(('textContent' in dlinks[i] ) && (dlinks[i].textContent.indexOf(linkText) == 0) &&
-    (dlinks[i].href.match(regPattUrl) == path)) {
-    nextArticle = dlinks[i].href;
+  var dlink = dlinks[i];
+  console.log(dlink.textContent, (('textContent' in dlink ) && (dlink.textContent.indexOf(linkTextStartingWith) == 0)))
+  if(('textContent' in dlink ) && (dlink.textContent.indexOf(linkTextStartingWith) == 0) &&
+    (dlink.href.match(regPattForURL) == matchedPartInURL)) {
+    nextArticle = dlink.href;
     onScroll();
     break;
   }
@@ -181,10 +181,12 @@ function scriptAtBottom() {
 }
   ];
 
-  localStorage.setItem('curkey', excludedURLsList);
+  localStorage.clear();
+  localStorage.setItem('systemDataKey', systemDataKey);
+  localStorage.setItem('curkey', systemDataKey);
   
-  for (var i = 0; i < arr.length; i++) {
-    var json = {[arr[i].name]: {regPattUrl: arr[i].regPattUrl, script: arr[i].script, match: ``}};
+  for (let i = 0; i < arr.length; i++) {
+    var json = {[arr[i].name]: {regPattForURL: arr[i].regPattForURL, script: arr[i].script, match: ``}};
     chrome.storage.sync.set(json, function () {});
   }
   chrome.storage.sync.get(null, function (data) { console.info(data) });
