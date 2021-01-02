@@ -16,7 +16,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 chrome.runtime.onInstalled.addListener(function (details) {
   console.log("onInstalled: " + details.reason);
   // if (details.reason = 'install') {
-    chrome.storage.sync.clear();
+    // chrome.storage.sync.clear();
   // }
   onChangedActiveTab();
 
@@ -39,7 +39,6 @@ function onChangedActiveTab(){
       chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         const tabId = tabs[0].id;
         const url = tabs[0].url;
-        console.log(url);
         setIcon(``, `Unmatched` );
         // Check URL
         for (let i = 0 ; i < keys.length; i++) {
@@ -50,6 +49,7 @@ function onChangedActiveTab(){
           for (let i = 0; i < regPattForURLArray.length; i++) {
             var regPattForURL = regPattForURLArray[i];
             var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
+            console.log(url, matchedURL);
             if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {
               matchedRegPatts += '\n' + regPattForURL;
             }
@@ -69,7 +69,7 @@ function onChangedActiveTab(){
             if ((key != systemDataKey) && (match)) {
               matchedRegPatts += match;
               var execScript = items[systemDataKey].script;
-              var curregPattForURL = item.regPattForURL.split(/\r\n|\r|\n/)[0];
+              var curregPattForURL = match.split(/\r\n|\r|\n/)[2]; //[0] is .[1] is name.
               execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curregPattForURL);
               execScript = execScript.replace(/\*\*script\*\*/, item.script);
               // console.log(`execScript : ` + execScript);
@@ -135,6 +135,7 @@ function onScroll() {
 }
 
 const regPattForURL = **regular expression pattern for url matching**;
+console.log(location.href.match(regPattForURL));
 const matchedPartInURL = location.href.match(regPattForURL)[0];
 **script**
 })();`
@@ -157,20 +158,48 @@ function scriptAtBottom() {
 }`
 },
 {
-name : `Open the link for the next article starting with "次"`,
+name : `Open the link for the next article starting with />|＞|next|次/`,
 regPattForURL : 
-`/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//`,
+`/^https:\\/\\/ncode.syosetu.com\\/n\\d{4}\[a-z]{2}\\//
+/^https:\\/\\/book.dmm.com\\/library\\//`,
 script : 
-`const linkTextStartingWith= "次";
+`const linkTextStartingWith= />|＞|next|次/;
 var nextArticle = '';
-console.log("matchedPartInURL : " + matchedPartInURL)
+console.log("matchedPartInURL : " + matchedPartInURL);
 const dlinks = document.links;
 for (var i = dlinks.length-1; i >= 0; i--){
   var dlink = dlinks[i];
-  console.log(dlink.textContent, (('textContent' in dlink ) && (dlink.textContent.indexOf(linkTextStartingWith) == 0)))
-  if(('textContent' in dlink ) && (dlink.textContent.indexOf(linkTextStartingWith) == 0) &&
-    (dlink.href.match(regPattForURL) == matchedPartInURL)) {
-    nextArticle = dlink.href;
+  var dlinkPath = dlink.href;
+  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
+  if(('textContent' in dlink ) && (dlink.textContent.search(linkTextStartingWith) == 0) &&
+    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
+    console.log("dlinkPath : " + dlinkPath);
+    nextArticle = dlinkPath;
+    onScroll();
+    break;
+  }
+}
+function scriptAtBottom() {
+  location.href = nextArticle;
+}`
+},
+{
+name : `surugayaHP next page`,
+regPattForURL : 
+`/^https:\\/\\/www.suruga-ya.jp\\/pcmypage\\/action_favorite_list\\/detail\\/\\d{5}\\?page=/`,
+script : 
+`const title= 'Go to next page';
+var nextArticle = '';
+console.log("matchedPartInURL : " + matchedPartInURL);
+const dlinks = document.links;
+for (var i = dlinks.length-1; i >= 0; i--){
+  var dlink = dlinks[i];
+  var dlinkPath = dlink.href;
+  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
+  if(('title' in dlink ) && (dlink.title.search(title) == 0) &&
+    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
+    console.log("dlinkPath : " + dlinkPath);
+    nextArticle = dlinkPath;
     onScroll();
     break;
   }
