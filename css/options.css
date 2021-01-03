@@ -42,3 +42,7 @@ select{
     display:inline-block;
     background-color: silver;
 }
+
+#ConvRegExp{
+    display:none;
+}

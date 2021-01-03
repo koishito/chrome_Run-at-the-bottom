@@ -46,8 +46,8 @@ function onChangedActiveTab(){
           var item = items[key];
           var regPattForURLArray = item.regPattForURL.split(/\r\n|\r|\n/)
           var matchedRegPatts = "";
-          for (let i = 0; i < regPattForURLArray.length; i++) {
-            var regPattForURL = regPattForURLArray[i];
+          for (let j = 0; j < regPattForURLArray.length; j++) {
+            var regPattForURL = regPattForURLArray[j];
             var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
             console.log(url, matchedURL);
             if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {

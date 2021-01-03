@@ -19,6 +19,7 @@ chrome.storage.sync.get(null, function(items) {
   document.getElementById('select').addEventListener('change', onSellectMenuChange);
   document.getElementById('save').addEventListener('click', onSaveButtonClick);
   document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
+  document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
 
 });
 
@@ -58,5 +59,50 @@ function onRemoveButtonClick() {
   chrome.storage.sync.remove(namevalue, function() {console.log("removed '" + namevalue + "'");});
   localStorage.setItem('curkey', systemDataKey);
   console.log("set current '" + systemDataKey + "'");
+
+}
+
+function onConvRegExpButtonClick() {
+  const regPattForURL = document.getElementById('regPattForURL');
+  var regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
+  var sourceURL = regPattForURLarr[regPattForURLarr.length - 1];
+  var targetURL = convURLtoRegExp(sourceURL);
+  regPattForURL.value += `\n` + targetURL;
+  onSaveButtonClick();
+}
+
+function convURLtoRegExp(sourceURL) {
+  /* var sourceURL = `https://www.suruga-ya.jp/pcmypage/action_favorite_list/detail/68366?page=1`;*/
+  var targetURL = sourceURL.match(/^https?:\/\/([\w-]+\.)([\w-]+\.)([\w-]+\/)/)[0];
+  sourceURL = sourceURL.replace(targetURL, ``);
+  targetURL = '/^' + targetURL.replace(/\//g,'\\\/');
+  
+  while (sourceURL) {
+    var alf = sourceURL.match(/^[A-Za-z_]+/);
+    var num = sourceURL.match(/^\d+/);
+    var zen = sourceURL.match(/\x01-\x7E/);
+    var sym = sourceURL.match(/^[\.\+\*\?\|\\\/\[\]\{\}\(\)=&%]/);
+    if (alf) {
+      targetURL += '[\\u\\l]{' + alf[0].length  +'}';
+      sourceURL = sourceURL.replace(alf[0], ``);
+    }
+    if (num) {
+      targetURL += '\\d{' + num[0].length  +'}';
+      sourceURL = sourceURL.replace(num[0], ``);
+    }
+    if (zen) {
+      targetURL += zen[0];
+      sourceURL = sourceURL.replace(zen[0], ``);
+    }
+    if (sym) {
+      targetURL += '\\' + sourceURL[0];
+      sourceURL = (sourceURL.length > 1) ? sourceURL.slice(1) : '';
+    }
+    if ((!alf) && (!num) && (!zen) && (!sym)) {break;}
+    // console.log(targetURL+' '+sourceURL);
+  }
+  targetURL += '/'
+  console.log(targetURL+' '+sourceURL);
+  return targetURL;
 
 }
