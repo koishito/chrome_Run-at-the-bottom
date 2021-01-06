@@ -184,31 +184,44 @@ function scriptAtBottom() {
 }`
 },
 {
-name : `surugayaHP next page`,
-regPattForURL : 
-`/^https:\\/\\/www.suruga-ya.jp\\/pcmypage\\/action_favorite_list\\/detail\\/\\d{5}\\?page=/`,
-script : 
-`const title= 'Go to next page';
-var nextArticle = '';
-console.log("matchedPartInURL : " + matchedPartInURL);
-const dlinks = document.links;
-for (var i = dlinks.length-1; i >= 0; i--){
-  var dlink = dlinks[i];
-  var dlinkPath = dlink.href;
-  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
-  if(('title' in dlink ) && (dlink.title.search(title) == 0) &&
-    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
-    console.log("dlinkPath : " + dlinkPath);
-    nextArticle = dlinkPath;
-    onScroll();
-    break;
+  name : `surugayaHP next page`,
+  regPattForURL : 
+  `/^https:\\/\\/www.suruga-ya.jp\\/pcmypage\\/action_favorite_list\\/detail\\/\\d{5}\\?page=/`,
+  script : 
+  `const title= 'Go to next page';
+  var nextArticle = '';
+  console.log("matchedPartInURL : " + matchedPartInURL);
+  const dlinks = document.links;
+  for (var i = dlinks.length-1; i >= 0; i--){
+    var dlink = dlinks[i];
+    var dlinkPath = dlink.href;
+    console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
+    if(('title' in dlink ) && (dlink.title.search(title) == 0) &&
+      (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
+      console.log("dlinkPath : " + dlinkPath);
+      nextArticle = dlinkPath;
+      onScroll();
+      break;
+    }
   }
-}
-function scriptAtBottom() {
-  location.href = nextArticle;
-}`
-}
-  ];
+  function scriptAtBottom() {
+    location.href = nextArticle;
+  }`
+  },
+  {
+    name : `このマンガがすごい Apply Arrow keys`,
+    regPattForURL : 
+    `/^https:\/\/tkj.jp\/ebook\/read\/cd\//`,
+    script : 
+    `document.body.addEventListener('keydown', event => {
+      if (event.key == 'ArrowLeft') {
+        document.getElementById("GestureLeft").children[0].click();
+      } else if (event.key == 'ArrowRight') {
+        document.getElementById("GestureRight").children[0].click();
+      }
+    });`
+    }
+        ];
 
   localStorage.clear();
   localStorage.setItem('systemDataKey', systemDataKey);
@@ -220,6 +233,21 @@ function scriptAtBottom() {
   }
   chrome.storage.sync.get(null, function (data) { console.info(data) });
 }
+
+document.body.addEventListener('keydown', event => {
+
+  if (event.key == 'ArrowLeft') {
+    document.getElementById("GestureLeft").children[0].click();
+  } else if (event.key == 'ArrowRight') {
+    document.getElementById("GestureRight").children[0].click();
+
+  }
+
+});
+
+
+
+
 
 // // 現時点でのruleをクリア(removeRules)して
 // chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
