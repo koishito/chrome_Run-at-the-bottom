@@ -1,11 +1,21 @@
 // const curkey = String.fromCharCode(189);
 const systemDataKey = `"System data : excluded URLs & Script template"`;
 
+
+// Fires when the active tab in a window changes.
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   // console.log(activeInfo.tabId);
   onChangedActiveTab();
 });
 
+// Fired when a tab is closed.
+chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+  // if (removeInfo.status == "complete" && tab.active) {
+    onChangedActiveTab();
+  // }
+});
+
+// Fired when a tab is updated.
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   if (changeInfo.status == "complete" && tab.active) {
     onChangedActiveTab();
