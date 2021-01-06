@@ -234,20 +234,6 @@ function scriptAtBottom() {
   chrome.storage.sync.get(null, function (data) { console.info(data) });
 }
 
-document.body.addEventListener('keydown', event => {
-
-  if (event.key == 'ArrowLeft') {
-    document.getElementById("GestureLeft").children[0].click();
-  } else if (event.key == 'ArrowRight') {
-    document.getElementById("GestureRight").children[0].click();
-
-  }
-
-});
-
-
-
-
 
 // // 現時点でのruleをクリア(removeRules)して
 // chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
