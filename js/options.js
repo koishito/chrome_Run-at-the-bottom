@@ -2,6 +2,7 @@
 const systemDataKey =  localStorage.getItem('systemDataKey');
 
 chrome.storage.sync.get(null, function(items) {
+  // console.log(JSON.stringify(items));
   const keys = Object.keys(items);
   // console.log(keys);
   // make items of listbox

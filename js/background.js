@@ -221,7 +221,7 @@ function scriptAtBottom() {
   {
     name : `このマンガがすごい Apply Arrow keys`,
     regPattForURL : 
-    `/^https:\/\/tkj.jp\/ebook\/read\/cd\//`,
+    `/^https:\\/\\/tkj.jp\\/ebook\\/read\\/cd\\//`,
     script : 
     `document.body.addEventListener('keydown', event => {
       if (event.key == 'ArrowLeft') {
@@ -244,6 +244,16 @@ function scriptAtBottom() {
   chrome.storage.sync.get(null, function (data) { console.info(data) });
 }
 
+// const dlinks = document.links;
+// for (var i = dlinks.length-1; i >= 0; i--){
+//   var dlink = dlinks[i];
+//   var dlinkTarget = dlink.target;
+//   console.log("dlink.target : " + dlink.target);
+//   if (dlinkTarget != `_blank`) {
+//     dlink.Target = '_blank';
+//     dlink.rel = 'noopener noreferrer';
+//   }
+// }
 
 // // 現時点でのruleをクリア(removeRules)して
 // chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
