@@ -44,5 +44,5 @@ select{
 }
 
 #ConvRegExp{
-    display:none;
+    visibility:hidden;
 }

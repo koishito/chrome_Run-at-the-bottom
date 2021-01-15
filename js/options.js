@@ -18,9 +18,12 @@ chrome.storage.sync.get(null, function(items) {
 
   onSellectMenuChange();
   document.getElementById('select').addEventListener('change', onSellectMenuChange);
+  document.getElementById('new').addEventListener('click', onNewButtonClick);
   document.getElementById('save').addEventListener('click', onSaveButtonClick);
   document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
-  document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
+  /*document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);*/
+  document.getElementById('import').addEventListener('click', onImportButtonClick);
+  document.getElementById('export').addEventListener('click', onExportButtonClick);
 
 });
 
@@ -39,8 +42,22 @@ function onSellectMenuChange() {
     const isSystemData = (curkey == systemDataKey);
     document.getElementById("name").disabled = isSystemData;
     document.getElementById("remove").disabled = isSystemData;
+    document.getElementById("import").disabled = !(isSystemData);
+    document.getElementById("export").disabled = !(isSystemData);
 
   });
+
+}
+
+function onNewButtonClick() {
+  document.getElementById("name").disabled = false;
+  document.getElementById("remove").disabled = true;
+
+  localStorage.setItem('curkey', null);
+  // document.getElementById("select").selectedIndex = -1;;
+  document.getElementById("name").value = "";
+  document.getElementById("regPattForURL").value = "";
+  document.getElementById("script").value = "";
 
 }
 
@@ -105,5 +122,48 @@ function convURLtoRegExp(sourceURL) {
   targetURL += '/'
   console.log(targetURL+' '+sourceURL);
   return targetURL;
+
+}
+
+function onImportButtonClick() {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.name="import";
+  input.accept=".json";
+  input.onchange = e => { 
+     var file = e.target.files[0];
+  }
+  
+  input.click();
+
+}
+
+function onExportButtonClick() {
+  // let link = document.createElement('a');
+  // link.setAttribute('href', 'data:.json;charset=utf-8,' + encodeURIComponent(export));
+  // link.setAttribute('download', filename);
+
+  // var input = document.createElement('input');
+  // input.type = 'file';
+  // input.name="import";
+  // input.accept=".json";
+  // input.onchange = e => { 
+    // var file = e.target.files[0];
+    chrome.storage.sync.get(null, function(items) {
+      // alert(JSON.parse(JSON.stringify(items)));
+      let blob = new Blob([JSON.stringify(items).replace(/\\/g, '\\\\')],{type:"text/plain"});
+      console.log("blob : " + blob);
+
+      let link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      // link.setAttribute('href', 'data:.json;charset=utf-8,');
+
+      link.download = "export.json";
+      link.click();
+    });
+  // }
+  // pom.click();
+
+  // input.click();
 
 }

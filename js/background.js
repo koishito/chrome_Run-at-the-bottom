@@ -123,7 +123,7 @@ function initialLoad() {
 name : systemDataKey,
 regPattForURL : 
 `/^chrome.+$/
-/^.+google.+$/
+/^.+(docs|translate|calendar|mail)\.google.+$/
 /^.+github.+$/`,
 script : 
 `// The part enclosed in ** is replaced.
@@ -194,44 +194,70 @@ function scriptAtBottom() {
 }`
 },
 {
-  name : `surugayaHP next page`,
-  regPattForURL : 
-  `/^https:\\/\\/www.suruga-ya.jp\\/pcmypage\\/action_favorite_list\\/detail\\/\\d{5}\\?page=/`,
-  script : 
-  `const title= 'Go to next page';
-  var nextArticle = '';
-  console.log("matchedPartInURL : " + matchedPartInURL);
-  const dlinks = document.links;
-  for (var i = dlinks.length-1; i >= 0; i--){
-    var dlink = dlinks[i];
-    var dlinkPath = dlink.href;
-    console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
-    if(('title' in dlink ) && (dlink.title.search(title) == 0) &&
-      (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
-      console.log("dlinkPath : " + dlinkPath);
-      nextArticle = dlinkPath;
-      onScroll();
-      break;
-    }
+name : `full screen`,
+regPattForURL : 
+`/^https:\/\/static\.ichijinsha\.co\.jp\/online\/u\/book\/zerosum\//
+/^https:\/\/pash\-up\.jp\/viewer\/viewer\.html\?cid\=/
+/^https:\/\/comic\-walker\.com\/viewer\//
+/^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
+/^https:\/\/www\.alphapolis\.co\.jp\/manga\/official\/\d{8,9}\//
+/^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
+/^https:\/\/seiga.nicovideo.jp\/watch\//
+/^https:\/\/viewer\.ganganonline\.com\/manga\//
+/^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\//`,
+script : 
+`document.documentElement.webkitRequestFullScreen();`
+},
+{
+name : `full screen for homepages such as comic-zenon`,
+regPattForURL : 
+`/^https:\/\/comic-zenon\.com\/episode\//
+/^https:\/\/pocket\.shonenmagazine\.com\/episode\//
+/^https:\/\/kuragebunch\.com\/episode\//
+/^https:\/\/comic\-gardo\.com\/episode\//
+/^https:\/\/comic\-days\.com\/episode\//`,
+script : 
+`document.body.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();`
+},
+{
+name : `surugayaHP next page`,
+regPattForURL : 
+`/^https:\\/\\/www.suruga-ya.jp\\/pcmypage\\/action_favorite_list\\/detail\\/\\d{5}\\?page=/`,
+script : 
+`const title= 'Go to next page';
+var nextArticle = '';
+console.log("matchedPartInURL : " + matchedPartInURL);
+const dlinks = document.links;
+for (var i = dlinks.length-1; i >= 0; i--){
+  var dlink = dlinks[i];
+  var dlinkPath = dlink.href;
+  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
+  if(('title' in dlink ) && (dlink.title.search(title) == 0) &&
+    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
+    console.log("dlinkPath : " + dlinkPath);
+    nextArticle = dlinkPath;
+    onScroll();
+    break;
   }
-  function scriptAtBottom() {
-    location.href = nextArticle;
-  }`
-  },
-  {
-    name : `このマンガがすごい Apply Arrow keys`,
-    regPattForURL : 
-    `/^https:\\/\\/tkj.jp\\/ebook\\/read\\/cd\\//`,
-    script : 
-    `document.body.addEventListener('keydown', event => {
-      if (event.key == 'ArrowLeft') {
-        document.getElementById("GestureLeft").children[0].click();
-      } else if (event.key == 'ArrowRight') {
-        document.getElementById("GestureRight").children[0].click();
-      }
-    });`
-    }
-        ];
+}
+function scriptAtBottom() {
+  location.href = nextArticle;
+}`
+},
+{
+name : `このマンガがすごい Apply Arrow keys`,
+regPattForURL : 
+`/^https:\\/\\/tkj.jp\\/ebook\\/read\\/cd\\//`,
+script : 
+`document.body.addEventListener('keydown', event => {
+  if (event.key == 'ArrowLeft') {
+    document.getElementById("GestureLeft").children[0].click();
+  } else if (event.key == 'ArrowRight') {
+    document.getElementById("GestureRight").children[0].click();
+  }
+});`
+}
+];
 
   localStorage.clear();
   localStorage.setItem('systemDataKey', systemDataKey);
