@@ -204,7 +204,8 @@ regPattForURL :
 /^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
 /^https:\/\/seiga.nicovideo.jp\/watch\//
 /^https:\/\/viewer\.ganganonline\.com\/manga\//
-/^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\//`,
+/^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\//
+/^https:\/\/kakuyomu\.jp\/works\/\d{19}\/episodes\/\d{19}/`,
 script : 
 `document.documentElement.webkitRequestFullScreen();`
 },
@@ -264,8 +265,8 @@ script :
   localStorage.setItem('curkey', systemDataKey);
   
   for (let i = 0; i < arr.length; i++) {
-    var json = {[arr[i].name]: {regPattForURL: arr[i].regPattForURL, script: arr[i].script, match: ``}};
-    chrome.storage.sync.set(json, function () {});
+    var obj = {[arr[i].name]: {regPattForURL: arr[i].regPattForURL, script: arr[i].script, match: ``}};
+    chrome.storage.sync.set(obj, function () {});
   }
   chrome.storage.sync.get(null, function (data) { console.info(data) });
 }
