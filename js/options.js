@@ -32,12 +32,15 @@ function onSellectMenuChange() {
   chrome.storage.sync.get(null, function(items) {
     // var keys = Object.keys(items);
     const curkey = document.getElementById('select').value;
-    const curitem = items[curkey];
-    document.getElementById('name').value = curkey;
-    document.getElementById('regPattForURL').value = curitem.regPattForURL/*.replace(/\\/g, '\\$&')*/;
-    document.getElementById('script').value = curitem.script/*.replace(/\\/g, '\\$&')*/;
-    localStorage.setItem('curkey', curkey);
-    console.log("set current '" + curkey + "'");
+    console.log('curkey : ' + curkey);
+    if (curkey.length > 0) {
+      const curitem = items[curkey];
+      document.getElementById('name').value = curkey;
+      document.getElementById('regPattForURL').value = curitem.regPattForURL/*.replace(/\\/g, '\\$&')*/;
+      document.getElementById('script').value = curitem.script/*.replace(/\\/g, '\\$&')*/;
+      localStorage.setItem('curkey', curkey);
+      console.log("set current '" + curkey + "'");
+    }
 
     const isSystemData = (curkey == systemDataKey);
     document.getElementById("name").disabled = isSystemData;
@@ -54,15 +57,15 @@ function onNewButtonClick() {
   document.getElementById("remove").disabled = true;
 
   localStorage.setItem('curkey', null);
-  // document.getElementById("select").selectedIndex = -1;;
   document.getElementById("name").value = "";
   document.getElementById("regPattForURL").value = "";
   document.getElementById("script").value = "";
-
+  
 }
 
 function onSaveButtonClick() {
-  const namevalue = document.getElementById('name').value;
+  let namevalue = document.getElementById('name').value;
+  if (namevalue.length == 0) {namevalue = new Date().toLocaleString()};
   const regPattForURLvalue = document.getElementById('regPattForURL').value;
   const scriptvalue = document.getElementById('script').value;
   const json = {[namevalue]: {regPattForURL: regPattForURLvalue, script: scriptvalue}};
