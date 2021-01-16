@@ -21,7 +21,7 @@ chrome.storage.sync.get(null, function(items) {
   document.getElementById('new').addEventListener('click', onNewButtonClick);
   document.getElementById('save').addEventListener('click', onSaveButtonClick);
   document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
-  /*document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);*/
+  document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
   document.getElementById('import').addEventListener('click', onImportButtonClick);
   document.getElementById('export').addEventListener('click', onExportButtonClick);
 
@@ -84,47 +84,65 @@ function onRemoveButtonClick() {
 }
 
 function onConvRegExpButtonClick() {
-  const regPattForURL = document.getElementById('regPattForURL');
+  let regPattForURL = document.getElementById('regPattForURL');
   var regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
   var sourceURL = regPattForURLarr[regPattForURLarr.length - 1];
   var targetURL = convURLtoRegExp(sourceURL);
-  regPattForURL.value += `\n` + targetURL;
+  regPattForURL.value += targetURL;
   onSaveButtonClick();
+
 }
 
 function convURLtoRegExp(sourceURL) {
   /* var sourceURL = `https://www.suruga-ya.jp/pcmypage/action_favorite_list/detail/68366?page=1`;*/
-  var targetURL = sourceURL.match(/^https?:\/\/([\w-]+\.)([\w-]+\.)([\w-]+\/)/)[0];
-  sourceURL = sourceURL.replace(targetURL, ``);
-  targetURL = '/^' + targetURL.replace(/\//g,'\\\/');
-  
-  while (sourceURL) {
-    var alf = sourceURL.match(/^[A-Za-z_]+/);
-    var num = sourceURL.match(/^\d+/);
-    var zen = sourceURL.match(/\x01-\x7E/);
-    var sym = sourceURL.match(/^[\.\+\*\?\|\\\/\[\]\{\}\(\)=&%]/);
-    if (alf) {
-      targetURL += '[\\u\\l]{' + alf[0].length  +'}';
-      sourceURL = sourceURL.replace(alf[0], ``);
+  if (/^\/\^/.test(sourceURL)) {return ''}
+  for (let singlestring of [...`\'".*+?^$-|/{}()[]`]) {
+    // console.log(singlestring, new RegExp('\\' + singlestring, "g") , '\\' + singlestring);
+    sourceURL = sourceURL.replace(new RegExp('\\' + singlestring, "g") , '\\' + singlestring);
+  };
+
+  let cnt = 0;
+  let targetURL = sourceURL;
+  for (let i = sourceURL.length - 1; i >= 0 ; i--) {
+    let isNumber = /[0-9]/.test(sourceURL[i]);
+    if (!(isNumber) && (cnt > 3)) {
+      targetURL = targetURL.replace(sourceURL.slice(i + 1 , i + 1 + cnt), `\\d\{` + cnt + `\}`);
+      cnt = 0;
     }
-    if (num) {
-      targetURL += '\\d{' + num[0].length  +'}';
-      sourceURL = sourceURL.replace(num[0], ``);
-    }
-    if (zen) {
-      targetURL += zen[0];
-      sourceURL = sourceURL.replace(zen[0], ``);
-    }
-    if (sym) {
-      targetURL += '\\' + sourceURL[0];
-      sourceURL = (sourceURL.length > 1) ? sourceURL.slice(1) : '';
-    }
-    if ((!alf) && (!num) && (!zen) && (!sym)) {break;}
-    // console.log(targetURL+' '+sourceURL);
+    if (isNumber) {cnt += 1;};
   }
-  targetURL += '/'
-  console.log(targetURL+' '+sourceURL);
-  return targetURL;
+
+  return '\r/^' + targetURL + '/';
+  // var targetURL = sourceURL.match(/^https?:\/\/([\w-]+\.)([\w-]+\.)([\w-]+\/)/)[0];
+  // sourceURL = sourceURL.replace(targetURL, ``);
+  // targetURL = '/^' + targetURL.replace(/\//g,'\\\/');
+  
+  // while (sourceURL) {
+  //   var alf = sourceURL.match(/^[A-Za-z_]+/);
+  //   var num = sourceURL.match(/^\d+/);
+  //   var zen = sourceURL.match(/\x01-\x7E/);
+  //   var sym = sourceURL.match(/^[\.\+\*\?\|\\\/\[\]\{\}\(\)=&%]/);
+  //   if (alf) {
+  //     targetURL += '[\\u\\l]{' + alf[0].length  +'}';
+  //     sourceURL = sourceURL.replace(alf[0], ``);
+  //   }
+  //   if (num) {
+  //     targetURL += '\\d{' + num[0].length  +'}';
+  //     sourceURL = sourceURL.replace(num[0], ``);
+  //   }
+  //   if (zen) {
+  //     targetURL += zen[0];
+  //     sourceURL = sourceURL.replace(zen[0], ``);
+  //   }
+  //   if (sym) {
+  //     targetURL += '\\' + sourceURL[0];
+  //     sourceURL = (sourceURL.length > 1) ? sourceURL.slice(1) : '';
+  //   }
+  //   if ((!alf) && (!num) && (!zen) && (!sym)) {break;}
+  //   // console.log(targetURL+' '+sourceURL);
+  // }
+  // targetURL += '/'
+  // console.log(targetURL+' '+sourceURL);
 
 }
 
