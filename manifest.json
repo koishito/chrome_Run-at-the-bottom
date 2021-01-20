@@ -6,6 +6,7 @@
           "storage",
           "unlimitedStorage",
           "tabs",
+          "notifications",
           "http://*/*",
           "https://*/*",
           "declarativeContent"

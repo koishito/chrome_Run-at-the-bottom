@@ -124,7 +124,8 @@ name : systemDataKey,
 regPattForURL : 
 `/^chrome.+$/
 /^.+(docs|translate|calendar|mail)\.google.+$/
-/^.+github.+$/`,
+/^.+github.+$/
+/^.+amazon.+$/`,
 script : 
 `// The part enclosed in ** is replaced.
 (function(){
@@ -205,7 +206,10 @@ regPattForURL :
 /^https:\/\/seiga.nicovideo.jp\/watch\//
 /^https:\/\/viewer\.ganganonline\.com\/manga\//
 /^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\//
-/^https:\/\/kakuyomu\.jp\/works\/\d{19}\/episodes\/\d{19}/`,
+/^https:\/\/kakuyomu\.jp\/works\/\d{19}\/episodes\/\d{19}/
+/^https:\/\/www\.mangabox\.me\/reader\/\d{5}\/episodes\/\d{5}\//
+/^https:\/\/comic\.pixiv\.net\/viewer\/stories\//
+/^https:\/\/gaugau\.futabanet\.jp\/common\/dld\/zip\//`,
 script : 
 `document.documentElement.webkitRequestFullScreen();`
 },

@@ -1,6 +1,24 @@
 // const curkey = String.fromCharCode(189);
 const systemDataKey =  localStorage.getItem('systemDataKey');
 
+const status = localStorage.getItem('status');
+// if (status == 'import') {
+//   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+//     localStorage.setItem('status', '');
+//     chrome.tabs.executeScript(tabs[0].id, {code: `document.documentElement.innerText`}, (result) => {
+//       if (chrome.runtime.lastError) {
+//           console.log(chrome.runtime.lastError.message);
+//       } else {
+//           alert(result);
+//       }
+//     });
+//   // var reader = new FileReader();
+//   // reader.readAsText(importTabURL);
+//   // reader.onload = function() {
+//   // alert(reader.result);
+//   });
+// };
+
 chrome.storage.sync.get(null, function(items) {
   // console.log(JSON.stringify(items));
   const keys = Object.keys(items);
@@ -27,6 +45,13 @@ chrome.storage.sync.get(null, function(items) {
 
 });
 
+chrome.tabs.query({currentWindow: true, active: true }, function (tabs) {
+  const tabUrl = tabs[0].url;
+  console.log(tabUrl, (/.+\.txt$/.test(tabUrl)));
+  document.getElementById("import").disabled = !(/.+\.txt$/.test(tabUrl));
+
+});
+
 // From here, single function processing for each button
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, function(items) {
@@ -45,15 +70,15 @@ function onSellectMenuChange() {
     const isSystemData = (curkey == systemDataKey);
     document.getElementById("name").disabled = isSystemData;
     document.getElementById("remove").disabled = isSystemData;
-    document.getElementById("import").disabled = !(isSystemData);
-    document.getElementById("export").disabled = !(isSystemData);
+    // document.getElementById("import").disabled = !(isSystemData);
+    // document.getElementById("export").disabled = !(isSystemData);
 
   });
 
 }
 
 function onNewButtonClick() {
-  localStorage.setItem('curkey', null);
+  localStorage.setItem('curkey', '');
   
   document.getElementById("name").disabled = false;
   document.getElementById("remove").disabled = true;
@@ -83,9 +108,9 @@ function onRemoveButtonClick() {
 function onConvRegExpButtonClick() {
   let regPattForURL = document.getElementById('regPattForURL');
   var regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
-  var sourceURL = regPattForURLarr[regPattForURLarr.length - 1];
+  var sourceURL = regPattForURLarr[0];
   var targetURL = convURLtoRegExp(sourceURL);
-  regPattForURL.value += targetURL;
+  regPattForURL.value = targetURL + regPattForURL.value;
   onSaveButtonClick();
 
 }
@@ -104,24 +129,45 @@ function convURLtoRegExp(sourceURL) {
     }
   }
 
-  return '\r/^' + sourceURL + '/';
+  return '/^' + sourceURL + '/\r';
 
 }
 
 function onImportButtonClick() {
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.name="import";
-  input.accept=".json";
-  input.onchange = e => { 
-     var file = e.target.files[0];
-  }
-  
-  input.click();
 
-}
+    localStorage.setItem('status', 'import');
+
+    // const tabId = tabs[0].id;
+    // const importText = innerText(tabId);
+    // alert("import text : " + importText[1]);
+
+    // async function innerText(tabId) {
+    //   await chrome.tabs.executeScript(targetTabId, {code: `document.documentElement.innerHTML`},(result) => {
+    //     if (chrome.runtime.lastError) {
+    //       console.error(chrome.runtime.lastError.message);
+    //   } else {
+    //       return result;
+    //   }
+    //   });
+
+    // }
+
+
+};
+
+
+
+
 
 function onExportButtonClick() {
+  const namevalue = document.getElementById('name').value;
+  const regPattForURLvalue = document.getElementById('regPattForURL').value;
+  const scriptvalue = document.getElementById('script').value;
+
+  if (isContainedReservedWord(namevalue, `name:`)) {alert(`Contains reserved words "name:"`); return;}
+  if (isContainedReservedWord(regPattForURLvalue, `regPattForURL:`)) {alert(`Contains reserved words "regPattForURL:"`); return;}
+  if (isContainedReservedWord(scriptvalue, `script:`)) {alert(`Contains reserved words "script:"`); return;}
+
   // let link = document.createElement('a');
   // link.setAttribute('href', 'data:.json;charset=utf-8,' + encodeURIComponent(export));
   // link.setAttribute('download', filename);
@@ -133,20 +179,48 @@ function onExportButtonClick() {
   // input.onchange = e => { 
     // var file = e.target.files[0];
     chrome.storage.sync.get(null, function(items) {
+      const keys = Object.keys(items);
+      // console.log(keys);
+      // make items of listbox
+
+      // const SelectItem = document.getElementById('select');
+      let text = "";
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        let item = items[key];
+        if (key != systemDataKey) {
+          text += "\rname:\r" + key;
+        }
+        text += "\rregPattForURL:\r" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
+        text += "\rscript:\r" + item.script;//.replace(/\\/g, /\\\\/);
+      }
+      text = text.slice(1);
+
       // alert(JSON.parse(JSON.stringify(items)));
-      let blob = new Blob([JSON.stringify(items).replace(/\\/g, '\\\\')],{type:"text/plain"});
-      console.log("blob : " + blob);
+      // let blob = new Blob([JSON.stringify(items).replace(/\\/g, '\\\\')],{type:"text/plain"});
+      let blob = new Blob([text],{type:"text/plain"});
+      // let blob = new Blob([items],{type:"application/octet-stream"});
+      // console.log("blob : " + blob);
 
       let link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       // link.setAttribute('href', 'data:.json;charset=utf-8,');
 
-      link.download = "export.json";
+      link.download = "export.txt";
       link.click();
+      // let obj = JSON.parse(JSON.stringify(items));
+      // alert(obj);
     });
   // }
   // pom.click();
 
   // input.click();
 
+}
+
+function isContainedReservedWord(MultipleLine, reservedWord) {
+  for (line of MultipleLine.split(/\r/)) {
+    if (line == reservedWord) {return true;}
+  }
+  return false;
 }
