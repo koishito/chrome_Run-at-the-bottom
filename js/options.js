@@ -2,55 +2,68 @@
 const systemDataKey =  localStorage.getItem('systemDataKey');
 
 const status = localStorage.getItem('status');
-// if (status == 'import') {
-//   chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-//     localStorage.setItem('status', '');
-//     chrome.tabs.executeScript(tabs[0].id, {code: `document.documentElement.innerText`}, (result) => {
-//       if (chrome.runtime.lastError) {
-//           console.log(chrome.runtime.lastError.message);
-//       } else {
-//           alert(result);
-//       }
-//     });
-//   // var reader = new FileReader();
-//   // reader.readAsText(importTabURL);
-//   // reader.onload = function() {
-//   // alert(reader.result);
-//   });
-// };
+if (status == 'import') {
+  localStorage.setItem('status', '');
+  window.onload = () =>{
+    document.getElementById("new").style.visibility = 'hidden';
+    document.getElementById("save").style.visibility = 'hidden';
+    document.getElementById("If").style.visibility = 'hidden';
+    document.getElementById("remove").style.visibility = 'hidden';
+    document.getElementById("ConvRegExp").style.visibility = 'hidden';
 
-chrome.storage.sync.get(null, function(items) {
-  // console.log(JSON.stringify(items));
-  const keys = Object.keys(items);
-  // console.log(keys);
-  // make items of listbox
-  const SelectItem = document.getElementById('select');
-  for (let i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    var option = document.createElement('option');
-    option.setAttribute('value', key);
-    option.innerHTML = '<xmp>' + key + '</xmp>';
-    SelectItem.appendChild(option);
+    document.getElementById('import').innerHTML = 'ok';
+    document.getElementById('export').innerHTML = 'cancel';
+    document.getElementById('import').addEventListener('click', onImportOkButtonClick);
+    document.getElementById('export').addEventListener('click', () => {});
+
+  };
+
+  function onImportOkButtonClick () {
+    alert('ok');
   }
-  SelectItem.value = localStorage.getItem('curkey');
-
-  onSellectMenuChange();
-  document.getElementById('select').addEventListener('change', onSellectMenuChange);
-  document.getElementById('new').addEventListener('click', onNewButtonClick);
-  document.getElementById('save').addEventListener('click', onSaveButtonClick);
-  document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
-  document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
-  document.getElementById('import').addEventListener('click', onImportButtonClick);
-  document.getElementById('export').addEventListener('click', onExportButtonClick);
-
-});
-
-chrome.tabs.query({currentWindow: true, active: true }, function (tabs) {
-  const tabUrl = tabs[0].url;
-  console.log(tabUrl, (/.+\.txt$/.test(tabUrl)));
-  document.getElementById("import").disabled = !(/.+\.txt$/.test(tabUrl));
-
-});
+  function onimportCancelButtonClick () {
+    alert('cancel');
+  }
+  //   chrome.tabs.executeScript(tabs[0].id, {code: `document.documentElement.innerText`}, (result) => {
+  //     if (chrome.runtime.lastError) {
+  //         console.log(chrome.runtime.lastError.message);
+  //     } else {
+  //         alert(result);
+  //     }
+  //   });
+  // var reader = new FileReader();
+  // reader.readAsText(importTabURL);
+  // reader.onload = function() {
+  // alert(reader.result);
+  // });
+  
+} else {
+  chrome.storage.sync.get(null, function(items) {
+    // console.log(JSON.stringify(items));
+    const keys = Object.keys(items);
+    // console.log(keys);
+    // make items of listbox
+    const SelectItem = document.getElementById('select');
+    for (let i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var option = document.createElement('option');
+      option.setAttribute('value', key);
+      option.innerHTML = '<xmp>' + key + '</xmp>';
+      SelectItem.appendChild(option);
+    }
+    SelectItem.value = localStorage.getItem('curkey');
+  
+    onSellectMenuChange();
+    document.getElementById('select').addEventListener('change', onSellectMenuChange);
+    document.getElementById('new').addEventListener('click', onNewButtonClick);
+    document.getElementById('save').addEventListener('click', onSaveButtonClick);
+    document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
+    document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
+    document.getElementById('import').addEventListener('click', onImportButtonClick);
+    document.getElementById('export').addEventListener('click', onExportButtonClick);
+  
+  });
+}
 
 // From here, single function processing for each button
 function onSellectMenuChange() {

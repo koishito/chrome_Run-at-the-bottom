@@ -11,6 +11,12 @@
           "https://*/*",
           "declarativeContent"
      ],
+     // "content_scripts": [
+     //      {
+     //        "matches": ["file://*.txt/"],
+     //        "js": ["js/content-script.js"]
+     //      }
+     //    ],
      "options_page": "html/options.html",
      "background": {
           "scripts": ["js/background.js"],
