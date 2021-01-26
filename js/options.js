@@ -5,6 +5,12 @@ const status = localStorage.getItem('status');
 if (status == 'import') {
   localStorage.setItem('status', '');
   window.onload = () =>{
+    document.getElementById('select').disabled = true;
+    document.getElementById("name").value = '** import mode **';
+    document.getElementById("name").disabled = true;
+    document.getElementById("regPattForURL").value = 'Enter import data in the script area.';
+    document.getElementById("regPattForURL").disabled = true;
+
     document.getElementById("new").style.visibility = 'hidden';
     document.getElementById("save").style.visibility = 'hidden';
     document.getElementById("If").style.visibility = 'hidden';
@@ -19,24 +25,22 @@ if (status == 'import') {
   };
 
   function onImportOkButtonClick () {
-    alert('ok');
+    chrome.storage.sync.clear();
+    const arr = document.getElementById('script').value.split(/name:\n/);
+    for (let item of arr) {
+      if (item != '') {
+        let itemarr = item.split(/regPattForURL:\n/);
+        let name = itemarr[0];
+        if (name == '') {name = systemDataKey;}
+        let regPattForURL = itemarr[1].split(/script:\n/)[0];
+        let script = itemarr[1].split(/script:\n/)[1];
+
+        var obj = {[name]: {regPattForURL: regPattForURL, script: script, match: ``}};
+        chrome.storage.sync.set(obj, function () {});
+      }
+    }
   }
-  function onimportCancelButtonClick () {
-    alert('cancel');
-  }
-  //   chrome.tabs.executeScript(tabs[0].id, {code: `document.documentElement.innerText`}, (result) => {
-  //     if (chrome.runtime.lastError) {
-  //         console.log(chrome.runtime.lastError.message);
-  //     } else {
-  //         alert(result);
-  //     }
-  //   });
-  // var reader = new FileReader();
-  // reader.readAsText(importTabURL);
-  // reader.onload = function() {
-  // alert(reader.result);
-  // });
-  
+
 } else {
   chrome.storage.sync.get(null, function(items) {
     // console.log(JSON.stringify(items));
