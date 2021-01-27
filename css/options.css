@@ -8,6 +8,7 @@ form{
 
 select{
     width: 700px;
+    height: 112px;
     box-sizing:border-box;
     font-family: Verdana;
 }

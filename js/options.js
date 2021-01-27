@@ -5,22 +5,26 @@ const status = localStorage.getItem('status');
 if (status == 'import') {
   localStorage.setItem('status', '');
   window.onload = () =>{
-    document.getElementById('select').disabled = true;
-    document.getElementById("name").value = '** import mode **';
-    document.getElementById("name").disabled = true;
-    document.getElementById("regPattForURL").value = 'Enter import data in the script area.';
-    document.getElementById("regPattForURL").disabled = true;
+    const SelectItem = document.getElementById('select');
+    for (let str of ['', '&emsp;** import mode **', ' ', `&emsp;enter export data in the 'script' area.`]) {
+      var option = document.createElement('option');
+      option.setAttribute('value', str);
+      option.innerHTML = str;
+      SelectItem.appendChild(option);
+    }
+    document.getElementById('name').disabled = true;
+    document.getElementById('regPattForURL').disabled = true;
 
-    document.getElementById("new").style.visibility = 'hidden';
-    document.getElementById("save").style.visibility = 'hidden';
-    document.getElementById("If").style.visibility = 'hidden';
-    document.getElementById("remove").style.visibility = 'hidden';
-    document.getElementById("ConvRegExp").style.visibility = 'hidden';
+    for (let id of ["new", "save", "If", "remove", "ConvRegExp"]) {
+      document.getElementById(id).style.visibility = 'hidden';
+    }
 
     document.getElementById('import').innerHTML = 'ok';
     document.getElementById('export').innerHTML = 'cancel';
     document.getElementById('import').addEventListener('click', onImportOkButtonClick);
     document.getElementById('export').addEventListener('click', () => {});
+
+    document.getElementById('script').focus();
 
   };
 
@@ -30,10 +34,11 @@ if (status == 'import') {
     for (let item of arr) {
       if (item != '') {
         let itemarr = item.split(/regPattForURL:\n/);
-        let name = itemarr[0];
+        let name = itemarr[0].trim();
         if (name == '') {name = systemDataKey;}
-        let regPattForURL = itemarr[1].split(/script:\n/)[0];
-        let script = itemarr[1].split(/script:\n/)[1];
+        let itemarr1 = itemarr[1].split(/script:\n/)
+        let regPattForURL = itemarr1[0].trim();
+        let script = itemarr1[1].trim();
 
         var obj = {[name]: {regPattForURL: regPattForURL, script: script, match: ``}};
         chrome.storage.sync.set(obj, function () {});
@@ -85,8 +90,8 @@ function onSellectMenuChange() {
     }
 
     const isSystemData = (curkey == systemDataKey);
-    document.getElementById("name").disabled = isSystemData;
-    document.getElementById("remove").disabled = isSystemData;
+    document.getElementById('name').disabled = isSystemData;
+    document.getElementById('remove').disabled = isSystemData;
     // document.getElementById("import").disabled = !(isSystemData);
     // document.getElementById("export").disabled = !(isSystemData);
 
@@ -97,8 +102,8 @@ function onSellectMenuChange() {
 function onNewButtonClick() {
   localStorage.setItem('curkey', '');
   
-  document.getElementById("name").disabled = false;
-  document.getElementById("remove").disabled = true;
+  document.getElementById('name').disabled = false;
+  document.getElementById('remove').disabled = true;
 
 }
 
@@ -107,7 +112,7 @@ function onSaveButtonClick() {
   if (namevalue.length == 0) {namevalue = new Date().toLocaleString();};
   const regPattForURLvalue = document.getElementById('regPattForURL').value;
   const scriptvalue = document.getElementById('script').value;
-  const obj = {[namevalue]: {regPattForURL: regPattForURLvalue, script: scriptvalue}};
+  const obj = {[namevalue.trim()]: {regPattForURL: regPattForURLvalue.trim(), script: scriptvalue.trim()}};
   chrome.storage.sync.set(obj, function () {console.log("saved '" + namevalue + "'")});
   localStorage.setItem('curkey', namevalue);
   console.log("set current '" + namevalue + "'");
@@ -151,93 +156,59 @@ function convURLtoRegExp(sourceURL) {
 }
 
 function onImportButtonClick() {
-
     localStorage.setItem('status', 'import');
 
-    // const tabId = tabs[0].id;
-    // const importText = innerText(tabId);
-    // alert("import text : " + importText[1]);
-
-    // async function innerText(tabId) {
-    //   await chrome.tabs.executeScript(targetTabId, {code: `document.documentElement.innerHTML`},(result) => {
-    //     if (chrome.runtime.lastError) {
-    //       console.error(chrome.runtime.lastError.message);
-    //   } else {
-    //       return result;
-    //   }
-    //   });
-
-    // }
-
-
 };
-
-
-
-
 
 function onExportButtonClick() {
   const namevalue = document.getElementById('name').value;
   const regPattForURLvalue = document.getElementById('regPattForURL').value;
   const scriptvalue = document.getElementById('script').value;
 
-  if (isContainedReservedWord(namevalue, `name:`)) {alert(`Contains reserved words "name:"`); return;}
-  if (isContainedReservedWord(regPattForURLvalue, `regPattForURL:`)) {alert(`Contains reserved words "regPattForURL:"`); return;}
-  if (isContainedReservedWord(scriptvalue, `script:`)) {alert(`Contains reserved words "script:"`); return;}
-
-  // let link = document.createElement('a');
-  // link.setAttribute('href', 'data:.json;charset=utf-8,' + encodeURIComponent(export));
-  // link.setAttribute('download', filename);
-
-  // var input = document.createElement('input');
-  // input.type = 'file';
-  // input.name="import";
-  // input.accept=".json";
-  // input.onchange = e => { 
-    // var file = e.target.files[0];
-    chrome.storage.sync.get(null, function(items) {
-      const keys = Object.keys(items);
-      // console.log(keys);
-      // make items of listbox
-
-      // const SelectItem = document.getElementById('select');
-      let text = "";
-      for (let i = 0; i < keys.length; i++) {
-        let key = keys[i];
-        let item = items[key];
-        if (key != systemDataKey) {
-          text += "\rname:\r" + key;
-        }
-        text += "\rregPattForURL:\r" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
-        text += "\rscript:\r" + item.script;//.replace(/\\/g, /\\\\/);
+  chrome.storage.sync.get(null, function(items) {
+    const keys = Object.keys(items);
+    // console.log(keys);
+    // make items of listbox
+    let text = "";
+    for (let i = 0; i < keys.length; i++) {
+      let key = keys[i];
+      let item = items[key];
+      if (isContainedReservedWord(key + `\n` + item.regPattForURL + `\n` + item.script, [`name:`, `regPattForURL:`, `script:`])) {return;}
+      if (key != systemDataKey) {
+        text += "\nname:\n" + key;
       }
-      text = text.slice(1);
+      text += "\nregPattForURL:\n" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
+      text += "\nscript:\n" + item.script;//.replace(/\\/g, /\\\\/);
+    }
+    text = text.slice(1);
+    
+    // alert(JSON.parse(JSON.stringify(items)));
+    // let blob = new Blob([JSON.stringify(items).replace(/\\/g, '\\\\')],{type:"text/plain"});
+    let blob = new Blob([text],{type:"text/plain"});
+    // let blob = new Blob([items],{type:"application/octet-stream"});
+    // console.log("blob : " + blob);
 
-      // alert(JSON.parse(JSON.stringify(items)));
-      // let blob = new Blob([JSON.stringify(items).replace(/\\/g, '\\\\')],{type:"text/plain"});
-      let blob = new Blob([text],{type:"text/plain"});
-      // let blob = new Blob([items],{type:"application/octet-stream"});
-      // console.log("blob : " + blob);
+    let link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    // link.setAttribute('href', 'data:.json;charset=utf-8,');
 
-      let link = document.createElement('a');
-      link.href = window.URL.createObjectURL(blob);
-      // link.setAttribute('href', 'data:.json;charset=utf-8,');
-
-      link.download = "export.txt";
-      link.click();
-      // let obj = JSON.parse(JSON.stringify(items));
-      // alert(obj);
-    });
-  // }
-  // pom.click();
-
-  // input.click();
+    link.download = "export.txt";
+    link.click();
+    // let obj = JSON.parse(JSON.stringify(items));
+    // alert(obj);
+  });
 
 }
 
-function isContainedReservedWord(MultipleLine, reservedWord) {
-  for (line of MultipleLine.split(/\r/)) {
-    if (line == reservedWord) {return true;}
+function isContainedReservedWord(MultipleLine, reservedWordarr) {
+  for (line of MultipleLine.split(/\r\n|\r|\n/)) {
+    for (reservedWord of reservedWordarr) {
+      if (line == reservedWord) {
+        alert(`Contains reserved words "` + reservedWord + `"`);
+        return true;
+      }
+    }
   }
   return false;
+
 }
