@@ -2,11 +2,11 @@
 const systemDataKey =  localStorage.getItem('systemDataKey');
 
 const status = localStorage.getItem('status');
-if (status == 'import') {
+if (status == 'impexp') {
   localStorage.setItem('status', '');
   window.onload = () =>{
     const SelectItem = document.getElementById('select');
-    for (let str of ['', '&emsp;** import mode **', ' ', `&emsp;enter export data in the 'script' area.`]) {
+    for (let str of ['', '&emsp;** export & import mode **', ' ', `&emsp;import : enter export data in the 'script' area.`]) {
       var option = document.createElement('option');
       option.setAttribute('value', str);
       option.innerHTML = str;
@@ -15,22 +15,24 @@ if (status == 'import') {
     document.getElementById('name').disabled = true;
     document.getElementById('regPattForURL').disabled = true;
 
-    for (let id of ["new", "save", "If", "remove", "ConvRegExp"]) {
+    for (let id of ["new", "save", "If", "remove"]) {
       document.getElementById(id).style.visibility = 'hidden';
     }
 
-    document.getElementById('import').innerHTML = 'ok';
-    document.getElementById('export').innerHTML = 'cancel';
-    document.getElementById('import').addEventListener('click', onImportOkButtonClick);
-    document.getElementById('export').addEventListener('click', () => {});
+    document.getElementById('ConvRegExp').innerHTML = 'export';
+    document.getElementById('impexp').innerHTML = 'import';
+    document.getElementById('positon').innerHTML = 'cancel';
+    document.getElementById('ConvRegExp').addEventListener('click', onExportButtonClick);
+    document.getElementById('impexp').addEventListener('click', onImportButtonClick);
+    document.getElementById('positon').addEventListener('click', () => {});
 
     document.getElementById('script').focus();
 
   };
 
-  function onImportOkButtonClick () {
-    chrome.storage.sync.clear();
+  function onImportButtonClick () {
     const arr = document.getElementById('script').value.split(/name:\n/);
+    if (arr.length == 0) {return;}
     for (let item of arr) {
       if (item != '') {
         let itemarr = item.split(/regPattForURL:\n/);
@@ -40,12 +42,67 @@ if (status == 'import') {
         let regPattForURL = itemarr1[0].trim();
         let script = itemarr1[1].trim();
 
-        var obj = {[name]: {regPattForURL: regPattForURL, script: script, match: ``}};
+        var obj = {[name]: {regPattForURL: regPattForURL, script: script, update: 'true'}};
         chrome.storage.sync.set(obj, function () {});
       }
     }
+    
+    chrome.storage.sync.get(null, function(items) {
+      const keys = Object.keys(items);
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        let item = items[key];
+        if (item.update != 'true') {
+          const obj = {['(delete?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
+          chrome.storage.sync.set(obj, () => {});
+        }
+      }
+    });
+
   }
 
+  function onExportButtonClick() {
+    const namevalue = document.getElementById('name').value;
+    const regPattForURLvalue = document.getElementById('regPattForURL').value;
+    const scriptvalue = document.getElementById('script').value;
+  
+    chrome.storage.sync.get(null, function(items) {
+      const keys = Object.keys(items);
+      let text = "";
+      for (let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        let item = items[key];
+        if (isContainedReservedWord(key + `\n` + item.regPattForURL + `\n` + item.script, [`name:`, `regPattForURL:`, `script:`])) {return;}
+        if (key != systemDataKey) {
+          text += "\nname:\n" + key;
+        }
+        text += "\nregPattForURL:\n" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
+        text += "\nscript:\n" + item.script;//.replace(/\\/g, /\\\\/);
+      }
+      text = text.slice(1);
+      let blob = new Blob([text],{type:"text/plain"});
+      let link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+  
+      link.download = "export.txt";
+      link.click();
+    });
+  
+  }
+  
+  function isContainedReservedWord(MultipleLine, reservedWordarr) {
+    for (line of MultipleLine.split(/\r\n|\r|\n/)) {
+      for (reservedWord of reservedWordarr) {
+        if (line == reservedWord) {
+          alert(`Contains reserved words "` + reservedWord + `"`);
+          return true;
+        }
+      }
+    }
+    return false;
+  
+  }
+  
 } else {
   chrome.storage.sync.get(null, function(items) {
     // console.log(JSON.stringify(items));
@@ -68,8 +125,8 @@ if (status == 'import') {
     document.getElementById('save').addEventListener('click', onSaveButtonClick);
     document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
     document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
-    document.getElementById('import').addEventListener('click', onImportButtonClick);
-    document.getElementById('export').addEventListener('click', onExportButtonClick);
+    document.getElementById('impexp').addEventListener('click', onImpExpButtonClick);
+    document.getElementById('positon').addEventListener('click', onPositionButtonClick);
   
   });
 }
@@ -155,60 +212,12 @@ function convURLtoRegExp(sourceURL) {
 
 }
 
-function onImportButtonClick() {
-    localStorage.setItem('status', 'import');
+function onImpExpButtonClick() {
+    localStorage.setItem('status', 'impexp');
 
 };
 
-function onExportButtonClick() {
-  const namevalue = document.getElementById('name').value;
-  const regPattForURLvalue = document.getElementById('regPattForURL').value;
-  const scriptvalue = document.getElementById('script').value;
+function onPositionButtonClick() {
 
-  chrome.storage.sync.get(null, function(items) {
-    const keys = Object.keys(items);
-    // console.log(keys);
-    // make items of listbox
-    let text = "";
-    for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
-      let item = items[key];
-      if (isContainedReservedWord(key + `\n` + item.regPattForURL + `\n` + item.script, [`name:`, `regPattForURL:`, `script:`])) {return;}
-      if (key != systemDataKey) {
-        text += "\nname:\n" + key;
-      }
-      text += "\nregPattForURL:\n" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
-      text += "\nscript:\n" + item.script;//.replace(/\\/g, /\\\\/);
-    }
-    text = text.slice(1);
-    
-    // alert(JSON.parse(JSON.stringify(items)));
-    // let blob = new Blob([JSON.stringify(items).replace(/\\/g, '\\\\')],{type:"text/plain"});
-    let blob = new Blob([text],{type:"text/plain"});
-    // let blob = new Blob([items],{type:"application/octet-stream"});
-    // console.log("blob : " + blob);
-
-    let link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
-    // link.setAttribute('href', 'data:.json;charset=utf-8,');
-
-    link.download = "export.txt";
-    link.click();
-    // let obj = JSON.parse(JSON.stringify(items));
-    // alert(obj);
-  });
-
-}
-
-function isContainedReservedWord(MultipleLine, reservedWordarr) {
-  for (line of MultipleLine.split(/\r\n|\r|\n/)) {
-    for (reservedWord of reservedWordarr) {
-      if (line == reservedWord) {
-        alert(`Contains reserved words "` + reservedWord + `"`);
-        return true;
-      }
-    }
-  }
-  return false;
 
 }
