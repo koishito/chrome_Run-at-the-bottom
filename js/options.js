@@ -46,13 +46,14 @@ if (status == 'impexp') {
         chrome.storage.sync.set(obj, function () {});
       }
     }
-    
+
     chrome.storage.sync.get(null, function(items) {
       const keys = Object.keys(items);
       for (let i = 0; i < keys.length; i++) {
         let key = keys[i];
         let item = items[key];
         if (item.update != 'true') {
+          chrome.storage.sync.remove(key, () => {});
           const obj = {['(delete?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
           chrome.storage.sync.set(obj, () => {});
         }
@@ -119,6 +120,8 @@ if (status == 'impexp') {
     }
     SelectItem.value = localStorage.getItem('curkey');
   
+    document.getElementById('positon').style.visibility = 'hidden';
+
     onSellectMenuChange();
     document.getElementById('select').addEventListener('change', onSellectMenuChange);
     document.getElementById('new').addEventListener('click', onNewButtonClick);
