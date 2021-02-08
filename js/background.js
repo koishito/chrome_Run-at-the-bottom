@@ -38,68 +38,62 @@ chrome.runtime.onInstalled.addListener(function (details) {
 
 // });
 
-function onChangedActiveTab(){
+function onChangedActiveTab(){ // This function is a recursive function.
   chrome.storage.sync.get(null, function(items) {
-    var keys = Object.keys(items);
-    // var getTabs = 2;
-    // do {
-      chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-        // storageが空の場合に、jstextの初期値を設定
-        if (keys.length === 0){
-          initialLoad();
-          onChangedActiveTab();
+    let keys = Object.keys(items);
+    // storageが空の場合に、jstextの初期値を設定
+    if (keys.length === 0){
+      initialLoad();
+    }
+    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+      if ((tabs != undefined) && (tabs.length > 0)) {
+        const tabId = tabs[0].id;
+        const url = tabs[0].url;
+        setIcon(``, `Unmatched` );
+        // Check URL
+        for (let i = 0 ; i < keys.length; i++) {
+          var key = keys[i];
+          var item = items[key];
+          var regPattForURLArray = item.regPattForURL.split(/\r\n|\r|\n/)
+          var matchedRegPatts = "";
+          for (let j = 0; j < regPattForURLArray.length; j++) {
+            var regPattForURL = regPattForURLArray[j];
+            var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
+            if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {
+              console.log(i, j, url, matchedURL);
+              matchedRegPatts += '\n' + regPattForURL;
+            }
+          }
+          item.match = (matchedRegPatts) ? `\n` + key + matchedRegPatts : ``;
         }
-        if (tabs != undefined) {
-          // getTabs = 0;
-          // console.log(tabs[0]);
-          const tabId = tabs[0].id;
-          const url = tabs[0].url;
-          setIcon(``, `Unmatched` );
-          // Check URL
+        // Processing based on the check result
+        const excludedMatch = items[systemDataKey].match;
+        if (excludedMatch) {
+          setIcon(`excpt`, excludedMatch.slice(1));
+        } else {
+          var matchedRegPatts = "";
           for (let i = 0 ; i < keys.length; i++) {
             var key = keys[i];
             var item = items[key];
-            var regPattForURLArray = item.regPattForURL.split(/\r\n|\r|\n/)
-            var matchedRegPatts = "";
-            for (let j = 0; j < regPattForURLArray.length; j++) {
-              var regPattForURL = regPattForURLArray[j];
-              var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
-              if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {
-                console.log(i, j, url, matchedURL);
-                matchedRegPatts += '\n' + regPattForURL;
-              }
+            var match = item.match;
+            if ((key != systemDataKey) && (match)) {
+              matchedRegPatts += match;
+              var execScript = items[systemDataKey].script;
+              var curregPattForURL = match.split(/\r\n|\r|\n/)[2]; //[0] is .[1] is name.
+              execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curregPattForURL);
+              execScript = execScript.replace(/\*\*script\*\*/, item.script);
+              // console.log(`execScript : ` + execScript);
+              var response = executeScript(tabId, execScript);
             }
-            item.match = (matchedRegPatts) ? `\n` + key + matchedRegPatts : ``;
           }
-          // Processing based on the check result
-          const excludedMatch = items[systemDataKey].match;
-          if (excludedMatch) {
-            setIcon(`excpt`, excludedMatch.slice(1));
-          } else {
-            var matchedRegPatts = "";
-            for (let i = 0 ; i < keys.length; i++) {
-              var key = keys[i];
-              var item = items[key];
-              var match = item.match;
-              if ((key != systemDataKey) && (match)) {
-                matchedRegPatts += match;
-                var execScript = items[systemDataKey].script;
-                var curregPattForURL = match.split(/\r\n|\r|\n/)[2]; //[0] is .[1] is name.
-                execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curregPattForURL);
-                execScript = execScript.replace(/\*\*script\*\*/, item.script);
-                // console.log(`execScript : ` + execScript);
-                var response = executeScript(tabId, execScript);
-              }
-            }
-            if (matchedRegPatts) {
-              setIcon(`set`, matchedRegPatts.slice(1));
-            }
+          if (matchedRegPatts) {
+            setIcon(`set`, matchedRegPatts.slice(1));
           }
         }
-      });
-      // console.log(getTabs);
-      // getTabs = getTabs--
-    // } while (getTabs-- > 0)
+      } else {
+        settimeout(onChangedActiveTab(), 100);
+      }
+    });
   });
 }
 
