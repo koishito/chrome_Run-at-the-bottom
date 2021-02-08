@@ -41,8 +41,8 @@ chrome.runtime.onInstalled.addListener(function (details) {
 function onChangedActiveTab(){
   chrome.storage.sync.get(null, function(items) {
     var keys = Object.keys(items);
-    var getTabs = 10;
-    do {
+    // var getTabs = 2;
+    // do {
       chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
         // storageが空の場合に、jstextの初期値を設定
         if (keys.length === 0){
@@ -50,8 +50,8 @@ function onChangedActiveTab(){
           onChangedActiveTab();
         }
         if (tabs != undefined) {
-          getTabs = 0;
-          console.log(tabs[0]);
+          // getTabs = 0;
+          // console.log(tabs[0]);
           const tabId = tabs[0].id;
           const url = tabs[0].url;
           setIcon(``, `Unmatched` );
@@ -64,8 +64,8 @@ function onChangedActiveTab(){
             for (let j = 0; j < regPattForURLArray.length; j++) {
               var regPattForURL = regPattForURLArray[j];
               var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
-              console.log(url, matchedURL);
               if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {
+                console.log(i, j, url, matchedURL);
                 matchedRegPatts += '\n' + regPattForURL;
               }
             }
@@ -97,8 +97,9 @@ function onChangedActiveTab(){
           }
         }
       });
+      // console.log(getTabs);
       // getTabs = getTabs--
-    } while (getTabs-- > 0)
+    // } while (getTabs-- > 0)
   });
 }
 
