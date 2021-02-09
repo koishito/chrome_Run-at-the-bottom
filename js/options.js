@@ -170,6 +170,7 @@ function onNewButtonClick() {
 function onSaveButtonClick() {
   let namevalue = document.getElementById('name').value;
   if (namevalue.length == 0) {namevalue = new Date().toLocaleString();};
+  if (/\"/g.test(namevalue)) {namevalue = namevalue.replace(/"/g,`'`);};
   const regPattForURLvalue = document.getElementById('regPattForURL').value;
   const scriptvalue = document.getElementById('script').value;
   const obj = {[namevalue.trim()]: {regPattForURL: regPattForURLvalue.trim(), script: scriptvalue.trim()}};

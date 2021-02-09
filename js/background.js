@@ -46,7 +46,9 @@ function onChangedActiveTab(){ // This function is a recursive function.
       initialLoad();
     }
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
-      if ((tabs != undefined) && (tabs.length > 0)) {
+      if ((tabs == undefined) || (tabs.length < 1)) {
+        settimeout(onChangedActiveTab(), 100);
+      } else {
         const tabId = tabs[0].id;
         const url = tabs[0].url;
         setIcon(``, `Unmatched` );
@@ -71,6 +73,7 @@ function onChangedActiveTab(){ // This function is a recursive function.
         if (excludedMatch) {
           setIcon(`excpt`, excludedMatch.slice(1));
         } else {
+          // make matchedRegPatts
           var matchedRegPatts = "";
           for (let i = 0 ; i < keys.length; i++) {
             var key = keys[i];
@@ -79,6 +82,7 @@ function onChangedActiveTab(){ // This function is a recursive function.
             if ((key != systemDataKey) && (match)) {
               matchedRegPatts += match;
               var execScript = items[systemDataKey].script;
+              execScript = execScript.replace(/\*\*name\*\*/, key);
               var curregPattForURL = match.split(/\r\n|\r|\n/)[2]; //[0] is .[1] is name.
               execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curregPattForURL);
               execScript = execScript.replace(/\*\*script\*\*/, item.script);
@@ -90,9 +94,7 @@ function onChangedActiveTab(){ // This function is a recursive function.
             setIcon(`set`, matchedRegPatts.slice(1));
           }
         }
-      } else {
-        settimeout(onChangedActiveTab(), 100);
-      }
+      } 
     });
   });
 }
@@ -130,7 +132,7 @@ regPattForURL :
 /^.+amazon.+$/`,
 script : 
 `// The part enclosed in ** is replaced.
-(function(){
+(window.onload = function(){
 function onScroll() {
   document.addEventListener('scroll',  function() {
     const scrollHeight = Math.max(
@@ -138,7 +140,7 @@ function onScroll() {
       document.body.offsetHeight, document.documentElement.offsetHeight,
       document.body.clientHeight, document.documentElement.clientHeight
     );
-    var scrollTop =
+    let scrollTop =
       document.documentElement.scrollTop || // IE、Firefox、Opera
       document.body.scrollTop;              // Chrome、Safari
     if (parseInt(scrollHeight - window.innerHeight - scrollTop) < 1) {
@@ -147,9 +149,57 @@ function onScroll() {
   });
 }
 
+function dispPosition() {
+  let a=document.createElement("div");
+  a.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);background:silver;padding:10px;text-align:center;z-index:19999;";
+  a.onclick=function(){
+    document.body.removeEventListener("mousemove", dispPosition);
+    a.parentNode.removeChild(a);
+  };
+  a.style.fontSize = '12px';
+  x=document.createElement("input");
+  x.type="text";
+  x.size="3"
+  x.id="xxx";
+  y=document.createElement("input");
+  y.type="text";
+  y.size="3"
+  y.id="yyy";
+  a.appendChild(x);
+  a.appendChild(y);
+  document.body.appendChild(a);
+
+  document.body.addEventListener("mousemove", dispPosition);
+  function dispPosition(e){
+    document.getElementById("xxx").value = "x : " + e.clientX;
+    document.getElementById("yyy").value = "y : " + e.clientY;
+  };
+
+}
+
+function floatBox_to(text) {
+
+  var mbox=document.createElement("div");
+  mbox.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:10px;text-align:center;z-index:19999;";
+  mbox.style.opacity = '0.8';
+  mbox.style.background = 'silver';
+  mbox.style.border = '1px solid #aaa';
+  mbox.style.fontSize = '20px';
+  var tnode = document.createTextNode(text);
+  mbox.appendChild(tnode);
+  document.body.appendChild(mbox);
+
+  /* setTimeout(closenode, 3000);
+    function closenode(){mbox.parentNode.removeChild(mbox);}*/
+
+  setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 3000);
+
+}
+
 const regPattForURL = **regular expression pattern for url matching**;
 console.log(location.href.match(regPattForURL));
 const matchedPartInURL = location.href.match(regPattForURL)[0];
+floatBox_to("**name**");
 **script**
 })();`
 },
