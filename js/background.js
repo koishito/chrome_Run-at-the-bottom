@@ -1,8 +1,7 @@
 // const curkey = String.fromCharCode(189);
-const systemDataKey = `"System data : excluded URLs & Script template"`;
+const systemDataKey = `'System data : excluded URLs & Script template'`;
 
-
-// Fires when the active tab in a window changes.
+// Fired when the active tab in a window changes.
 chrome.tabs.onActivated.addListener(function (activeInfo) {
   // console.log(activeInfo.tabId);
   onChangedActiveTab();
@@ -51,6 +50,7 @@ function onChangedActiveTab(){ // This function is a recursive function.
       } else {
         const tabId = tabs[0].id;
         const url = tabs[0].url;
+        const title = tabs[0].title;
         setIcon(``, `Unmatched` );
         // Check URL
         for (let i = 0 ; i < keys.length; i++) {
@@ -70,7 +70,8 @@ function onChangedActiveTab(){ // This function is a recursive function.
         }
         // Processing based on the check result
         const excludedMatch = items[systemDataKey].match;
-        if (excludedMatch) {
+        let errorPage = (url.search(title) >= 0);
+        if (excludedMatch || errorPage) {
           setIcon(`excpt`, excludedMatch.slice(1));
         } else {
           // make matchedRegPatts
