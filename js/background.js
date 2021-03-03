@@ -89,6 +89,7 @@ function onChangedActiveTab(){ // This function is a recursive function.
               execScript = execScript.replace(/\*\*script\*\*/, item.script);
               // console.log(`execScript : ` + execScript);
               var response = executeScript(tabId, execScript);
+              localStorage.setItem('curkey', key);
             }
           }
           if (matchedRegPatts) {
