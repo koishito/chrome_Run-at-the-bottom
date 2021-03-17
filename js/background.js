@@ -27,6 +27,9 @@ chrome.runtime.onInstalled.addListener(function (details) {
   // if (details.reason = 'install') {
   //   initialLoad();
   // }
+  if (localStorage.getItem('dispMatchedRegPattsCode') == null){
+    initialLoad();
+  }
   onChangedActiveTab();
 
 });
@@ -41,9 +44,6 @@ function onChangedActiveTab(){ // This function is a recursive function.
   chrome.storage.sync.get(null, function(items) {
     let keys = Object.keys(items);
     // localstorage('dispMatchedRegPattsCode')が空の場合に、各storageの初期値を設定
-    if (localStorage.getItem('dispMatchedRegPattsCode') == null){
-      initialLoad();
-    }
     chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
       if ((tabs == undefined) || (tabs.length < 1)) {
         settimeout(onChangedActiveTab(), 100);
@@ -97,8 +97,8 @@ function onChangedActiveTab(){ // This function is a recursive function.
 
             var execScript = localStorage.getItem('dispMatchedRegPattsCode');
             var matchedKeys = matchedRegPatts.split(/\r\n|\r|\n/)
-              .reduce((acc, val, idx) => acc += (idx % 2 == 1) ? `\n` + val: ``)
-            execScript = execScript.replace(/\*\*matchedRegPatts\*\*/, matchedKeys.slice(1));
+              .reduce((acc, val, idx) => acc += (idx % 2 == 1) ? `\n` + val: ``).slice(1);
+            execScript = execScript.replace(/\*\*matchedRegPatts\*\*/, matchedKeys);
             var response = executeScript(tabId, execScript);
           }
         }
@@ -592,10 +592,11 @@ script :
   mbox.style.border = '1px solid #aaa';
   mbox.style.fontSize = '14px';
   text.split(/\\r\\n|\\r|\\n/).forEach(element => {
+    mbox.appendChild(document.createElement('br'));
     mbox.appendChild(document.createTextNode(element));
     mbox.appendChild(document.createElement('br'));
-    mbox.appendChild(document.createElement('br'));
   });
+  mbox.appendChild(document.createElement('br'));
   document.body.appendChild(mbox);
 
   /* setTimeout(closenode, 3000);
