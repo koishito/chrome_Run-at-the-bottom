@@ -192,15 +192,15 @@ function onConvRegExpButtonClick() {
   let regPattForURL = document.getElementById('regPattForURL');
   var regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
   var sourceURL = regPattForURLarr[0];
+  if (/^\//.test(sourceURL)) {return;}
   var targetURL = convURLtoRegExp(sourceURL);
-  regPattForURL.value = targetURL + regPattForURL.value;
+  //regPattForURL.value = targetURL + regPattForURL.value;
+  regPattForURL.value = regPattForURL.value.replace(sourceURL, targetURL);
   onSaveButtonClick();
 
 }
 
 function convURLtoRegExp(sourceURL) {
-  if (/^\/\^/.test(sourceURL)) {return ''}
-
   for (let singlestring of [...`\'".*+?^$-|/{}()[]`]) {
     // console.log(singlestring, new RegExp('\\' + singlestring, "g") , '\\' + singlestring);
     sourceURL = sourceURL.replace(new RegExp('\\' + singlestring, "g") , '\\' + singlestring);
