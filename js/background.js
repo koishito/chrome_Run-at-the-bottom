@@ -602,7 +602,7 @@ script :
   /* setTimeout(closenode, 3000);
     function closenode(){mbox.parentNode.removeChild(mbox);}*/
 
-  setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 3000);
+  setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 1500);
 
 })();`);
   
