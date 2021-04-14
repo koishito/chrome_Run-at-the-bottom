@@ -70,7 +70,8 @@ function onChangedActiveTab(){ // This function is a recursive function.
         }
         // Processing based on the check result
         const excludedMatch = items[systemDataKey].match;
-        let errorPage = (url.indexOf(title) >= 0);
+        let errorPage = !(/^http/.test(title)) && (url.indexOf(title) >= 0);
+
         if (excludedMatch || errorPage) {
           setIcon(`excpt`, excludedMatch.slice(1));
         } else {
