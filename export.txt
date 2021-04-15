@@ -408,13 +408,11 @@ document.getElementById("CommonHeader").style.display ="none";
 document.getElementById("ko_head_bar_min").style.display ="none";
 document.getElementById("ko_controls").style.display ="none";
 
-
-
 var page = 0;
 document.getElementById("page_0").scrollIntoView();
 
 let anchor = document.createElement('a');
-anchor .id = "aaa";
+anchor.id = "aaa";
 let text = document.createTextNode('0');
 anchor.appendChild(text);
 document.body.appendChild(anchor);
@@ -422,27 +420,22 @@ document.body.appendChild(anchor);
 document.body.addEventListener('keydown', event => {
 
   let pageee = Number(document.getElementById('aaa').textContent);
-  let dir = 0;
-  let maxdir = -99;
-  if (event.key == 'ArrowRight') {dir = -1;}
-  if (event.key == 'ArrowLeft') {dir = 1;}
+  let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
   if (dir == 0) {return;}
+  if ((document.getElementById("page_" + pageee) == null) && (Math.sign(pageee) == dir)) {return;}
 
   pageee = pageee + dir;
-  console.log(pageee);
   if (document.getElementById("page_" + pageee) == null) {
-    console.log((document.getElementById("page_" + (pageee + dir)) != null));
     pageee = pageee + dir;
-    //pageee = pageee + ((document.getElementById("page_" + (pageee + dir)) != null) ? dir : -dir);
   }
   console.log(pageee);
 
   if (document.getElementById("page_" + pageee) == null) {
     document.getElementById("ko_bookmark_player").scrollIntoView();
-   } else {
-     document.getElementById("page_" + pageee).scrollIntoView();
-     document.getElementById('aaa').textContent = pageee;
+  } else {
+    document.getElementById("page_" + pageee).scrollIntoView();
   }
+  document.getElementById('aaa').textContent = pageee;
 });
 name:
 rakugakidou
