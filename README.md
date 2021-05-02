@@ -10,6 +10,7 @@ Register the JavaScript to be executed at the bottom of the page with the URL th
 
 
 ### Version history
+- ver 1.3 : Significantly changed imp/exp function.(read file is yet.)
 - ver 1.2 : The implementation of the import function is complete.
 - ver 1.1 : Fixed URL consistency check process.
 - ver 0.2 : Specification change to operation specification method at URL pattern matching.

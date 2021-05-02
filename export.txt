@@ -5,7 +5,6 @@ regPattForURL:
 /^.+(docs|translate|calendar|mail)\.google.+$/
 /^.+github.+$/
 /^.+amazon.+$/
-/^.+rakuten.+$/
 script:
 // The part enclosed in ** is replaced.
 (window.onload=function(){
@@ -91,6 +90,17 @@ const matchedPartInURL = location.href.match(regPattForURL)[0];
 //floatBox_to("**name**");
 })();
 name:
+2021/4/19 20:02:03
+regPattForURL:
+//^https:\/\/renta\.papy\.co\.jp\//
+script:
+var fullscreen = function(){
+  document.dispatchEvent( new KeyboardEvent( "keydown", { key: "f", ctrlKey: true }));
+  document.dispatchEvent( new KeyboardEvent( "keyup", { key: "f", ctrlKey: true }));
+  //document.dispatchEvent( new KeyboardEvent( "keyup", { keycode: 122 }));
+}
+setTimeout(fullscreen, 1000);
+name:
 ClickByPushedKey.js
 regPattForURL:
 This bookmarklet can acquire the mouse position secondarily.
@@ -165,6 +175,22 @@ javascript:(function(){
   //   }
   // });
 name:
+Let's go to another route
+regPattForURL:
+/^https:\/\/www\.bookoffonline\.co\.jp\/disp\/CCtViewCart/
+/^https:\/\/basket\.step\.rakuten\.co\.jp\/rms\/mall\/bs\/cartall\//
+script:
+var ab = function(){
+  var att=document.createElement("div");
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;min-height: 100vh;width:100%;padding:4px;background:coral;z-index:19999;";
+  att.innerHTML=`Let's go to another route`;
+  att.style.fontSize = '40px';
+  document.body.appendChild(att);
+  setTimeout(closenode, 1000);
+  function closenode(){att.parentNode.removeChild(att);}
+}
+setTimeout(ab, 1000);
+name:
 Open in new tab
 regPattForURL:
 //^https:\/\/(www|news)\.google\.com\/search\?.+$/
@@ -202,7 +228,7 @@ Open the link for the next article starting with /次|>|＞|next|→/
 regPattForURL:
 /^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
 /^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
-/^https:\/\/book.dmm.com\/library\//
+//^https:\/\/book.dmm.com\/library\//
 script:
 const linkTextStartingWith= /次|>|＞|next|→/;
 var nextArticle = '';
@@ -229,7 +255,7 @@ Push '→' Open the link for the next article starting with /次|>|＞|next|→/
 regPattForURL:
 /^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
 /^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
-/^https:\/\/book.dmm.com\/library\//
+//^https:\/\/book.dmm.com\/library\//
 script:
 const linkTextStartingWith= /次|>|＞|next|→/;
 var nextArticle = '';
@@ -265,16 +291,92 @@ document.body.addEventListener('keydown', event => {
 
 });
 name:
+comicbunch Appry Arrow Keys
+regPattForURL:
+//^https:\/\/kuragebunch\.com\/episode\/\d{19}/
+script:
+var ab = function(){
+
+  //document.body.style.zoom=`75%`;
+  let n = 0;
+  let att = document.createElement(`div`);
+  att.id = `att`;
+  att.style.cssText=`visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;`;
+  let text = document.createTextNode(n);
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  viewSpreadPage(n, true);
+
+  function viewSpreadPage (curPage, isVsb) {
+    console.log(`curPage : ${curPage}`);
+    let visibility = (isVsb) ? `visible` : `hidden`;
+    let pageCenter = parseInt(window.innerWidth / 2);
+
+    let pages = document.getElementsByClassName(`page-area js-page-area`);
+    let cssText =  `visibility:${visibility};position:fixed;top:0px;width:844px;z-index:19999;`;
+
+    let rightPage = pages[curPage];
+    if (rightPage) {
+      rightPage.children[0].scrollIntoView();
+      rightPage.children[0].style.cssText = `${cssText};left:${pageCenter}px;`;
+    }
+    let leftPage = pages[curPage + 1];
+    if (leftPage) {
+      leftPage.children[0].scrollIntoView();
+      leftPage.children[0].style.cssText = `${cssText};left:${pageCenter - 844}px;`;
+    }
+    document.getElementById(`att`).style.visibility = ((rightPage) || (leftPage)) ? `visible` : `hidden`;
+    document.getElementsByClassName(`series-header-image-wrapper`)[0].scrollIntoView();
+
+  }
+
+
+  document.body.addEventListener(`keydown`, event => {
+    let curPage = Number(document.getElementById(`att`).textContent);
+
+    let dir = (event.key == `ArrowLeft`) - (event.key == `ArrowRight`);
+    if (dir == 0) {return;}
+
+    let pages = document.getElementsByClassName(`page-area js-page-area`);
+
+
+    if ((pages[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      let next_prevClass = (dir == 1) ? `next-link test-back-matter-next-link` : `previous-link`;
+      let next_prev = document.getElementsByClassName(next_prevClass)[0];
+      if  (next_prev) {location.href = next_prev.href;}
+      return;
+    }
+
+    viewSpreadPage(curPage, false);
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, true);
+    // console.log(`curRight : ${curPage}`);
+    // console.log(`curLeft : ${curPage + 1}`);
+
+    document.getElementById(`att`).textContent = curPage;
+
+  });
+
+}
+setTimeout(ab, 500);
+setTimeout(fillscreen, 3000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+    document.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();
+}
+name:
 comics.gendaibusiness Apply Arrow keys
 regPattForURL:
 /^https:\/\/comics\.gendaibusiness\.com\/viewer\//
 script:
 document.body.addEventListener('keydown', event => {
 
-  if (event.key == 'ArrowLeft') {
+  if (event.key == 'ArrowRight') {
     console.log("next : " + document.getElementsByClassName("next false css-j2s51w")[0]);
     document.getElementsByClassName("next false css-j2s51w")[0].click();
-  } else if (event.key == 'ArrowRight') {
+  } else if (event.key == 'ArrowLeft') {
     console.log("prev : " + document.getElementsByClassName("prev false css-j2s51w")[0]);
     document.getElementsByClassName("prev false css-j2s51w")[0].click();
 
@@ -284,13 +386,14 @@ document.body.addEventListener('keydown', event => {
 name:
 full screen
 regPattForURL:
+//^https:\/\/seiga.nicovideo.jp\/watch\//
 /^https:\/\/comic\-fuz\.com\/viewer\.html/
 /^https:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
 /^https:\/\/book\.dmm\.com\/streaming\//
 /^https:\/\/manga\.line\.me\/book\/viewer\?id=/
 /^https:\/\/tkj\.jp\/ebook\/read\/cd\//
 /^http:\/\/webcomicgamma\.takeshobo\.co\.jp\/manga\//
-/^https:\/\/web\-ace\.jp\/youngaceup\/contents\//
+//^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\/\d{4}\//
 /^https:\/\/r\.binb\.jp\/epm\//
 /^https:\/\/comics\.gendaibusiness\.com\/viewer\//
 /^https:\/\/viewer\.comic\-earthstar\.jp\/viewer\.html\?cid=/
@@ -305,7 +408,6 @@ regPattForURL:
 /^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
 /^https:\/\/www\.alphapolis\.co\.jp\/manga\/official\/\d{8,9}\//
 /^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
-/^https:\/\/seiga.nicovideo.jp\/watch\//
 /^https:\/\/viewer\.ganganonline\.com\/manga\//
 /^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\/\d+/
 /^https:\/\/kakuyomu\.jp\/works\/\d{19}\/episodes\/\d{19}/
@@ -316,14 +418,13 @@ script:
 var fullscreen = function(){
   document.documentElement.webkitRequestFullScreen();
 }
-setTimeout(fullscreen, 1000);
+setTimeout(fullscreen, 1500);
 name:
 full screen by elementFromPoint(790, 600).click()
 regPattForURL:
 /^https:\/\/tonarinoyj\.jp\/episode\//
 /^https:\/\/magcomi\.com\/episode\//
 /^https:\/\/comic\-gardo\.com\/episode\//
-/^https:\/\/kuragebunch\.com\/episode\//
 script:
 var fullscreen = function(){
   curclepoint(790,600);
@@ -331,11 +432,19 @@ var fullscreen = function(){
 }
 setTimeout(fullscreen, 1000);
 name:
-full screen by elementFromPoint(800，610).click()
+full screen by elementFromPoint(790, 750).click()
 regPattForURL:
 /^https:\/\/comic\-days\.com\/episode\//
+script:
+var fullscreen = function(){
+  document.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();
+}
+setTimeout(fullscreen, 1000);
+name:
+full screen by elementFromPoint(800，610).click()
+regPattForURL:
 /^https:\/\/shonenjumpplus\.com\/episode\//
-/^https:\/\/tonarinoyj\.jp\/episode\//
+//^https:\/\/tonarinoyj\.jp\/episode\//
 /^https:\/\/comic\-gardo\.com\/episode\//
 script:
 alert("(800，610)");
@@ -399,20 +508,96 @@ var fullscreen = function(){
 }
 setTimeout(fullscreen, 500);
 name:
+kuragebunch View SpreadPage
+regPattForURL:
+//^https:\/\/kuragebunch\.com\/episode\//
+script:
+var ab = function(){
+
+  document.body.style.zoom='75%';
+
+  let att = document.createElement('div');
+  att.id = 'att';
+  att.style.cssText='visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;';
+  let text = document.createTextNode('0');
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  viewSpreadPage(0, true);
+
+  function viewSpreadPage (curPage, vsb) {
+    let vsb = (vsb) ? 'visible' : 'hidden';
+    let pageCenter = parseInt(window.innerWidth / 2);
+
+    let pages = document.getElementsByClassName('page-area js-page-area');
+    let cssText =  'visibility:${vsb};position:fixed;top:0px;z-index:19999;';
+
+    let rightPage = pages[curPage];
+    if (rightPage) {
+        rightPage.scrollIntoView();
+        rightPage.style.cssText = '${cssText};left:${pageCenter}px;';
+    }
+    let leftPage = pages[curPage + 1];
+    if (leftPage) {
+        leftPage.scrollIntoView();
+        leftPage.style.cssText = '${cssText};left:${pageCenter - leftPage.children[0].width}px;';
+    }
+
+    document.getElementById('att').style.visibility = ((rightPage) || (leftPage)) ? 'visible' : 'hidden';
+    let next_prev = (Math.sign(curPage) > 0) ? 'next-link test-back-matter-next-link' : 'series-header-image-wrapper';
+    document.getElementsByClassName(next_prev)[0].scrollIntoView();
+
+  }
+
+
+  document.body.addEventListener('keydown', event => {
+    let curPage = Number(document.getElementById('att').textContent);
+    console.log('curPage : ' + curPage);
+
+    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+
+    let pages = document.getElementsByClassName('page-area js-page-area');
+
+    if ((pages[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      if (dir == 1) {
+        next_prev = document.getElementsByClassName('next-link test-back-matter-next-link')[1].click();
+      }
+      return;
+    }
+
+    viewSpreadPage(curPage, false);
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, true);
+    console.log('curRight : ${curPage}');
+    console.log('curLeft : ${curPage + 1}');
+
+    document.getElementById('att').textContent = curPage;
+
+  });
+
+}
+setTimeout(ab, 500);
+setTimeout(fillscreen, 3000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+}
+name:
 niconico Appry Arrow Keys
 regPattForURL:
-/^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d{6}\?track=/
+//^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d{6}/
 script:
 document.body.style.zoom='92%';
 document.getElementById("CommonHeader").style.display ="none";
 document.getElementById("ko_head_bar_min").style.display ="none";
 document.getElementById("ko_controls").style.display ="none";
 
-var page = 0;
 document.getElementById("page_0").scrollIntoView();
 
 let anchor = document.createElement('a');
 anchor.id = "aaa";
+anchor.style.display = 'none';
 let text = document.createTextNode('0');
 anchor.appendChild(text);
 document.body.appendChild(anchor);
@@ -422,21 +607,140 @@ document.body.addEventListener('keydown', event => {
   let pageee = Number(document.getElementById('aaa').textContent);
   let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
   if (dir == 0) {return;}
-  if ((document.getElementById("page_" + pageee) == null) && (Math.sign(pageee) == dir)) {return;}
+  if ((document.getElementById("page_" + pageee) == null) && (Math.sign(pageee) == dir)) {
+    let episode_dir = (dir == 1) ? 'next' : 'prev';
+    let next_prev = document.getElementsByClassName(episode_dir)
+    if  (next_prev != null) {next_prev[1].click();}
+    return;
+  }
 
-  pageee = pageee + dir;
+  pageee += dir;
   if (document.getElementById("page_" + pageee) == null) {
-    pageee = pageee + dir;
+    pageee += dir;
   }
   console.log(pageee);
 
-  if (document.getElementById("page_" + pageee) == null) {
+  let page_ = document.getElementById("page_" + pageee);
+  if (page_ == null) {
     document.getElementById("ko_bookmark_player").scrollIntoView();
   } else {
-    document.getElementById("page_" + pageee).scrollIntoView();
+    page_.scrollIntoView();
   }
   document.getElementById('aaa').textContent = pageee;
 });
+name:
+niconico Appry Arrow Keys(2)
+regPattForURL:
+/^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d{6}/
+script:
+var ab = function(){
+  if (document.getElementById('att')) {return;}
+
+  document.body.style.zoom='92%';
+  document.getElementById("CommonHeader").style.display ="none";
+  document.getElementById("ko_head_bar_min").style.display ="none";
+  document.getElementById("ko_controls").style.display ="none";
+
+  let head = "page_";
+  let n = 0;
+  let arr = [-1, n];
+  let page = document.getElementById(head + ++n);
+  let isLeftPage = true;
+
+  do {
+    if (page) {
+      //page.scrollIntoView();
+      arr.push(n);
+    } else {
+      if (arr.length % 2 == 0) {
+        arr.shift();
+        isLeftPage = -isLeftPage;
+      }
+      arr.splice(arr.length - 1, 0, -1);
+    }
+    isLeftPage = -isLeftPage;
+    page = document.getElementById(head + ++n);
+    nextpage = document.getElementById(head + (n + 1));
+  } while ((nextpage) || (page))
+  if (isLeftPage) {arr.push(-1);}
+  arr.unshift(0);
+  console.log(arr);
+
+  /*let arrStr = arr.join(',');
+  console.log(arrStr);
+  ary = arrStr.split(',');
+  console.log(ary);*/
+
+  let att = document.createElement("div");
+  att.id = "att";
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;";
+  let text = document.createTextNode(arr.join(','));
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  let curPage = Number(arr[0]);
+  arr.shift();
+  viewSpreadPage(curPage, arr, true);
+
+
+  function viewSpreadPage (curPage, arr, vsb) {
+    let PageCenter = parseInt(window.innerWidth / 2);
+
+    let rightPage = document.getElementById("page_" + arr[curPage]);
+    if (rightPage) {
+        rightPage.scrollIntoView();
+        rightPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + PageCenter +"px;";
+        rightPage.style.display = (vsb) ? "" :"none";
+    }
+
+    let leftPage = document.getElementById("page_" + arr[curPage + 1]);
+    if (leftPage) {
+        leftPage.scrollIntoView();
+        leftPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + (PageCenter - 650) +"px;";
+        leftPage.style.display = (vsb) ? "" :"none";
+    }
+
+    document.getElementById('att').style.display = ((rightPage) || (leftPage)) ? "" : "none"
+    document.getElementById("ko_bookmark_player").scrollIntoView();
+
+  }
+
+
+  document.body.addEventListener('keydown', event => {
+    let arr = document.getElementById('att').textContent.split(',');
+    let curPage = Number(arr[0]);
+    arr.shift();
+    //console.log("curPage : " + curPage);
+
+    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+
+    if ((arr[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      let episode_dir = (dir == 1) ? 'next' : 'prev';
+      let next_prev = document.getElementsByClassName(episode_dir);
+      if  (next_prev != null) {next_prev[1].click();}
+      return;
+    }
+
+    viewSpreadPage(curPage, arr, false);
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, arr, true);
+    console.log("curPage : " + curPage, );
+    console.log("right : " + arr[curPage]);
+    console.log("left : " + arr[curPage + 1]);
+    arr.unshift(curPage)
+
+    document.getElementById('att').textContent = arr.join(',');
+
+  });
+
+}
+setTimeout(ab, 500);
+setTimeout(fillscreen, 3000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+}
 name:
 rakugakidou
 regPattForURL:
@@ -470,6 +774,65 @@ function scriptAtBottom() {
   location.href = nextArticle;
 }
 name:
+tonarinoyj jump to next
+regPattForURL:
+/^https:\/\/tonarinoyj\.jp\/episode\//
+script:
+document.body.addEventListener('keydown', event => {
+
+  if (event.key == 'n') {
+    let nextLink = document.getElementsByClassName("next-link test-back-matter-next-link");
+    let nlhref = nextLink[0].href;
+    window.open(nlhref);
+
+  }
+});
+name:
+youngaceup Appry Arrow Keys
+regPattForURL:
+/^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\/\d{4}\//
+script:
+var fullscreen = function(){
+  document.documentElement.webkitRequestFullScreen();
+  document.getElementById("img0").scrollIntoView();
+
+  let anchor = document.createElement('a');
+  anchor.id = "aaa";
+  anchor.style.display = 'none';
+  let text = document.createTextNode('0');
+  anchor.appendChild(text);
+  document.body.appendChild(anchor);
+
+  document.body.addEventListener('keydown', event => {
+
+    let pageee = Number(document.getElementById('aaa').textContent);
+    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+    if ((document.getElementById("img" + pageee) == null) && (Math.sign(pageee) == dir)) {
+      let episode_dir = (dir == 1) ? 'viewerbtn_toNext' : 'viewerbtn_toBack';
+      let next_prev = document.getElementsByClassName(episode_dir)
+      console.log(next_prev );
+      if  (next_prev != null) {next_prev[0].click();}
+      return;
+    }
+
+    pageee += dir;
+    if (document.getElementById("img" + pageee) == null) {
+      pageee += dir;
+    }
+    console.log(pageee);
+
+    let page_ = document.getElementById("img" + pageee);
+    if (page_ == null) {
+      document.getElementsByClassName("viewerbtn")[1].scrollIntoView();
+    } else {
+      page_.scrollIntoView();
+    }
+    document.getElementById('aaa').textContent = pageee;
+  });
+}
+setTimeout(fullscreen, 1000);
+name:
 このマンガがすごい Apply Arrow keys
 regPattForURL:
 /^https:\/\/tkj.jp\/ebook\/read\/cd\//
@@ -481,3 +844,79 @@ document.body.addEventListener('keydown', event => {
     document.getElementById("GestureRight").children[0].click();
   }
 });
+name:
+働かないふたり Appry Arrow Keys
+regPattForURL:
+/^https:\/\/kuragebunch\.com\/episode\/3269632237/
+script:
+var ab = function(){
+
+  //document.body.style.zoom=`75%`;
+  let n = 0;
+  let att = document.createElement(`div`);
+  att.id = `att`;
+  att.style.cssText=`visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;`;
+  let text = document.createTextNode(n);
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  viewSpreadPage(n, true);
+
+  function viewSpreadPage (curPage, isVsb) {
+    console.log(`curPage : ${curPage}`);
+    let visibility = (isVsb) ? `visible` : `hidden`;
+    let pageCenter = parseInt(window.innerWidth / 2);
+
+    let pages = document.getElementsByClassName(`page-area js-page-area`);
+    let cssText =  `visibility:${visibility};position:fixed;top:0px;width:844px;z-index:19999;`;
+
+    let rightPage = pages[curPage];
+    if (rightPage) {
+      rightPage.children[0].scrollIntoView();
+      rightPage.children[0].style.cssText = `${cssText};left:${pageCenter}px;`;
+    }
+    let leftPage = pages[curPage + 1];
+    if (leftPage) {
+      leftPage.children[0].scrollIntoView();
+      leftPage.children[0].style.cssText = `${cssText};left:${pageCenter - 844}px;`;
+    }
+    document.getElementById(`att`).style.visibility = ((rightPage) || (leftPage)) ? `visible` : `hidden`;
+    document.getElementsByClassName(`series-header-image-wrapper`)[0].scrollIntoView();
+
+  }
+
+
+  document.body.addEventListener(`keydown`, event => {
+    let curPage = Number(document.getElementById(`att`).textContent);
+
+    let dir = (event.key == `ArrowLeft`) - (event.key == `ArrowRight`);
+    if (dir == 0) {return;}
+
+    let pages = document.getElementsByClassName(`page-area js-page-area`);
+
+
+    if ((pages[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      let next_prevClass = (dir == 1) ? `next-link test-back-matter-next-link` : `previous-link`;
+      let next_prev = document.getElementsByClassName(next_prevClass)[0];
+      if  (next_prev) {location.href = next_prev.href;}
+      return;
+    }
+
+    viewSpreadPage(curPage, false);
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, true);
+    // console.log(`curRight : ${curPage}`);
+    // console.log(`curLeft : ${curPage + 1}`);
+
+    document.getElementById(`att`).textContent = curPage;
+
+  });
+
+}
+setTimeout(ab, 500);
+setTimeout(fillscreen, 3000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+    document.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();
+}

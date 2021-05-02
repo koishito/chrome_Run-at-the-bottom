@@ -9,24 +9,33 @@
 </head>
 <body>
     <form>
+        <input type="checkbox" id="expand-toggle" hidden>
+        <label for="expand-toggle" id="expand-btn">edit mode</label>
+        <label for="expand-toggle" id="expand-btn2">imp/exp mode</label>
         <h2><u>Run at the bottom</u></h2>
-        <b>select name</b>
-        <select size="5" name="select" id="select"></select>
-        <b>name</b>
-        <input type="text" id="name"></input>
-        <b>regular expression pattern for url matching</b>
-        <textarea type="text" id="regPattForURL"></textarea>
-        <b>script</b><!--   <font size="2">(Editable) *Add commented title on the first line</font> -->
-        <textarea id="script"></textarea>
-        <div class="button">
-            <!-- <input type="button" id="Save" value="Save"> -->
-            <button class="buttons" id="new">new</button>&emsp;
-            <button class="buttons" id="save">save</button>
+
+        <div class="edit_mode">
+            <b>select name</b>
+            <select size="5" name="select" id="select"></select>
+            <b>name</b>
+            <input type="text" id="name"></input>
+            <b>regular expression pattern for url matching</b>
+            <textarea type="text" id="regPattForURL"></textarea>
+            <b>script</b><!--   <font size="2">(Editable) *Add commented title on the first line</font> -->
+            <textarea id="script"></textarea>
+            <button id="new">new</button>&emsp;
+            <button id="save">save</button>
             <font size="2" id="If">*If name is the same, it will be overwritten</font>&emsp;
-            <button class="buttons" id="remove">remove</button>&emsp;
-            <button class="buttons" id="ConvRegExp">convReg</button>&emsp;
-            <button class="buttons" id="impexp">imp/exp</button>&emsp;
-            <button class="buttons" id="positon">pos.</button>
+            <button id="remove">remove</button>&emsp;
+            <button id="ConvRegExp">convReg</button>&emsp;
+        </div>
+
+        <div class="impexp_mode" hidden>
+            <b>scripts</b>
+            <textarea id="scripts"></textarea>
+            <button id="read_file" hidden>read file</button>&emsp;&emsp;
+            <button id="export">export</button>&emsp;&emsp;
+            <button id="import">import</button>&emsp;&emsp;
         </div>
     </form>
 </body>

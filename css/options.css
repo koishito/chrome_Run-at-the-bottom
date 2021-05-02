@@ -1,45 +1,84 @@
+/* toggle ~*/
+:root {
+  --light_border: solid 2px #e0e0e0;
+  --shadow_border: solid 2px #717171;
+}
+
+#expand-btn, #expand-btn2{
+  float: right;
+  width: 100px;
+  text-align: center;
+  margin-top: 3px;
+  padding: 0px 3px;
+  background-color: silver;
+  user-select: none;
+  align-items: flex-end;
+}
+
+#expand-btn {
+  display: inline-block;
+  border-top : var(--light_border);
+  border-left : var(--light_border);
+  border-right : var(--shadow_border);
+  border-bottom : var(--shadow_border);
+}
+
+#expand-btn2 {
+  display: none;
+  border-top : var(--shadow_border);
+  border-left : var(--shadow_border);
+  border-right : var(--light_border);
+  border-bottom : var(--light_border);
+}
+
+#expand-toggle:checked ~ #expand-btn {
+  display: none;
+}
+#expand-toggle:checked ~ #expand-btn2 {
+  display: inline-block;
+}
+
+#expand-toggle:checked ~ .edit_mode {
+  display: none;
+}
+
+#expand-toggle:checked ~ .impexp_mode {
+  display: inline-block;
+}
+/*~ toggle */
+
 form{
     width: 700px;
     background-color: #eaeaea;
-    padding:10px 20px;
+    padding: 10px 20px;
     margin: 0 auto;
     font-family: Verdana;
 }
 
-select{
-    width: 700px;
-    height: 112px;
-    box-sizing:border-box;
-    font-family: Verdana;
+#select, #name, #regPattForURL, #script, #scripts{
+  resize: none;
+  width: 700px;
+  box-sizing: border-box;
+  font-family: Verdana;
 }
 
-#name{
-    width: 700px;
-    box-sizing: border-box;
-    font-family: Verdana;
+#select{
+  height: 112px;
 }
 
 #regPattForURL{
-    resize: vertical;
-    height: 54px;
-    width: 700px;
-    box-sizing: border-box;
-    font-family: Verdana;
+  height: 54px;
 }
 
 #script{
-    resize: vertical;
-    height: 234px;
-    width: 700px;
-    box-sizing: border-box;
-    font-family: Verdana;
+  height: 234px;
 }
 
-.button{
-    text-align:center;
+button{
+  background-color: silver;
 }
 
-.buttons{
-    display:inline-block;
-    background-color: silver;
+#scripts{
+  height: 460px;
 }
+
