@@ -2,18 +2,15 @@
 const systemDataKey =  localStorage.getItem('systemDataKey');
 
 chrome.storage.sync.get(null, function(items) {
-  // console.log(JSON.stringify(items));
   const keys = Object.keys(items);
-  // console.log(keys);
   // make items of listbox
   const SelectItem = document.getElementById('select');
-  for (let i = 0; i < keys.length; i++) {
-    var key = keys[i];
-    var option = document.createElement('option');
+  keys.forEach(key => {
+    let option = document.createElement('option');
     option.setAttribute('value', key);
     option.innerHTML = '<xmp>' + key + '</xmp>';
     SelectItem.appendChild(option);
-  }
+  });
   SelectItem.value = localStorage.getItem('curkey');
 
   onSellectMenuChange();
@@ -23,7 +20,7 @@ chrome.storage.sync.get(null, function(items) {
   document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
   document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
 
-  // document.getElementById('read_file').addEventListener('click', onExportButtonClick);
+  document.getElementById('read_file').addEventListener('change', onReadFileButtonClick);
   document.getElementById('export').addEventListener('click', onExportButtonClick);
   document.getElementById('import').addEventListener('click', onImportButtonClick);
 
@@ -83,10 +80,10 @@ function onRemoveButtonClick() {
 
 function onConvRegExpButtonClick() {
   let regPattForURL = document.getElementById('regPattForURL');
-  var regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
-  var sourceURL = regPattForURLarr[0];
+  let regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
+  let sourceURL = regPattForURLarr[0];
   if (/^\//.test(sourceURL)) {return;}
-  var targetURL = convURLtoRegExp(sourceURL);
+  let targetURL = convURLtoRegExp(sourceURL);
   //regPattForURL.value = targetURL + regPattForURL.value;
   regPattForURL.value = regPattForURL.value.replace(sourceURL, targetURL);
   onSaveButtonClick();
@@ -109,8 +106,17 @@ function convURLtoRegExp(sourceURL) {
 
 }
 
-function onReadFileButtonClick () {
+function onReadFileButtonClick (evt) {
+  let input = evt.target;
+  if (input.files.length == 0) {/*alert('No file selected');*/ return;}
 
+  const file = input.files[0];
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById('scripts').innerHTML = reader.result;
+  };
+  reader.readAsText(file);
+  
 }
 
 function onImportButtonClick () {
@@ -131,16 +137,25 @@ function onImportButtonClick () {
   }
 
   chrome.storage.sync.get(null, function(items) {
-    const keys = Object.keys(items);
-    for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
+    Object.keys(items).forEach(key => {
       let item = items[key];
       if (item.update != 'true') {
         chrome.storage.sync.remove(key, () => {});
         const obj = {['(delete?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
         chrome.storage.sync.set(obj, () => {});
       }
-    }
+    })
+
+    // const keys = Object.keys(items);
+    // for (let i = 0; i < keys.length; i++) {
+    //   let key = keys[i];
+    //   let item = items[key];
+    //   if (item.update != 'true') {
+    //     chrome.storage.sync.remove(key, () => {});
+    //     const obj = {['(delete?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
+    //     chrome.storage.sync.set(obj, () => {});
+    //   }
+    // }
   });
 
 }

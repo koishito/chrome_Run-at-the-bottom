@@ -82,3 +82,14 @@ button{
   height: 460px;
 }
 
+#select_file{
+  /* width: 100px; */
+  text-align: center;
+  margin-top: 30px;
+  padding: 2px 4px;
+  border: solid 2px #717171;
+  background-color: silver;
+  user-select: none;
+  /* align-items: flex-end; */
+}
+

@@ -90,6 +90,90 @@ const matchedPartInURL = location.href.match(regPattForURL)[0];
 //floatBox_to("**name**");
 })();
 name:
+(delete?)2021/5/3 19:28:22
+regPattForURL:
+
+script:
+
+name:
+(delete?)Push '→,←' Open starting with /^[次|>|＞|next|→]/, /^[前|<|＜|prev|←]/
+regPattForURL:
+/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
+//^https:\/\/book.dmm.com\/library\//
+script:
+let rightlink = Array.prototype.slice.call(document.links)
+  .filter(element => {return ('textContent' in element );})
+  .filter(element => {return element.textContent.match(/^[次|>|＞|next|→]/);})
+  .filter(element => {return element.hasAttribute("href");})
+  .filter(element => {return element.href.match(regPattForURL);})
+  [0].href;
+
+let leftlink = Array.prototype.slice.call(document.links)
+  .filter(element => {return ('textContent' in element );})
+  .filter(element => {return element.textContent.match(/^[前|<|＜|prev|←]/);})
+  .filter(element => {return element.hasAttribute("href");})
+  .filter(element => {return element.href.match(regPattForURL);})
+  [0].href;
+
+if ((rightlink) || (leftlink)) {
+
+  document.body.addEventListener('keydown', event => {
+    if ((rightlink) && (event.key == 'ArrowRight')) {
+      location.href = rightlink;
+    } else if ((leftlink) && (event.key == 'ArrowLeft')) {
+      location.href = leftlink;
+    }
+  });
+
+}
+name:
+(delete?)at Bottom /^[次|>|＞|next|→]/
+regPattForURL:
+/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+//^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
+//^https:\/\/book.dmm.com\/library\//
+script:
+const linkTextStartingWith= /次|>|＞|next|→/;
+var nextArticle = '';
+console.log("matchedPartInURL : " + matchedPartInURL);
+const dlinks = document.links;
+for (var i = dlinks.length-1; i >= 0; i--){
+  var dlink = dlinks[i];
+  var dlinkPath = dlink.href;
+  console.log("dlink.textContent.search : " + dlink.textContent.search(linkTextStartingWith));
+  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
+  if(('textContent' in dlink ) && (dlink.textContent.search(linkTextStartingWith) == 0) &&
+    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
+    console.log("dlinkPath : " + dlinkPath);
+    nextArticle = dlinkPath;
+    onScroll();
+    break;
+  }
+}
+function scriptAtBottom() {
+  location.href = nextArticle;
+}
+name:
+(delete?)move at Bottom
+regPattForURL:
+/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
+/^https:\/\/book.dmm.com\/library\//
+script:
+let nextArticle = Array.prototype.slice.call(document.links)
+  .filter(element => {return ('textContent' in element );})
+  .filter(element => {return element.textContent.match(/^[次|>|＞|next|→]/);})
+  .filter(element => {return element.hasAttribute("href");})
+  .filter(element => {return element.href.match(regPattForURL);})
+  [0].href;
+
+if (nextArticle) {onScroll();}
+
+function scriptAtBottom() {
+  location.href = nextArticle;
+}
+name:
 2021/4/19 20:02:03
 regPattForURL:
 //^https:\/\/renta\.papy\.co\.jp\//
