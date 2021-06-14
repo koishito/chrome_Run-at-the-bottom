@@ -1,7 +1,7 @@
 /* toggle ~*/
 :root {
-  --light_border: solid 2px #e0e0e0;
-  --shadow_border: solid 2px #717171;
+  --light_border: solid 2px #767676;
+  --shadow_border: solid 2px #212121;
 }
 
 #expand-btn, #expand-btn2{
@@ -53,6 +53,7 @@ form{
     padding: 10px 20px;
     margin: 0 auto;
     font-family: Verdana;
+    user-select: none;
 }
 
 #select, #name, #regPattForURL, #script, #scripts{

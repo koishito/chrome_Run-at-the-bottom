@@ -1,7 +1,11 @@
 // const curkey = String.fromCharCode(189);
 const systemDataKey =  localStorage.getItem('systemDataKey');
+if (systemDataKey == null) {initialLoad();}
+// const QuotationMark = `\b` //String.fromCharCode(8);
+var itemsOnMemory;
 
 chrome.storage.sync.get(null, function(items) {
+  itemsOnMemory = items;
   const keys = Object.keys(items);
   // make items of listbox
   const SelectItem = document.getElementById('select');
@@ -13,6 +17,8 @@ chrome.storage.sync.get(null, function(items) {
   });
   SelectItem.value = localStorage.getItem('curkey');
 
+  // document.getElementById('scripts').value = createSettingText();
+
   onSellectMenuChange();
   document.getElementById('select').addEventListener('change', onSellectMenuChange);
   document.getElementById('new').addEventListener('click', onNewButtonClick);
@@ -23,8 +29,17 @@ chrome.storage.sync.get(null, function(items) {
   document.getElementById('read_file').addEventListener('change', onReadFileButtonClick);
   document.getElementById('export').addEventListener('click', onExportButtonClick);
   document.getElementById('import').addEventListener('click', onImportButtonClick);
+  // document.getElementById('scripts').addEventListener('dblclick', (() => {document.getElementById('scripts').value = createSettingText();}));
 
 });
+
+// redgister initial data
+// function initialLoad() {
+//   localStorage.clear();
+//   localStorage.setItem('systemDataKey', systemDataKey);
+//   localStorage.setItem('curkey', systemDataKey);
+
+// }
 
 // From here, single function processing for each button
 function onSellectMenuChange() {
@@ -120,14 +135,35 @@ function onReadFileButtonClick (evt) {
 }
 
 function onImportButtonClick () {
+  // const arr = document.getElementById('scripts').value.split(`\bname:\b\n`);
+  // return;
+
+  var obj = {};
+  const arr2 = document.getElementById('scripts').value.split(/(name:\n|regPattForURL:\n|script:\n)/);
+  for (let i = -1; i < arr2.length; i = i + 6) {
+    obj[(arr2[i + 1] == '') ? systemDataKey : arr2[i + 1]] = {regPattForURL: arr2[i + 3].trim(), script: arr2[i + 5].trim(), update: 'true'};
+  }
+
   const arr = document.getElementById('scripts').value.split(/name:\n/);
+  // const arr2 = arr.forEach(element=>{element.split(/(regPattForURL:\n|script:\n)/)});;
+  // var obj = {};
+  // arr//.filter(element => {(element != '')})
+  // .forEach(element=>{
+  //   let item = element.split(/(regPattForURL:\n|script:\n)/)
+  //   let name = item[0].trim();
+  //   if (name == '') {name = systemDataKey;}
+  //   obj[name] = {regPattForURL: item[1].trim(), script: item[2].trim(), update: 'true'};
+  //   // chrome.storage.sync.set(obj, function () {});
+  
+  // });
+
   if (arr.length == 0) {return;}
   for (let item of arr) {
     if (item != '') {
-      let itemarr = item.split(/regPattForURL:\n/);
+      let itemarr = item.split(`regPattForURL:\n`);
       let name = itemarr[0].trim();
       if (name == '') {name = systemDataKey;}
-      let itemarr1 = itemarr[1].split(/script:\n/)
+      let itemarr1 = itemarr[1].split(`script:\n`)
       let regPattForURL = itemarr1[0].trim();
       let script = itemarr1[1].trim();
 
@@ -145,25 +181,15 @@ function onImportButtonClick () {
         chrome.storage.sync.set(obj, () => {});
       }
     })
-
-    // const keys = Object.keys(items);
-    // for (let i = 0; i < keys.length; i++) {
-    //   let key = keys[i];
-    //   let item = items[key];
-    //   if (item.update != 'true') {
-    //     chrome.storage.sync.remove(key, () => {});
-    //     const obj = {['(delete?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
-    //     chrome.storage.sync.set(obj, () => {});
-    //   }
-    // }
   });
 
 }
 
 function onExportButtonClick() {
-  const namevalue = document.getElementById('name').value;
-  const regPattForURLvalue = document.getElementById('regPattForURL').value;
-  const scriptvalue = document.getElementById('script').value;
+  // const namevalue = document.getElementById('name').value;
+  // const regPattForURLvalue = document.getElementById('regPattForURL').value;
+  // const scriptvalue = document.getElementById('script').value;
+  // let text = createSettingText();
 
   chrome.storage.sync.get(null, function(items) {
     const keys = Object.keys(items);
@@ -202,3 +228,17 @@ function isContainedReservedWord(MultipleLine, reservedWordarr) {
 
 }
 
+// function createSettingText() {
+//     console.log(itemsOnMemory);
+//     let text = "";
+//     Object.keys(itemsOnMemory).forEach(key => {
+//       let item = itemsOnMemory[key];
+//       if (key != systemDataKey) {
+//         text += `\n${QuotationMark}name:${QuotationMark}\n` + key;
+//       }
+//       text += `\n${QuotationMark}regPattForURL:${QuotationMark}\n` + item.regPattForURL;//.replace(/\\/g, /\\\\/);
+//       text += `\n${QuotationMark}script:${QuotationMark}\n` + item.script;//.replace(/\\/g, /\\\\/);
+//     })
+//     return text.slice(1);
+
+// }

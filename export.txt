@@ -1,4 +1,8 @@
 regPattForURL:
+/^http:\/\/mental\-support\.org\//
+/^http:\/\/www\.furanskin\.net\//
+/^http:\/\/otakomu\.jp\//
+/^http:\/\/blog\.esuteru\.com\//
 /^file:\/\/\//
 /^https:\/\/bitbucket.org\//
 /^chrome.+$/
@@ -8,6 +12,7 @@ regPattForURL:
 script:
 // The part enclosed in ** is replaced.
 (window.onload=function(){
+wasExecuted = true;
 function onScroll() {
   document.addEventListener('scroll',  function() {
     const scrollHeight = Math.max(
@@ -47,8 +52,8 @@ function dispPosition() {
 
   document.body.addEventListener("mousemove", dispPosition);
   function dispPosition(e){
-    document.getElementById("xxx").value = "x : " + e.clientX;
-    document.getElementById("yyy").value = "y : " + e.clientY;
+    document.getElementById("xxx").value = `x : ${e.clientX}`;
+    document.getElementById("yyy").value = `y : ${e.clientY}`;
   };
 
 }
@@ -78,7 +83,7 @@ function floatBox_to(text) {
 function curclepoint(x, y) {
   //x-=10;y-=10;
   let cp=document.createElement("div");
-  cp.style.cssText="position:fixed;top:"+ y +"px;left:"+ x +"px;width: 20px;height:20px;border-radius:50%;background-color:#f00;";
+  cp.style.cssText="position:fixed;top:${y}px;left:${x}px;width:20px;height:20px;border-radius:50%;background-color:#f00;";
   document.body.appendChild(cp);
   setTimeout(() =>{cp.parentNode.removeChild(cp);}, 2000)
 }
@@ -90,90 +95,6 @@ const matchedPartInURL = location.href.match(regPattForURL)[0];
 //floatBox_to("**name**");
 })();
 name:
-(delete?)2021/5/3 19:28:22
-regPattForURL:
-
-script:
-
-name:
-(delete?)Push '→,←' Open starting with /^[次|>|＞|next|→]/, /^[前|<|＜|prev|←]/
-regPattForURL:
-/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
-/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
-//^https:\/\/book.dmm.com\/library\//
-script:
-let rightlink = Array.prototype.slice.call(document.links)
-  .filter(element => {return ('textContent' in element );})
-  .filter(element => {return element.textContent.match(/^[次|>|＞|next|→]/);})
-  .filter(element => {return element.hasAttribute("href");})
-  .filter(element => {return element.href.match(regPattForURL);})
-  [0].href;
-
-let leftlink = Array.prototype.slice.call(document.links)
-  .filter(element => {return ('textContent' in element );})
-  .filter(element => {return element.textContent.match(/^[前|<|＜|prev|←]/);})
-  .filter(element => {return element.hasAttribute("href");})
-  .filter(element => {return element.href.match(regPattForURL);})
-  [0].href;
-
-if ((rightlink) || (leftlink)) {
-
-  document.body.addEventListener('keydown', event => {
-    if ((rightlink) && (event.key == 'ArrowRight')) {
-      location.href = rightlink;
-    } else if ((leftlink) && (event.key == 'ArrowLeft')) {
-      location.href = leftlink;
-    }
-  });
-
-}
-name:
-(delete?)at Bottom /^[次|>|＞|next|→]/
-regPattForURL:
-/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
-//^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
-//^https:\/\/book.dmm.com\/library\//
-script:
-const linkTextStartingWith= /次|>|＞|next|→/;
-var nextArticle = '';
-console.log("matchedPartInURL : " + matchedPartInURL);
-const dlinks = document.links;
-for (var i = dlinks.length-1; i >= 0; i--){
-  var dlink = dlinks[i];
-  var dlinkPath = dlink.href;
-  console.log("dlink.textContent.search : " + dlink.textContent.search(linkTextStartingWith));
-  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
-  if(('textContent' in dlink ) && (dlink.textContent.search(linkTextStartingWith) == 0) &&
-    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
-    console.log("dlinkPath : " + dlinkPath);
-    nextArticle = dlinkPath;
-    onScroll();
-    break;
-  }
-}
-function scriptAtBottom() {
-  location.href = nextArticle;
-}
-name:
-(delete?)move at Bottom
-regPattForURL:
-/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
-/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
-/^https:\/\/book.dmm.com\/library\//
-script:
-let nextArticle = Array.prototype.slice.call(document.links)
-  .filter(element => {return ('textContent' in element );})
-  .filter(element => {return element.textContent.match(/^[次|>|＞|next|→]/);})
-  .filter(element => {return element.hasAttribute("href");})
-  .filter(element => {return element.href.match(regPattForURL);})
-  [0].href;
-
-if (nextArticle) {onScroll();}
-
-function scriptAtBottom() {
-  location.href = nextArticle;
-}
-name:
 2021/4/19 20:02:03
 regPattForURL:
 //^https:\/\/renta\.papy\.co\.jp\//
@@ -184,6 +105,12 @@ var fullscreen = function(){
   //document.dispatchEvent( new KeyboardEvent( "keyup", { keycode: 122 }));
 }
 setTimeout(fullscreen, 1000);
+name:
+Alert http Site
+regPattForURL:
+/^http:\/\//
+script:
+alert("http site");
 name:
 ClickByPushedKey.js
 regPattForURL:
@@ -298,8 +225,9 @@ regPattForURL:
 script:
 const id = 'contentMain-readNextEpisode';
 var nextArticle = '';
-const targetElement = document.getElementById(id);
-if(('href' in targetElement ) && (targetElement.href.match(regPattForURL)[0] == matchedPartInURL)) {
+let targetElement = document.getElementById(id);
+if (targetElement == null) {return;}
+if ((targetElement.hasAttribute('href')) && (targetElement.href.match(regPattForURL)[0] == matchedPartInURL)) {
   nextArticle = targetElement.href;
   onScroll();
 }
@@ -308,59 +236,36 @@ function scriptAtBottom() {
   location.href = nextArticle;
 }
 name:
-Open the link for the next article starting with /次|>|＞|next|→/
+Push '→,←' Open starting with /^(次|>|＞|next|→)/, /^(前|<|＜|prev|←)/
 regPattForURL:
+/^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
 /^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
-/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
 //^https:\/\/book.dmm.com\/library\//
 script:
-const linkTextStartingWith= /次|>|＞|next|→/;
-var nextArticle = '';
-console.log("matchedPartInURL : " + matchedPartInURL);
-const dlinks = document.links;
-for (var i = dlinks.length-1; i >= 0; i--){
-  var dlink = dlinks[i];
-  var dlinkPath = dlink.href;
-  console.log("dlink.textContent.search : " + dlink.textContent.search(linkTextStartingWith));
-  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
-  if(('textContent' in dlink ) && (dlink.textContent.search(linkTextStartingWith) == 0) &&
-    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
-    console.log("dlinkPath : " + dlinkPath);
-    nextArticle = dlinkPath;
-    onScroll();
-    break;
-  }
-}
-function scriptAtBottom() {
-  location.href = nextArticle;
-}
-name:
-Push '→' Open the link for the next article starting with /次|>|＞|next|→/
-regPattForURL:
-/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
-/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\//
-//^https:\/\/book.dmm.com\/library\//
-script:
-const linkTextStartingWith= /次|>|＞|next|→/;
-var nextArticle = '';
-console.log("matchedPartInURL : " + matchedPartInURL);
-const dlinks = document.links;
-for (var i = dlinks.length-1; i >= 0; i--){
-  var dlink = dlinks[i];
-  var dlinkPath = dlink.href;
-  console.log("dlink.textContent.search : " + dlink.textContent.search(linkTextStartingWith));
-  console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
-  if(('textContent' in dlink ) && (dlink.textContent.search(linkTextStartingWith) == 0) &&
-    (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
-    console.log("dlinkPath : " + dlinkPath);
-    nextArticle = dlinkPath;
-    document.body.addEventListener('keydown', event => {
-      if (event.key == 'ArrowRight') {
-        location.href = nextArticle;
-      }
-    });
-    break;
-  }
+let rightlink = Array.prototype.slice.call(document.links)
+  .filter(element => {return ('textContent' in element );})
+  .filter(element => {return element.textContent.match(/^(次|>|＞|next|→)/);})
+  .filter(element => {return element.hasAttribute("href");})
+  .filter(element => {return element.href.match(regPattForURL);})
+  [0].href;
+
+let leftlink = Array.prototype.slice.call(document.links)
+  .filter(element => {return ('textContent' in element );})
+  .filter(element => {return element.textContent.match(/^(前|<|＜|prev|←)/);})
+  .filter(element => {return element.hasAttribute("href");})
+  .filter(element => {return element.href.match(regPattForURL);})
+  [0].href;
+
+if ((rightlink) || (leftlink)) {
+
+  document.body.addEventListener('keydown', event => {
+    if ((rightlink) && (event.key == 'ArrowRight')) {
+      location.href = rightlink;
+    } else if ((leftlink) && (event.key == 'ArrowLeft')) {
+      location.href = leftlink;
+    }
+  });
+
 }
 name:
 comic-walker  Apply Arrow keys
@@ -368,77 +273,128 @@ regPattForURL:
 //^https:\/\/comic\-walker\.com\/viewer\//
 script:
 document.body.addEventListener('keydown', event => {
+  if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
   console.log(document.getElementsByClass("btnNext").children);
-  if (event.key == 'ArrowLeft') {
-    document.getElementsByClass("btnNext").children[0].children[0].click();
+  if (event.key == 'ArrowDown') {
+    document.getElementsByClassName("btnNext").children[0].children[0].click();
+  } else if (event.key == 'ArrowUp') {
+    document.getElementsByClassName("btnBack").children[0].children[0].click();
   }
 
 });
 name:
 comicbunch Appry Arrow Keys
 regPattForURL:
-//^https:\/\/kuragebunch\.com\/episode\/\d{19}/
+/^https:\/\/www\.comicbunch\.com\/manga\/bunch\/.+\/view\/\d+\//
 script:
 var ab = function(){
+  if (document.getElementById('att')) {return;}
 
-  //document.body.style.zoom=`75%`;
-  let n = 0;
-  let att = document.createElement(`div`);
-  att.id = `att`;
-  att.style.cssText=`visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;`;
-  let text = document.createTextNode(n);
+  document.getElementsByClassName("footer_comics_ad push")[0].hidden = true;
+  document.body.style.zoom=`92%`;
+
+  let head = "cmc";
+  let pageWidth = 640;
+  let n = 1;
+  let arr = [0, n];
+  let page = document.getElementById(head + ++n);
+  let isLeftPage = true;
+
+  do {
+    if (page) {
+      //page.scrollIntoView();
+      arr.push(n);
+    } else {
+      if (arr.length % 2 == 0) {
+        arr.shift();
+        isLeftPage = -isLeftPage;
+      }
+      arr.splice(arr.length - 1, 0, -1);
+    }
+    isLeftPage = -isLeftPage;
+    page = document.getElementById(head + ++n);
+    nextpage = document.getElementById(head + (n + 1));
+  } while ((nextpage) || (page))
+  if (isLeftPage) {arr.push(-1);}
+  arr.unshift(0);
+  console.log(arr);
+
+  /*let arrStr = arr.join(',');
+  console.log(arrStr);
+  ary = arrStr.split(',');
+  console.log(ary);*/
+
+  let att = document.createElement("div");
+  att.id = "att";
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;";
+  let text = document.createTextNode(arr.join(','));
   att.appendChild(text);
   document.body.appendChild(att);
 
-  viewSpreadPage(n, true);
+  let curPage = Number(arr[0]);
+  arr.shift();
+  viewSpreadPage(curPage, arr, true);
 
-  function viewSpreadPage (curPage, isVsb) {
-    console.log(`curPage : ${curPage}`);
-    let visibility = (isVsb) ? `visible` : `hidden`;
+
+  function viewSpreadPage (curPage, arr, vsb) {
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
     let pageCenter = parseInt(window.innerWidth / 2);
 
-    let pages = document.getElementsByClassName(`page-area js-page-area`);
-    let cssText =  `visibility:${visibility};position:fixed;top:0px;width:844px;z-index:19999;`;
-
-    let rightPage = pages[curPage];
+    let rightPage = document.getElementById(head + arr[curPage]);
     if (rightPage) {
-      rightPage.children[0].scrollIntoView();
-      rightPage.children[0].style.cssText = `${cssText};left:${pageCenter}px;`;
+        rightPage.scrollIntoView();
+        rightPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + pageCenter +"px;";
+        rightPage.style.display = (vsb) ? "" :"none";
     }
-    let leftPage = pages[curPage + 1];
+
+    let leftPage = document.getElementById(head + arr[curPage + 1]);
     if (leftPage) {
-      leftPage.children[0].scrollIntoView();
-      leftPage.children[0].style.cssText = `${cssText};left:${pageCenter - 844}px;`;
+        leftPage.scrollIntoView();
+        leftPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + (pageCenter - pageWidth) +"px;";
+        leftPage.style.display = (vsb) ? "" :"none";
     }
-    document.getElementById(`att`).style.visibility = ((rightPage) || (leftPage)) ? `visible` : `hidden`;
-    document.getElementsByClassName(`series-header-image-wrapper`)[0].scrollIntoView();
+
+    document.getElementById('att').style.display = ((rightPage) || (leftPage)) ? "" : "none"
+    document.getElementById("footer").scrollIntoView();
 
   }
 
 
-  document.body.addEventListener(`keydown`, event => {
-    let curPage = Number(document.getElementById(`att`).textContent);
+  document.body.addEventListener('keydown', event => {
+    let arr = document.getElementById('att').textContent.split(',');
+    let curPage = Number(arr[0]);
+    arr.shift();
+    //console.log("curPage : " + curPage);
 
-    let dir = (event.key == `ArrowLeft`) - (event.key == `ArrowRight`);
+    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
     if (dir == 0) {return;}
 
-    let pages = document.getElementsByClassName(`page-area js-page-area`);
-
-
-    if ((pages[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
-      let next_prevClass = (dir == 1) ? `next-link test-back-matter-next-link` : `previous-link`;
-      let next_prev = document.getElementsByClassName(next_prevClass)[0];
-      if  (next_prev) {location.href = next_prev.href;}
+    if ((arr[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      let episode_dir = (dir == 1) ? '次の話' : '前の話';
+      let next_prev = Array.prototype.slice.call(document.links)
+      .filter(element => {return ('textContent' in element );})
+      .filter(element => {return (element.textContent.indexOf(episode_dir) == 0);})
+      .filter(element => {return element.hasAttribute("href");})
+      //.filter(element => {return element.href.match(regPattForURL);})
+      [0];
+      console.log(next_prev);
+      if  (next_prev != null) {
+        //window.open(next_prev[1].href, null, "fullscreen=yes")
+        //document.webkitExitFullscreen();
+        next_prev.click();
+      }
       return;
     }
 
-    viewSpreadPage(curPage, false);
+    viewSpreadPage(curPage, arr, false);
     curPage += (dir * 2);
-    viewSpreadPage(curPage, true);
-    // console.log(`curRight : ${curPage}`);
-    // console.log(`curLeft : ${curPage + 1}`);
+    viewSpreadPage(curPage, arr, true);
+    console.log("curPage : " + curPage, );
+    console.log("right : " + arr[curPage]);
+    console.log("left : " + arr[curPage + 1]);
+    arr.unshift(curPage)
 
-    document.getElementById(`att`).textContent = curPage;
+    document.getElementById('att').textContent = arr.join(',');
 
   });
 
@@ -448,7 +404,6 @@ setTimeout(fillscreen, 3000);
 
 function fillscreen() {
     document.documentElement.webkitRequestFullScreen();
-    document.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();
 }
 name:
 comics.gendaibusiness Apply Arrow keys
@@ -470,6 +425,12 @@ document.body.addEventListener('keydown', event => {
 name:
 full screen
 regPattForURL:
+/^https:\/\/www\.ganganonline\.com\/title\/.+\/chapter\//
+/^https:\/\/piccoma\.com\/web\/viewer\//
+/^https:\/\/ebookjapan\.yahoo\.co\.jp\/viewer\/story\//
+/^https:\/\/comic\-meteor\.jp\/ptdata\//
+/^http:\/\/www\.comic\-medu\.com\/st\/.+\/\d+/
+/^https:\/\/novelup\.plus\/story\/\d{9}\/\d{9}/
 //^https:\/\/seiga.nicovideo.jp\/watch\//
 /^https:\/\/comic\-fuz\.com\/viewer\.html/
 /^https:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
@@ -493,14 +454,15 @@ regPattForURL:
 /^https:\/\/www\.alphapolis\.co\.jp\/manga\/official\/\d{8,9}\//
 /^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
 /^https:\/\/viewer\.ganganonline\.com\/manga\//
-/^https:\/\/ncode.syosetu.com\/n\d{4}[a-z]{2}\/\d+/
+/^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
 /^https:\/\/kakuyomu\.jp\/works\/\d{19}\/episodes\/\d{19}/
 /^https:\/\/www\.mangabox\.me\/reader\/\d{5}\/episodes\/\d{5}\//
 /^https:\/\/comic\.pixiv\.net\/viewer\/stories\//
 /^https:\/\/gaugau\.futabanet\.jp\/common\/dld\/zip\//
 script:
 var fullscreen = function(){
-  document.documentElement.webkitRequestFullScreen();
+console.log(wasExecuted);
+  if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
 }
 setTimeout(fullscreen, 1500);
 name:
@@ -577,6 +539,7 @@ script:
 var fullscreen = function(){
   document.getElementsByClassName("viewer-page__button viewer-page__button--green viewer-page__button--large viewer-page__button--read")[0].click();
   document.getElementsByClassName("viewer-button viewer-button--full")[0].click();
+  document.body.style.zoom=`90%`;
 
 
 }
@@ -591,6 +554,206 @@ var fullscreen = function(){
   document.documentElement.webkitRequestFullScreen();
 }
 setTimeout(fullscreen, 500);
+name:
+fullscreen for palcy
+regPattForURL:
+/^https:\/\/palcy\.jp\/comics\//
+script:
+var ab = function(){
+  if (document.getElementById('att')) {return;}
+
+  document.documentElement.webkitRequestFullScreen();
+  document.body.style.zoom='92%';
+
+  let pageWidth = 720;
+  let n = 0;
+  let arr = [-1];
+  let pages = document.getElementsByClassName(`pages`)[0].children
+  for (page of pages) {
+    arr.push(n++);
+  }
+  arr.push(-1);
+  if (arr.length % 2 == 1) {arr.shift();}
+  arr.unshift(0); //set curPage
+  console.log(arr);
+  
+  let att = document.createElement("div");
+  att.id = "att";
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;";
+  let text = document.createTextNode(arr.join(','));
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  let curPage = parseInt(arr[0]);
+  arr.shift();
+  viewSpreadPage(curPage, arr, true);
+
+
+  function viewSpreadPage (curPage, arr, vsb) {
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+    const pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+
+    let rightPage = pages[arr[curPage]];
+    if (rightPage) {
+        rightPage.scrollIntoView();
+        rightPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + pageCenter +"px;";
+        rightPage.style.display = (vsb) ? "" :"none";
+    }
+
+    let leftPage = pages[arr[curPage + 1]];;
+    if (leftPage) {
+        leftPage.scrollIntoView();
+        leftPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + (pageCenter - pageWidth) +"px;";
+        leftPage.style.display = (vsb) ? "" :"none";
+    }
+
+    document.getElementById('att').style.display = ((rightPage) || (leftPage)) ? "" : "none"
+    document.getElementsByClassName("banner-area")[0].scrollIntoView();
+
+  }
+
+
+  document.body.addEventListener('keydown', event => {
+    let arr = document.getElementById('att').textContent.split(',');
+    let curPage = parseInt(arr[0]);
+    arr.shift();
+    //console.log("curPage : " + curPage);
+
+    let dir = (event.key == 'p') * 99 + (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+
+    if ((arr[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      // let episode_dir = (dir == 1) ? 'viewerbtn_toNext' : 'viewerbtn_toBack';
+      // let next_prev = document.getElementsByClassName(episode_dir);
+      // if  (next_prev != null) {
+      //   //window.open(next_prev[1].href, null, "fullscreen=yes")
+      //   //document.webkitExitFullscreen();
+      //   next_prev[1].children[0].click();
+      // }
+      return;
+    }
+
+    viewSpreadPage(curPage, arr, false);
+    
+    if (dir == 99) {
+      dir = 0;
+      
+      if (parseInt(arr[0]) == -1) {
+        arr.shift();
+      } else {
+        arr.unshift(-1);
+      }
+
+      if (parseInt(arr.slice(-1)[0]) == -1) {
+        arr.pop();
+      } else {
+        arr.push(-1);
+      }
+    }
+
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, arr, true);
+    console.log("curPosition : " + curPage, );
+    console.log("Page : " + arr[curPage + 1] + " , " + arr[curPage]);
+    arr.unshift(curPage);
+
+    document.getElementById('att').textContent = arr.join(',');
+
+  });
+
+}
+setTimeout(ab, 500);
+setTimeout(fillscreen, 3000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+}
+name:
+fullscreen then push space
+regPattForURL:
+//^https:\/\/novelup\.plus\/story\/\d{9}\/\d{9}/
+//^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
+//^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+script:
+document.body.addEventListener('keydown', event => {
+  console.log(event.key);
+  if (event.key == ' ') {
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+  }
+});
+name:
+hellowork
+regPattForURL:
+/^https:\/\/kyushoku\.hellowork\.mhlw\.go\.jp\/kyushoku\/GEAA1\d{5}\.do/
+script:
+if (document.title != `ハローワークインターネットサービス - 求人情報検索・一覧`) {return;}
+  document.body.style.zoom='95%';
+
+  /*利点を強調*/
+  const nes_label = document.getElementsByClassName(`nes_label any fs07 mt04`);
+  for (element of nes_label) {
+    if (/background-color/.test(element.style.cssText))  {return;}
+    element.style.cssText += `background-color:#FFCBCB;`;
+  }
+
+  /*日付を強調*/
+  var date = new Date();
+  date.setDate(date.getDate() - 1);
+  const yesterdayDate = 'YYYY年MM月DD日'.replace(/YYYY/, date.getFullYear())
+                                        .replace(/MM/, date.getMonth() + 1)
+                                        .replace(/DD/, date.getDate());
+  var date = new Date();
+  const todayDate = 'YYYY年MM月DD日'.replace(/YYYY/, date.getFullYear())
+                                    .replace(/MM/, date.getMonth() + 1)
+                                    .replace(/DD/, date.getDate());
+  const fs13_ml01 = document.getElementsByClassName(`fs13 ml01`);
+  const baseStyle = "border:1px solid #0000ff;background-color:";
+  for (element of fs13_ml01) {
+    if (element.innerText == yesterdayDate) {element.style.cssText += `${baseStyle}plum;`;}
+    if (element.innerText == todayDate) {element.style.cssText += `${baseStyle}aqua;`;}
+  }
+
+  let item = 0; /*global*/
+  /*let dir = 0;
+  let scrollOffset = 5;*/
+  const headerHight = document.getElementById(`top_header`).clientHeight;
+  const kyujin = document.getElementsByClassName(`kyujin mt1 noborder`);
+  const kennsuu = document.getElementsByClassName("flex align_end last_right mt05")[0].innerText.split(/(件中 |～)/);
+  const kyujinTotal = kennsuu[0];
+  const kyujinStart = parseInt(kennsuu[2]);
+  for (let i = 0; i < kyujin.length; i++) {
+    kyujin[i].getElementsByClassName(`fb`)[0].innerText=`(${kyujinStart + i}/${kyujinTotal}) 職種`;
+  }
+
+  scrollKyujin(kyujin[item]);
+
+  function scrollKyujin(element) {
+    /*setTimeout(() => {*/
+      element.scrollIntoView({block: `end`});
+      const ClientRectTop = element.getBoundingClientRect().top;
+      const scrollTop = window.pageYOffset + ClientRectTop - headerHight/* - (dir * scrollOffset)*/;
+      console.log(`scrollTop : ${scrollTop}`);
+      document.documentElement.scrollTop = scrollTop - 10; /*10px is no reason*/
+    /*}, 100);*/
+  }
+
+  document.body.addEventListener('keydown', event => {
+    /*dir = (event.key == 'ArrowDown') - (event.key == 'ArrowUp');*/
+    const dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+
+    if ((typeof kyujin[item] == `undefined`) && (Math.sign(item) == dir)) {
+      const tagName = (dir == -1) ? `fwListNaviBtnPrev` : `fwListNaviBtnNext`;
+      document.getElementsByName(tagName)[0].click();
+    } else {
+      item += dir;
+      console.log(`item : ${item}`);
+      if (item == -1) {document.getElementsByClassName(`flex page_navi`)[0].scrollIntoView({block: `center`});}
+      else if (item == kyujin.length) {document.getElementsByClassName(`flex page_navi`)[1].scrollIntoView({block: `center`});}
+      else {scrollKyujin(kyujin[item]);}
+    }
+
+  });
 name:
 kuragebunch View SpreadPage
 regPattForURL:
@@ -635,6 +798,7 @@ var ab = function(){
 
 
   document.body.addEventListener('keydown', event => {
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
     let curPage = Number(document.getElementById('att').textContent);
     console.log('curPage : ' + curPage);
 
@@ -667,6 +831,35 @@ setTimeout(fillscreen, 3000);
 function fillscreen() {
     document.documentElement.webkitRequestFullScreen();
 }
+name:
+move at Bottom
+regPattForURL:
+/^https:\/\/www\.alphapolis\.co\.jp\/novel\/.+\/episode\//
+/^https:\/\/novelup\.plus\/story\/\d{9}\/\d{9}/
+/^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
+/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+script:
+const regexp = /(次へ|次の話|>|＞|next|→)/;
+let NextArticleElements = Array.prototype.slice.call(document.links)
+  .filter(element => {return ('textContent' in element);})
+  .filter(element => {return element.textContent.match(regexp);})
+  .filter(element => {return element.hasAttribute("href");})
+  .filter(element => {return element.href.match(regPattForURL);})
+
+if (NextArticleElements.length) {
+  nextArticle = NextArticleElements[0].href;
+  console.log(nextArticle);
+  if (nextArticle) {onScroll();}
+}
+
+function scriptAtBottom() {
+  location.href = nextArticle;
+}
+
+document.body.addEventListener('keydown', event => {
+  if (event.key != ' ') {return;}
+  if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+});
 name:
 niconico Appry Arrow Keys
 regPattForURL:
@@ -715,9 +908,10 @@ document.body.addEventListener('keydown', event => {
 name:
 niconico Appry Arrow Keys(2)
 regPattForURL:
-/^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d{6}/
+//^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d+/
 script:
 var ab = function(){
+  console.log(`niconico Appry Arrow Keys(2)`);
   if (document.getElementById('att')) {return;}
 
   document.body.style.zoom='92%';
@@ -726,35 +920,28 @@ var ab = function(){
   document.getElementById("ko_controls").style.display ="none";
 
   let head = "page_";
+  let pageWidth = 650;
+  let pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
   let n = 0;
-  let arr = [-1, n];
-  let page = document.getElementById(head + ++n);
-  let isLeftPage = true;
+  let arr = [-1];
+  let page = document.getElementById(head + n.toString());
 
-  do {
+  while ((page) || (document.getElementById(head + (n + 1).toString()))) {
     if (page) {
-      //page.scrollIntoView();
+      page.scrollIntoView();
       arr.push(n);
-    } else {
-      if (arr.length % 2 == 0) {
-        arr.shift();
-        isLeftPage = -isLeftPage;
+      let pageStyle = page.children[0].style;
+      if (parseInt(pageStyle.height.replace("px","")) < parseInt(pageStyle.width.replace("px",""))) {
+        arr.splice(arr.length - 1, 0, -1);
+        if (arr.length % 2 == 1) {arr.shift();}
       }
-      arr.splice(arr.length - 1, 0, -1);
     }
-    isLeftPage = -isLeftPage;
-    page = document.getElementById(head + ++n);
-    nextpage = document.getElementById(head + (n + 1));
-  } while ((nextpage) || (page))
-  if (isLeftPage) {arr.push(-1);}
-  arr.unshift(0);
+    page = document.getElementById(head + (++n).toString());
+  }
+  if (arr.length % 2 == 1) {arr.push(-1);}
+  arr.unshift(0); //set curPage
   console.log(arr);
-
-  /*let arrStr = arr.join(',');
-  console.log(arrStr);
-  ary = arrStr.split(',');
-  console.log(ary);*/
-
+  
   let att = document.createElement("div");
   att.id = "att";
   att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;";
@@ -762,25 +949,26 @@ var ab = function(){
   att.appendChild(text);
   document.body.appendChild(att);
 
-  let curPage = Number(arr[0]);
+  let curPage = parseInt(arr[0]);
   arr.shift();
   viewSpreadPage(curPage, arr, true);
 
 
   function viewSpreadPage (curPage, arr, vsb) {
-    let PageCenter = parseInt(window.innerWidth / 2);
+    let pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+    let cssText = `visibility:visible;position:fixed;top:0px;z-index:19999;`
 
-    let rightPage = document.getElementById("page_" + arr[curPage]);
+    let rightPage = document.getElementById(head  + arr[curPage]);
     if (rightPage) {
         rightPage.scrollIntoView();
-        rightPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + PageCenter +"px;";
+        rightPage.style.cssText = `${cssText};left:${pageCenter}px;`;
         rightPage.style.display = (vsb) ? "" :"none";
     }
 
-    let leftPage = document.getElementById("page_" + arr[curPage + 1]);
+    let leftPage = document.getElementById(head  + arr[curPage + 1]);
     if (leftPage) {
         leftPage.scrollIntoView();
-        leftPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + (PageCenter - 650) +"px;";
+        leftPage.style.cssText = `${cssText};left:${(pageCenter - pageWidth)}px;`;
         leftPage.style.display = (vsb) ? "" :"none";
     }
 
@@ -792,27 +980,49 @@ var ab = function(){
 
   document.body.addEventListener('keydown', event => {
     let arr = document.getElementById('att').textContent.split(',');
-    let curPage = Number(arr[0]);
+    let curPage = parseInt(arr[0]);
     arr.shift();
     //console.log("curPage : " + curPage);
 
-    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    let dir = (event.key == 'p') * 99 + (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
     if (dir == 0) {return;}
+
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
 
     if ((arr[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
       let episode_dir = (dir == 1) ? 'next' : 'prev';
       let next_prev = document.getElementsByClassName(episode_dir);
-      if  (next_prev != null) {next_prev[1].click();}
+      if  (next_prev != null) {
+        //window.open(next_prev[1].href, null, "fullscreen=yes")
+        //document.webkitExitFullscreen();
+        next_prev[1].click();
+      }
       return;
     }
 
     viewSpreadPage(curPage, arr, false);
+    
+    if (dir == 99) {
+      dir = 0;
+      
+      if (parseInt(arr[0]) == -1) {
+        arr.shift();
+      } else {
+        arr.unshift(-1);
+      }
+
+      if (parseInt(arr.slice(-1)[0]) == -1) {
+        arr.pop();
+      } else {
+        arr.push(-1);
+      }
+    }
+
     curPage += (dir * 2);
     viewSpreadPage(curPage, arr, true);
-    console.log("curPage : " + curPage, );
-    console.log("right : " + arr[curPage]);
-    console.log("left : " + arr[curPage + 1]);
-    arr.unshift(curPage)
+    console.log("curPosition : " + curPage, );
+    console.log("Page : " + arr[curPage + 1] + " , " + arr[curPage]);
+    arr.unshift(curPage);
 
     document.getElementById('att').textContent = arr.join(',');
 
@@ -820,19 +1030,124 @@ var ab = function(){
 
 }
 setTimeout(ab, 500);
-setTimeout(fillscreen, 3000);
+setTimeout(fillscreen, 5000);
 
 function fillscreen() {
     document.documentElement.webkitRequestFullScreen();
+}
+name:
+niconico Appry Arrow Keys(3)
+regPattForURL:
+/^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d+/
+script:
+var ab = function(){
+  if (document.getElementById('att')) {return;}
+
+  document.body.style.zoom='92%';
+  document.getElementById(`CommonHeader`).style.display =`none`;
+  document.getElementById(`ko_head_bar_min`).style.display =`none`;
+  document.getElementById(`ko_controls`).style.display =`none`;
+
+  let att = document.createElement(`div`);
+  att.id = `att`;
+  att.style.cssText=`visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;`;
+  document.body.appendChild(att);
+
+
+  
+
+
+
+
+  let curPage = 0;
+  // const OriginalPages = document.getElementsByClassName(`page `);
+  const OriginalPages = document.getElementById(`page_contents`).children;
+  console.log(OriginalPages.length);
+  const cssText = `visibility:visible;position:fixed;top:0px;z-index:19999;`;
+  const pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+  let pageIds = [];
+  for (let OriginalPage of OriginalPages) {
+    // if (/^page_/.test(OriginalPage.id)) {
+      // OriginalPage.style.cssText = 
+      //   `${cssText};left:${(pageCenter - (OriginalPage.children[0].style.width.replace(`px`,``) / 2))}px;`;
+      pageIds.push(OriginalPage.id);
+      // OriginalPage.scrollIntoView();
+      // OriginalPage.style.display = `none`;
+    // }
+  }
+  console.log(pageIds.length);
+
+  document.getElementById(`ko_bookmark_player`).scrollIntoView();
+  setTimeout(viewSinglePage(curPage, true), 500);
+
+  function viewSinglePage (curPage, display) {
+    const pageId = pageIds[curPage];
+    if (pageId) {
+      // if (display) {console.log(page);};
+      const page = document.getElementById(pageId);
+      page.scrollIntoView();
+      page.style.cssText = `${cssText};left:${(pageCenter - (page.children[0].style.width.replace(`px`,``) / 2))}px;`;
+      page.style.display = (display) ? `` :`none`;
+    }
+    document.getElementById('att').style.display = (pageId) ? `` : `none`
+    document.getElementById(`ko_bookmark_player`).scrollIntoView();
+
+  }
+
+  document.body.addEventListener('mouseup', event => {
+    const innerWidth = window.innerWidth;
+    const clientX = event.clientX;
+    let dir = (clientX < innerWidth * 0.3) - (clientX > innerWidth * 0.7);
+    if (dir == 0) {return;}
+    movePage(dir);
+    
+  });
+
+  document.body.addEventListener('keydown', event => {
+    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+    movePage(dir);
+
+  });
+
+  function movePage(dir) {
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+    if ((pageIds[curPage] == undefined) && (Math.sign(curPage) == dir)) {
+      let episode_dir = (dir == 1) ? 'next' : 'prev';
+      let next_prev = document.getElementsByClassName(episode_dir);
+      if  (next_prev != null) {
+        next_prev[1].click();
+      }
+      return;
+    }
+
+      viewSinglePage(curPage, false);
+      curPage += dir;
+      viewSinglePage(curPage, true);
+      console.log(`curPage : ${curPage}`);
+
+  }
+
+}
+
+  setTimeout(ab, 500);
+  setTimeout(fs, 3000);
+
+function fs() {
+  document.documentElement.webkitRequestFullScreen();
 }
 name:
 rakugakidou
 regPattForURL:
 /^https:\/\/www\.rakugakidou\.net\//
 script:
-if (window.pageYOffset == 0) {
+(window.onload = function() {
+var fullscreen = function(){
+  if (window.pageYOffset == 0) {
   document.getElementsByName(new Date().toJSON().slice(0,10).replace(/-/g,''))[0].scrollIntoView();
-  }
+  }}
+setTimeout(fullscreen, 1500);
+})();
 name:
 surugayaHP next page
 regPattForURL:
@@ -876,51 +1191,136 @@ youngaceup Appry Arrow Keys
 regPattForURL:
 /^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\/\d{4}\//
 script:
-var fullscreen = function(){
-  document.documentElement.webkitRequestFullScreen();
-  document.getElementById("img0").scrollIntoView();
+var ab = function(){
+  if (document.getElementById('att')) {return;}
 
-  let anchor = document.createElement('a');
-  anchor.id = "aaa";
-  anchor.style.display = 'none';
-  let text = document.createTextNode('0');
-  anchor.appendChild(text);
-  document.body.appendChild(anchor);
+  document.documentElement.webkitRequestFullScreen();
+
+  let head = "img";
+  let pageWidth = 800;
+  let n = 0;
+  let arr = [-1];
+  // let page = document.getElementById(head + n.toString());
+  let pages = document.getElementsByClassName(`row clearfix`);
+  for (page of pages) {
+    if (page.hasAttribute(`ID`)) {arr.push(n++);}
+  }
+  // let page = pages[n];
+  // while ((page) || (document.getElementById(head + (n + 1).toString()))) {
+  //   console.log(`page : ${n}`);
+  //   if (page) {
+  //     arr.push(n);
+  //     let pageStyle = page.children[0].children[0].children[0].style;
+  //     if (parseInt(pageStyle.height.replace("px","")) < parseInt(pageStyle.width.replace("px",""))) {
+  //       arr.splice(arr.length - 1, 0, -1);
+  //       if (arr.length % 2 == 1) {arr.unshift(-1);}
+  //     }
+  //   }
+  //   page = document.getElementById(head + (++n).toString());
+  //   console.log(`page : ${(page)}`);
+  // }
+  // arr.pop();
+  arr.push(-1);
+  if (arr.length % 2 == 1) {arr.shift();}
+  arr.unshift(0); //set curPage
+  console.log(arr);
+  
+  let att = document.createElement("div");
+  att.id = "att";
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;";
+  let text = document.createTextNode(arr.join(','));
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  let curPage = parseInt(arr[0]);
+  arr.shift();
+  viewSpreadPage(curPage, arr, true);
+
+
+  function viewSpreadPage (curPage, arr, vsb) {
+  if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+    const pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+    let rightPage = document.getElementById(head + arr[curPage]);
+    if (rightPage) {
+        rightPage.scrollIntoView();
+        rightPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + pageCenter +"px;";
+        rightPage.style.display = (vsb) ? "" :"none";
+    }
+
+    let leftPage = document.getElementById(head + arr[curPage + 1]);
+    if (leftPage) {
+        leftPage.scrollIntoView();
+        leftPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + (pageCenter - pageWidth) +"px;";
+        leftPage.style.display = (vsb) ? "" :"none";
+    }
+
+    document.getElementById('att').style.display = ((rightPage) || (leftPage)) ? "" : "none"
+    document.getElementsByClassName("viewerbtn")[1].scrollIntoView();
+
+  }
+
 
   document.body.addEventListener('keydown', event => {
+    let arr = document.getElementById('att').textContent.split(',');
+    let curPage = parseInt(arr[0]);
+    arr.shift();
+    //console.log("curPage : " + curPage);
 
-    let pageee = Number(document.getElementById('aaa').textContent);
-    let dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    let dir = (event.key == 'p') * 99 + (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
     if (dir == 0) {return;}
-    if ((document.getElementById("img" + pageee) == null) && (Math.sign(pageee) == dir)) {
+
+    if ((arr[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
       let episode_dir = (dir == 1) ? 'viewerbtn_toNext' : 'viewerbtn_toBack';
-      let next_prev = document.getElementsByClassName(episode_dir)
-      console.log(next_prev );
-      if  (next_prev != null) {next_prev[0].click();}
+      let next_prev = document.getElementsByClassName(episode_dir);
+      if  (next_prev != null) {
+        //window.open(next_prev[1].href, null, "fullscreen=yes")
+        //document.webkitExitFullscreen();
+        next_prev[1].children[0].click();
+      }
       return;
     }
 
-    pageee += dir;
-    if (document.getElementById("img" + pageee) == null) {
-      pageee += dir;
-    }
-    console.log(pageee);
+    viewSpreadPage(curPage, arr, false);
+    
+    if (dir == 99) {
+      dir = 0;
+      
+      if (parseInt(arr[0]) == -1) {
+        arr.shift();
+      } else {
+        arr.unshift(-1);
+      }
 
-    let page_ = document.getElementById("img" + pageee);
-    if (page_ == null) {
-      document.getElementsByClassName("viewerbtn")[1].scrollIntoView();
-    } else {
-      page_.scrollIntoView();
+      if (parseInt(arr.slice(-1)[0]) == -1) {
+        arr.pop();
+      } else {
+        arr.push(-1);
+      }
     }
-    document.getElementById('aaa').textContent = pageee;
+
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, arr, true);
+    console.log("curPosition : " + curPage, );
+    console.log("Page : " + arr[curPage + 1] + " , " + arr[curPage]);
+    arr.unshift(curPage);
+
+    document.getElementById('att').textContent = arr.join(',');
+
   });
+
 }
-setTimeout(fullscreen, 1000);
+setTimeout(ab, 500);
+setTimeout(fillscreen, 3000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+}
 name:
 このマンガがすごい Apply Arrow keys
 regPattForURL:
 /^https:\/\/tkj.jp\/ebook\/read\/cd\//
 script:
+document.getElementById("ControlArea").hidden = true;
 document.body.addEventListener('keydown', event => {
   if (event.key == 'ArrowLeft') {
     document.getElementById("GestureLeft").children[0].click();
@@ -929,13 +1329,98 @@ document.body.addEventListener('keydown', event => {
   }
 });
 name:
-働かないふたり Appry Arrow Keys
+働かないふたり
 regPattForURL:
-/^https:\/\/kuragebunch\.com\/episode\/3269632237/
+/^https:\/\/kuragebunch\.com\/episode\//
 script:
 var ab = function(){
+  if (!(/^働かないふたり/.test(document.getElementsByTagName(`title`)[0].innerText))) {return;}
 
-  //document.body.style.zoom=`75%`;
+  document.body.style.zoom='75%';
+  let pageWidth = 844;
+  let pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+
+  // let att = document.getElementById(`att`);
+  // if (att) {att.style.visibility = `visible`;}
+  // else {
+    console.log(document.getElementById(`att`));
+    let att = document.createElement(`div`);
+    att.id = `att`;
+    att.style.cssText=`visibility:visible;position:fixed;top:0px;left:0px;
+                      height:100%;width:100%;padding:4px;background:black;z-index:19998;`;
+    document.body.appendChild(att);
+  // }
+
+  let curPage = 0;
+  viewPage(0);
+
+  function viewPage (dir) {
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+
+    // do {
+      var pages = document.getElementsByTagName(`canvas`);
+      console.log(pages);
+    // } while (pages.length == 0)
+
+    if ((pages[curPage] != undefined) || (pages[curPage + dir] != undefined)) {curPage += dir;}
+    console.log(`curPage : ${curPage}`);
+    // console.log(pages[curPage]);
+
+    let cssText = `position:fixed;top:0px;left:${pageCenter - (pageWidth / 2)}px;z-index:19999;`;
+    for (let i = 0; i < pages.length; i++) {
+      pages[i].scrollIntoView();
+      pages[i].style.cssText = `visibility:${(i == curPage) ? `visible` : `hidden`};${cssText}`;
+    }
+
+    document.getElementById(`att`).style.visibility = (pages[curPage] != undefined) ? `visible` : `hidden`;
+    document.getElementsByClassName(`series-header-image-wrapper`)[0].scrollIntoView();
+
+  }
+
+  document.body.addEventListener(`keydown`, event => {
+
+    let dir = (event.key == `ArrowLeft`) - (event.key == `ArrowRight`);
+    if (dir == 0) {return;}
+
+    let pages = document.getElementsByTagName(`canvas`);
+    if ((pages[curPage] == undefined) && (Math.sign(curPage) == dir)) {
+      let next_prevClass = (dir == 1) ? `next-link test-back-matter-next-link` : `previous-link`;
+      let next_prev = document.getElementsByClassName(next_prevClass)[0];
+      if  (next_prev) {location.href = next_prev.href;}
+      return;
+    }
+
+    viewPage(dir);
+
+  });
+
+}
+
+(window.onload = function() {
+  setTimeout(ab, 1000);
+  setTimeout(fillscreen, 3000);
+})
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+    document.getElementsByClassName(`viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen`)[0].click();
+}
+name:
+働かないふたり Appry Arrow Keys
+regPattForURL:
+//^https:\/\/kuragebunch\.com\/episode\//
+script:
+var ab = function(){
+  //if (document.getElementById('att')) {document.getElementById('att').remove();}
+  if (!(/^働かないふたり/.test(document.getElementsByTagName("title")[0].innerText))) {return;}
+
+  document.body.style.zoom='75%';
+  let pageWidth = 844;
+  let pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+
+  let pages = document.getElementsByTagName("canvas");
+  console.log(pages);
+
   let n = 0;
   let att = document.createElement(`div`);
   att.id = `att`;
@@ -947,22 +1432,20 @@ var ab = function(){
   viewSpreadPage(n, true);
 
   function viewSpreadPage (curPage, isVsb) {
-    console.log(`curPage : ${curPage}`);
+    if (isVsb) {console.log(`curPage : ${curPage}`);}
     let visibility = (isVsb) ? `visible` : `hidden`;
-    let pageCenter = parseInt(window.innerWidth / 2);
-
-    let pages = document.getElementsByClassName(`page-area js-page-area`);
-    let cssText =  `visibility:${visibility};position:fixed;top:0px;width:844px;z-index:19999;`;
+    let cssText =  `visibility:${visibility};position:fixed;top:0px;width:${pageWidth}px;z-index:19999;`;
 
     let rightPage = pages[curPage];
     if (rightPage) {
-      rightPage.children[0].scrollIntoView();
-      rightPage.children[0].style.cssText = `${cssText};left:${pageCenter}px;`;
+      rightPage.scrollIntoView();
+      rightPage.style.cssText = `${cssText};left:${pageCenter}px;`;
     }
+
     let leftPage = pages[curPage + 1];
     if (leftPage) {
-      leftPage.children[0].scrollIntoView();
-      leftPage.children[0].style.cssText = `${cssText};left:${pageCenter - 844}px;`;
+      leftPage.scrollIntoView();
+      leftPage.style.cssText = `${cssText};left:${pageCenter - pageWidth}px;`;
     }
     document.getElementById(`att`).style.visibility = ((rightPage) || (leftPage)) ? `visible` : `hidden`;
     document.getElementsByClassName(`series-header-image-wrapper`)[0].scrollIntoView();
@@ -971,13 +1454,10 @@ var ab = function(){
 
 
   document.body.addEventListener(`keydown`, event => {
-    let curPage = Number(document.getElementById(`att`).textContent);
+    let curPage = parseInt(document.getElementById(`att`).textContent);
 
     let dir = (event.key == `ArrowLeft`) - (event.key == `ArrowRight`);
     if (dir == 0) {return;}
-
-    let pages = document.getElementsByClassName(`page-area js-page-area`);
-
 
     if ((pages[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
       let next_prevClass = (dir == 1) ? `next-link test-back-matter-next-link` : `previous-link`;
@@ -989,16 +1469,18 @@ var ab = function(){
     viewSpreadPage(curPage, false);
     curPage += (dir * 2);
     viewSpreadPage(curPage, true);
-    // console.log(`curRight : ${curPage}`);
-    // console.log(`curLeft : ${curPage + 1}`);
+    // console.log(`curPage : ${curPage + 1} , ${curPage}`);
 
     document.getElementById(`att`).textContent = curPage;
 
   });
 
 }
-setTimeout(ab, 500);
-setTimeout(fillscreen, 3000);
+
+(window.onload = function() {
+  setTimeout(ab, 1000);
+  setTimeout(fillscreen, 3000);
+})();
 
 function fillscreen() {
     document.documentElement.webkitRequestFullScreen();
