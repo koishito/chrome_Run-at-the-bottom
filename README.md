@@ -19,7 +19,7 @@ Register the JavaScript to be executed at the bottom of the page with the URL th
 
 
 
-以下、参考
+以下、参考転載
 # DEMO
 
 You can learn how to making cute physics simulations (looks retro game).
