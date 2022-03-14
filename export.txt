@@ -1,4 +1,6 @@
 regPattForURL:
+/^http:\/\/redis\.shibu\.jp\//
+/^http:\/\/192\.168\./
 /^http:\/\/mental\-support\.org\//
 /^http:\/\/www\.furanskin\.net\//
 /^http:\/\/otakomu\.jp\//
@@ -6,12 +8,13 @@ regPattForURL:
 /^file:\/\/\//
 /^https:\/\/bitbucket.org\//
 /^chrome.+$/
-/^.+(docs|translate|calendar|mail)\.google.+$/
+/^.+(docs|translate|calendar|news)\.google.+$/
 /^.+github.+$/
-/^.+amazon.+$/
+//^.+amazon.+$/
 script:
 // The part enclosed in ** is replaced.
 (window.onload=function(){
+//(function(){
 wasExecuted = true;
 function onScroll() {
   document.addEventListener('scroll',  function() {
@@ -95,6 +98,31 @@ const matchedPartInURL = location.href.match(regPattForURL)[0];
 //floatBox_to("**name**");
 })();
 name:
+'javascript sample'
+regPattForURL:
+
+script:
+//location.href処理
+const urlArray = location.href.split('/');
+let lastUrl = urlArray.slice(-1)[0];
+
+//cookie処理
+const cookieArray = document.cookie.split(';');
+if (cookieArray.filter((element) => element.startsWith(`key1=`)).length = 0) {
+  document.cookie = `key1=` + lastUrl;
+} else {
+
+}
+
+// リンクがクリックされたときの処理の追加
+let nextLink = Array.prototype.slice.call(document.links)
+  .filter(e => 'textContent' in e )
+  .filter(e => e.textContent == `next`)[0]
+nextLink.addEventListener("click", e => {
+    // リンクがクリックされたときの処理
+    e.preventDefault();  // 画面遷移を無効化
+}, false);
+name:
 2021/4/19 20:02:03
 regPattForURL:
 //^https:\/\/renta\.papy\.co\.jp\//
@@ -105,6 +133,18 @@ var fullscreen = function(){
   //document.dispatchEvent( new KeyboardEvent( "keyup", { keycode: 122 }));
 }
 setTimeout(fullscreen, 1000);
+name:
+2021/7/23 16:11:19
+regPattForURL:
+/^https:\/\/novema\.jp\/comic\-grast\/serial\//
+script:
+document.body.addEventListener('keydown', event => {
+  if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+  console.log(event.key);
+  if (event.key == 'ArrowLeft') {document.elementFromPoint(100, 600).click();}
+  if (event.key == 'ArrowRight') {document.elementFromPoint(1880, 600).click();}
+
+});
 name:
 Alert http Site
 regPattForURL:
@@ -186,14 +226,51 @@ javascript:(function(){
   //   }
   // });
 name:
+DMM books 120title
+regPattForURL:
+/^https:\/\/book\.dmm\.com\/bookmark\//
+script:
+if (!location.href.match(/limit=120/)) {
+  location.href = 'https://book.dmm.com/bookmark/?limit=120&view=table&page=1';
+}
+name:
+DMM comic rental basket
+regPattForURL:
+/^https:\/\/www\.dmm\.com\/rental\/comic\/\-\/basket\//
+script:
+const al = document.getElementsByClassName(`area-lead lead-wrapper`);
+const bs = document.getElementsByClassName(`box-sort`);
+if (bs.length == 2) {
+  al[0].appendChild(bs[0].cloneNode(true));
+}
+name:
+DMM 購入済みの本一覧
+regPattForURL:
+/^https:\/\/book\.dmm\.com\/library\//
+script:
+if (!location.href.match(/(sort=short|item_id=)/)) {
+  location.href = 'https://book.dmm.com/library/?age_limit=all&expired=0&sort=short';
+}
+name:
+Gmail 今すぐメール受信
+regPattForURL:
+/^https:\/\/mail\.google\.com\/mail\/u\/0\/#settings\/accounts/
+script:
+var MailCheck = function(){
+  Array.from(document.getElementsByTagName('span')).filter((s) => {return s.textContent === `他のアカウントのメールを確認:`;}).forEach(element => element.scrollIntoView());
+  Array.from(document.getElementsByTagName('span')).filter((s) => {return s.textContent === `メールを今すぐ確認する`;}).forEach(element => element.click());
+}
+setTimeout(MailCheck, 5000);
+name:
 Let's go to another route
 regPattForURL:
+/^https:\/\/www\.amazon\.co\.jp\/.+\/buy\//
 /^https:\/\/www\.bookoffonline\.co\.jp\/disp\/CCtViewCart/
 /^https:\/\/basket\.step\.rakuten\.co\.jp\/rms\/mall\/bs\/cartall\//
 script:
 var ab = function(){
   var att=document.createElement("div");
-  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;min-height: 100vh;width:100%;padding:4px;background:coral;z-index:19999;";
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;min-height: 100vh;width:100%;padding:4px;background:coral;z-index:19999;display:flex;flex-direction:column;justify-content:center;align-items:center;";
   att.innerHTML=`Let's go to another route`;
   att.style.fontSize = '40px';
   document.body.appendChild(att);
@@ -221,7 +298,7 @@ for (var i = dlinks.length-1; i >= 0; i--){
 name:
 Open the link for the next article on カクヨム
 regPattForURL:
-/^https:\/\/kakuyomu.jp\/works\/\d{19}\/episodes\//
+/^https:\/\/kakuyomu.jp\/works\/\d+\/episodes\//
 script:
 const id = 'contentMain-readNextEpisode';
 var nextArticle = '';
@@ -239,7 +316,7 @@ name:
 Push '→,←' Open starting with /^(次|>|＞|next|→)/, /^(前|<|＜|prev|←)/
 regPattForURL:
 /^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
-/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+/
 //^https:\/\/book.dmm.com\/library\//
 script:
 let rightlink = Array.prototype.slice.call(document.links)
@@ -268,6 +345,104 @@ if ((rightlink) || (leftlink)) {
 
 }
 name:
+Via Apps
+regPattForURL:
+/^https:\/\/ebookstore\.sony\.jp\/cart\/incart/
+/^https:\/\/www\.amazon\.co\.jp\/.+\/buy\//
+/^https:\/\/basket\.step\.rakuten\.co\.jp\/rms\/mall\/bs\/cartall\//
+script:
+var ab = function(){
+  var att=document.createElement("div");
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;min-height: 100vh;width:100%;padding:4px;background:coral;z-index:19999;display:flex;flex-direction:column;justify-content:center;align-items:center;";
+  att.innerHTML=`Let's go to another route`;
+  att.style.fontSize = '40px';
+  document.body.appendChild(att);
+  setTimeout(closenode, 1000);
+  function closenode(){att.parentNode.removeChild(att);}
+}
+setTimeout(ab, 1000);
+name:
+Via Hapitas
+regPattForURL:
+/^https:\/\/ebookjapan\.yahoo\.co\.jp\/cart\/confirm\//
+script:
+var ab = function(){
+  var att=document.createElement("div");
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;min-height: 100vh;width:100%;padding:4px;background:gold;z-index:19999;display:flex;flex-direction:column;justify-content:center;align-items:center;";
+  att.innerHTML=`ハピタス経由`;
+  att.style.fontSize = '80px';
+  document.body.appendChild(att);
+  setTimeout(closenode, 1000);
+  function closenode(){att.parentNode.removeChild(att);}
+}
+setTimeout(ab, 1000);
+name:
+Via Rebates
+regPattForURL:
+/^https:\/\/www\.bookoffonline\.co\.jp\/disp\/CCtViewCart/
+/^https:\/\/basket\.step\.rakuten\.co\.jp\/rms\/mall\/bs\/cartall\//
+script:
+var ab = function(){
+  var att=document.createElement("div");
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;min-height: 100vh;width:100%;padding:4px;background:coral;z-index:19999;display:flex;flex-direction:column;justify-content:center;align-items:center;";
+  att.innerHTML=`Let's go to another route`;
+  att.style.fontSize = '40px';
+  document.body.appendChild(att);
+  setTimeout(closenode, 1000);
+  function closenode(){att.parentNode.removeChild(att);}
+}
+setTimeout(ab, 1000);
+name:
+add 閲覧履歴 in なろう
+regPattForURL:
+/^https:\/\/syosetu\.com\/favnovelmain\/list\//
+script:
+const writter_menu = document.getElementsByClassName("writter_menu")[0];
+if (writter_menu.childElementCount == 6) {
+  writter_menu.lastElementChild.remove();
+  writter_menu.lastElementChild.remove();
+  writter_menu.lastElementChild.remove();
+  writter_menu.lastElementChild.remove();
+  writter_menu.lastElementChild.remove();
+  
+  const li = document.createElement('li');
+  const a = document.createElement('a');
+  a.appendChild(document.createTextNode("閲覧履歴"));
+  a.href = "https://yomou.syosetu.com/rireki/list/";
+  a.style.color = "red";
+  li.appendChild(a);
+  writter_menu.appendChild(li);
+
+  const li2 = document.createElement('li');
+  const a2 = document.createElement('a');
+  a2.appendChild(document.createTextNode("読もう"));
+  a2.href = "https://yomou.syosetu.com/";
+  a2.style.color = "purple";
+  li.appendChild(a2);
+  writter_menu.appendChild(li2);
+
+  const li3 = document.createElement('li');
+  const a3 = document.createElement('a');
+  a3.appendChild(document.createTextNode("xブックマーク"));
+  a3.href = "https://syosetu.com/favnovelmain18/list/";
+  a3.style.color = "pink";
+  li.appendChild(a3);
+  writter_menu.appendChild(li3);
+
+}
+name:
+alphapolis comic zoom
+regPattForURL:
+/^https:\/\/www\.alphapolis\.co\.jp\/manga\/official\/\d{8,9}\//
+script:
+document.body.style.zoom='150%';
+name:
+chromeブックマーク 背景色指定
+regPattForURL:
+/^chrome:\/\/bookmarks\//
+script:
+
+name:
 comic-walker  Apply Arrow keys
 regPattForURL:
 //^https:\/\/comic\-walker\.com\/viewer\//
@@ -283,6 +458,149 @@ document.body.addEventListener('keydown', event => {
 
 });
 name:
+comicNewtype Appry Arrow Keys(2)
+regPattForURL:
+//^https:\/\/comic\.webnewtype\.com\/contents\/.+\/\d+/
+script:
+document.getElementsByClassName("lazy viewerFixedImage")
+
+if (document.getElementById('att')) {return;}
+(function(){
+  console.log(`comicNewtype Appry Arrow Keys(2)`);
+  document.body.style.overflow = "hidden";
+  document.body.style.zoom='220%';
+  document.getElementsByClassName("ViewerHeader")[0].style.display ="none";
+
+  // move to PageNavi(To complete loading the page image)
+  document.getElementsByClassName("ViewerNav")[0].scrollIntoView();
+  setTimeout(fillscreen, 2000);
+})();
+
+let ab = function(){
+
+  let pageWidth = 836;
+
+  let images = document.getElementsByClassName("lazy viewerFixedImage");
+  let arr = [-1];
+  for (let n = 0; n < images.length; n++) {
+    if (images[n].style.maxWidth) {arr.push(-1);}
+    arr.push(n);
+  }
+
+  // let n = 0;
+  // let arr = [-1];
+  // let page = document.getElementById(head + n.toString());
+
+  // while ((page) || (document.getElementById(head + (n + 1).toString()))) {
+  //   if (page) {
+  //     page.scrollIntoView();
+  //     arr.push(n);
+  //     let pageStyle = page.children[0].style;
+  //     if (parseInt(pageStyle.height.replace("px","")) < parseInt(pageStyle.width.replace("px",""))) {
+  //       arr.splice(arr.length - 1, 0, -1);
+  //       if (arr.length % 2 == 1) {arr.shift();}
+  //     }
+  //   }
+  //   page = document.getElementById(head + (++n).toString());
+  // }
+  // if (arr.length % 2 == 1) {arr.push(-1);}
+  arr.unshift(-2); //set curPage
+  console.log(arr);
+
+  let att = document.createElement("div");
+  att.id = "att";
+  att.style.cssText="visibility:visible;position:fixed;top:0px;left:0px;height:100%;width:100%;padding:4px;background:black;z-index:19998;";
+  let text = document.createTextNode(arr.join(','));
+  att.appendChild(text);
+  document.body.appendChild(att);
+
+  let curPage = parseInt(arr[0]);
+  arr.shift();
+  viewSpreadPage(curPage, arr, true);
+
+
+  function viewSpreadPage (curPage, arr, vsb) {
+    let pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
+    let cssText = `visibility:visible;position:fixed;top:0px;z-index:19999;`
+
+    let rightPage = pages(arr[curPage]);
+    if (rightPage) {
+        rightPage.scrollIntoView();
+        rightPage.style.cssText = `${cssText};left:${pageCenter}px;`;
+        rightPage.style.display = (vsb) ? "" :"none";
+    }
+
+    let leftPage = pages(arr[curPage + 1]);
+    if (leftPage) {
+        leftPage.scrollIntoView();
+        leftPage.style.cssText = `${cssText};left:${(pageCenter - pageWidth)}px;`;
+        leftPage.style.display = (vsb) ? "" :"none";
+    }
+
+    document.getElementById('att').style.display = ((rightPage) || (leftPage)) ? "" : "none"
+    document.getElementsByClassName("ViewerNav")[0].scrollIntoView();
+
+  }
+
+
+  document.body.addEventListener('keydown', event => {
+    let arr = document.getElementById('att').textContent.split(',');
+    let curPage = parseInt(arr[0]);
+    arr.shift();
+    //console.log("curPage : " + curPage);
+
+    let dir = (event.key == 'p') * 99 + (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+    if (dir == 0) {return;}
+
+    if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
+
+    if ((arr[curPage + 1] == undefined) && (Math.sign(curPage) == dir)) {
+      let episode_dir = (dir == 1) ? 'ViewerNav-next' : 'ViewerNav-prev';
+      let next_prev = document.getElementsByClassName(episode_dir);
+      if  (next_prev != null) {
+        //window.open(next_prev[1].href, null, "fullscreen=yes")
+        //document.webkitExitFullscreen();
+        next_prev[0].click();
+      }
+      return;
+    }
+
+    viewSpreadPage(curPage, arr, false);
+
+    if (dir == 99) {
+      dir = 0;
+
+      if (parseInt(arr[0]) == -1) {
+        arr.shift();
+      } else {
+        arr.unshift(-1);
+      }
+
+      if (parseInt(arr.slice(-1)[0]) == -1) {
+        arr.pop();
+      } else {
+        arr.push(-1);
+      }
+    }
+
+    curPage += (dir * 2);
+    viewSpreadPage(curPage, arr, true);
+    console.log("curPosition : " + curPage, );
+    console.log("Page : " + arr[curPage + 1] + " , " + arr[curPage]);
+    arr.unshift(curPage);
+
+    document.getElementById('att').textContent = arr.join(',');
+
+  });
+
+}
+setTimeout(ab, 2000);
+setTimeout(fillscreen, 5000);
+
+function fillscreen() {
+    document.documentElement.webkitRequestFullScreen();
+}
+name:
 comicbunch Appry Arrow Keys
 regPattForURL:
 /^https:\/\/www\.comicbunch\.com\/manga\/bunch\/.+\/view\/\d+\//
@@ -290,6 +608,7 @@ script:
 var ab = function(){
   if (document.getElementById('att')) {return;}
 
+  document.body.style.overflow = "hidden";
   document.getElementsByClassName("footer_comics_ad push")[0].hidden = true;
   document.body.style.zoom=`92%`;
 
@@ -425,6 +744,12 @@ document.body.addEventListener('keydown', event => {
 name:
 full screen
 regPattForURL:
+/^https:\/\/manga\-park\.com\/title\//
+/^https:\/\/firecross\.jp\/reader\//
+//^https:\/\/comic\-days\.com\/episode\//
+/^https:\/\/book\.dmm\.com\/free_streaming\//
+/^https:\/\/ebookjapan\.yahoo\.co\.jp\/viewer\//
+/^https:\/\/gammaplus\.takeshobo\.co\.jp\/manga\/.+\/_files\//
 /^https:\/\/www\.ganganonline\.com\/title\/.+\/chapter\//
 /^https:\/\/piccoma\.com\/web\/viewer\//
 /^https:\/\/ebookjapan\.yahoo\.co\.jp\/viewer\/story\//
@@ -438,7 +763,7 @@ regPattForURL:
 /^https:\/\/manga\.line\.me\/book\/viewer\?id=/
 /^https:\/\/tkj\.jp\/ebook\/read\/cd\//
 /^http:\/\/webcomicgamma\.takeshobo\.co\.jp\/manga\//
-//^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\/\d{4}\//
+//^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\//
 /^https:\/\/r\.binb\.jp\/epm\//
 /^https:\/\/comics\.gendaibusiness\.com\/viewer\//
 /^https:\/\/viewer\.comic\-earthstar\.jp\/viewer\.html\?cid=/
@@ -452,7 +777,6 @@ regPattForURL:
 /^https:\/\/comic\-walker\.com\/viewer\//
 /^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
 /^https:\/\/www\.alphapolis\.co\.jp\/manga\/official\/\d{8,9}\//
-/^http:\/\/gammaplus\.takeshobo\.co\.jp\/manga\//
 /^https:\/\/viewer\.ganganonline\.com\/manga\//
 /^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
 /^https:\/\/kakuyomu\.jp\/works\/\d{19}\/episodes\/\d{19}/
@@ -464,7 +788,16 @@ var fullscreen = function(){
 console.log(wasExecuted);
   if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
 }
-setTimeout(fullscreen, 1500);
+
+setTimeout(fullscreen, 3000);
+
+window.addEventListener("mousemove", event => {
+  if (event.clientX < 70) {fullscreen;};
+});
+
+window.addEventListener("keydown", event => {
+  if (event.key != ' ') {fullscreen;};
+});
 name:
 full screen by elementFromPoint(790, 600).click()
 regPattForURL:
@@ -480,7 +813,7 @@ setTimeout(fullscreen, 1000);
 name:
 full screen by elementFromPoint(790, 750).click()
 regPattForURL:
-/^https:\/\/comic\-days\.com\/episode\//
+//^https:\/\/comic\-days\.com\/episode\//
 script:
 var fullscreen = function(){
   document.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();
@@ -687,10 +1020,14 @@ regPattForURL:
 /^https:\/\/kyushoku\.hellowork\.mhlw\.go\.jp\/kyushoku\/GEAA1\d{5}\.do/
 script:
 if (document.title != `ハローワークインターネットサービス - 求人情報検索・一覧`) {return;}
-  document.body.style.zoom='95%';
+  document.body.style.zoom=`95%`;
+
+  /*fontを変更*/
+  [...document.getElementsByClassName("flex flex_top_sa mb1")]
+    .forEach(element => element.style.fontFamily ="UD デジタル 教科書体 NK-B")
 
   /*利点を強調*/
-  const nes_label = document.getElementsByClassName(`nes_label any fs07 mt04`);
+  const nes_label = document.getElementsByClassName(`nes_label any`);
   for (element of nes_label) {
     if (/background-color/.test(element.style.cssText))  {return;}
     element.style.cssText += `background-color:#FFCBCB;`;
@@ -698,31 +1035,39 @@ if (document.title != `ハローワークインターネットサービス - 求
 
   /*日付を強調*/
   var date = new Date();
+  date.setDate(date.getDate() - 2);
+  const dayBeforeYesterdayDate = `YYYY年MM月DD日`.replace(/YYYY/, date.getFullYear())
+                                        .replace(/MM/, date.getMonth() + 1)
+                                        .replace(/DD/, date.getDate());  var date = new Date();
   date.setDate(date.getDate() - 1);
-  const yesterdayDate = 'YYYY年MM月DD日'.replace(/YYYY/, date.getFullYear())
+  const yesterdayDate = `YYYY年MM月DD日`.replace(/YYYY/, date.getFullYear())
                                         .replace(/MM/, date.getMonth() + 1)
                                         .replace(/DD/, date.getDate());
   var date = new Date();
-  const todayDate = 'YYYY年MM月DD日'.replace(/YYYY/, date.getFullYear())
+  const todayDate = `YYYY年MM月DD日`.replace(/YYYY/, date.getFullYear())
                                     .replace(/MM/, date.getMonth() + 1)
                                     .replace(/DD/, date.getDate());
   const fs13_ml01 = document.getElementsByClassName(`fs13 ml01`);
-  const baseStyle = "border:1px solid #0000ff;background-color:";
+  const baseStyle = `border:1px solid #0000ff;background-color:`;
   for (element of fs13_ml01) {
+    if (element.innerText == dayBeforeYesterdayDate) {element.style.cssText += `${baseStyle}gold;`;}
     if (element.innerText == yesterdayDate) {element.style.cssText += `${baseStyle}plum;`;}
     if (element.innerText == todayDate) {element.style.cssText += `${baseStyle}aqua;`;}
   }
 
+  /*件目／件数の追加*/
   let item = 0; /*global*/
   /*let dir = 0;
   let scrollOffset = 5;*/
   const headerHight = document.getElementById(`top_header`).clientHeight;
   const kyujin = document.getElementsByClassName(`kyujin mt1 noborder`);
-  const kennsuu = document.getElementsByClassName("flex align_end last_right mt05")[0].innerText.split(/(件中 |～)/);
+  const kennsuu = document.getElementsByClassName(`flex align_end last_right mt05`)[0].innerText.split(/(件中 |～)/);
   const kyujinTotal = kennsuu[0];
   const kyujinStart = parseInt(kennsuu[2]);
   for (let i = 0; i < kyujin.length; i++) {
-    kyujin[i].getElementsByClassName(`fb`)[0].innerText=`(${kyujinStart + i}/${kyujinTotal}) 職種`;
+    let syokusyu = kyujin[i].getElementsByClassName(`m13 fs1`)[0].children[0];
+    syokusyu.innerHTML =`<span style="color:blue;font-weight:bold;border:3px solid #ff9933;">(${kyujinStart + i}/${kyujinTotal})</span>　` + syokusyu.innerHTML;
+    /*kyujin[i].getElementsByClassName(`fb`)[0].innerText=`(${kyujinStart + i}/${kyujinTotal}) `;*/
   }
 
   scrollKyujin(kyujin[item]);
@@ -737,9 +1082,9 @@ if (document.title != `ハローワークインターネットサービス - 求
     /*}, 100);*/
   }
 
-  document.body.addEventListener('keydown', event => {
-    /*dir = (event.key == 'ArrowDown') - (event.key == 'ArrowUp');*/
-    const dir = (event.key == 'ArrowLeft') - (event.key == 'ArrowRight');
+  document.body.addEventListener(`keydown`, event => {
+    /*dir = (event.key == `ArrowDown`) - (event.key == `ArrowUp`);*/
+    const dir = (event.key == `ArrowLeft`) - (event.key == `ArrowRight`);
     if (dir == 0) {return;}
 
     if ((typeof kyujin[item] == `undefined`) && (Math.sign(item) == dir)) {
@@ -748,8 +1093,9 @@ if (document.title != `ハローワークインターネットサービス - 求
     } else {
       item += dir;
       console.log(`item : ${item}`);
-      if (item == -1) {document.getElementsByClassName(`flex page_navi`)[0].scrollIntoView({block: `center`});}
-      else if (item == kyujin.length) {document.getElementsByClassName(`flex page_navi`)[1].scrollIntoView({block: `center`});}
+      let flex_page_navi = document.getElementsByClassName(`flex page_navi`)
+      if (item == -1) {flex_page_navi[0].scrollIntoView({block: `center`});}
+      else if (item == kyujin.length) {flex_page_navi[1].scrollIntoView({block: `center`});}
       else {scrollKyujin(kyujin[item]);}
     }
 
@@ -834,12 +1180,15 @@ function fillscreen() {
 name:
 move at Bottom
 regPattForURL:
+/^https:\/\/president\.jp\/articles\//
+/^https:\/\/gendai\.ismedia\.jp\/articles\//
+/^https:\/\/media\.rakuten\-sec\.net\/articles\/\-\//
 /^https:\/\/www\.alphapolis\.co\.jp\/novel\/.+\/episode\//
 /^https:\/\/novelup\.plus\/story\/\d{9}\/\d{9}/
 /^https:\/\/ncode\.syosetu\.com\/n\d{4}[a-z]{2}\/\d+/
-/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+\?page=/
+/^https:\/\/toyokeizai\.net\/articles\/\-\/\d+/
 script:
-const regexp = /(次へ|次の話|>|＞|next|→)/;
+const regexp = /(次へ|次の話|>|＞|next|→|次ページ)/;
 let NextArticleElements = Array.prototype.slice.call(document.links)
   .filter(element => {return ('textContent' in element);})
   .filter(element => {return element.textContent.match(regexp);})
@@ -908,16 +1257,17 @@ document.body.addEventListener('keydown', event => {
 name:
 niconico Appry Arrow Keys(2)
 regPattForURL:
-//^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d+/
+/^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d+/
 script:
 var ab = function(){
   console.log(`niconico Appry Arrow Keys(2)`);
   if (document.getElementById('att')) {return;}
 
-  document.body.style.zoom='92%';
+  document.body.style.overflow = "hidden";
   document.getElementById("CommonHeader").style.display ="none";
   document.getElementById("ko_head_bar_min").style.display ="none";
   document.getElementById("ko_controls").style.display ="none";
+  document.getElementById("show_comment").click();
 
   let head = "page_";
   let pageWidth = 650;
@@ -925,6 +1275,9 @@ var ab = function(){
   let n = 0;
   let arr = [-1];
   let page = document.getElementById(head + n.toString());
+  const pageHeight = parseInt(page.children[0].style.height.replace("px",""));
+  document.body.style.zoom = Math.floor(1080 / pageHeight * 100) + '%';
+
 
   while ((page) || (document.getElementById(head + (n + 1).toString()))) {
     if (page) {
@@ -939,7 +1292,7 @@ var ab = function(){
     page = document.getElementById(head + (++n).toString());
   }
   if (arr.length % 2 == 1) {arr.push(-1);}
-  arr.unshift(0); //set curPage
+  arr.unshift(-2); //set curPage
   console.log(arr);
   
   let att = document.createElement("div");
@@ -973,6 +1326,7 @@ var ab = function(){
     }
 
     document.getElementById('att').style.display = ((rightPage) || (leftPage)) ? "" : "none"
+    document.body.style.overflow = ((rightPage) || (leftPage)) ? "hidden" : "";
     document.getElementById("ko_bookmark_player").scrollIntoView();
 
   }
@@ -1038,7 +1392,7 @@ function fillscreen() {
 name:
 niconico Appry Arrow Keys(3)
 regPattForURL:
-/^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d+/
+//^https:\/\/seiga\.nicovideo\.jp\/watch\/mg\d+/
 script:
 var ab = function(){
   if (document.getElementById('att')) {return;}
@@ -1141,13 +1495,13 @@ rakugakidou
 regPattForURL:
 /^https:\/\/www\.rakugakidou\.net\//
 script:
-(window.onload = function() {
+/*(window.onload = function() {*/
 var fullscreen = function(){
   if (window.pageYOffset == 0) {
   document.getElementsByName(new Date().toJSON().slice(0,10).replace(/-/g,''))[0].scrollIntoView();
   }}
 setTimeout(fullscreen, 1500);
-})();
+/*})();*/
 name:
 surugayaHP next page
 regPattForURL:
@@ -1189,11 +1543,13 @@ document.body.addEventListener('keydown', event => {
 name:
 youngaceup Appry Arrow Keys
 regPattForURL:
-/^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\/\d{4}\//
+/^https:\/\/web\-ace\.jp\/youngaceup\/contents\/\d{7}\/episode\//
 script:
 var ab = function(){
   if (document.getElementById('att')) {return;}
 
+  document.body.style.overflow = "hidden";
+  document.body.style.zoom='95%';
   document.documentElement.webkitRequestFullScreen();
 
   let head = "img";
@@ -1220,8 +1576,9 @@ var ab = function(){
   //   console.log(`page : ${(page)}`);
   // }
   // arr.pop();
+  //arr.splice(4, 0, -1);
   arr.push(-1);
-  if (arr.length % 2 == 1) {arr.shift();}
+  //if (arr.length % 2 == 1) {arr.splice(4, 0, -1);}
   arr.unshift(0); //set curPage
   console.log(arr);
   
@@ -1240,17 +1597,19 @@ var ab = function(){
   function viewSpreadPage (curPage, arr, vsb) {
   if (!document.FullscreenElement) {document.documentElement.webkitRequestFullScreen();}
     const pageCenter = parseInt(window.innerWidth / (parseInt(document.body.style.zoom ? document.body.style.zoom : "100") / 100) / 2);
-    let rightPage = document.getElementById(head + arr[curPage]);
+    let cssText = `visibility:visible;position:fixed;top:-23px;z-index:19999;`
+
+    let rightPage = document.getElementById(head  + arr[curPage]);
     if (rightPage) {
         rightPage.scrollIntoView();
-        rightPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + pageCenter +"px;";
+        rightPage.style.cssText = `${cssText};left:${pageCenter}px;`;
         rightPage.style.display = (vsb) ? "" :"none";
     }
 
-    let leftPage = document.getElementById(head + arr[curPage + 1]);
+    let leftPage = document.getElementById(head  + arr[curPage + 1]);
     if (leftPage) {
         leftPage.scrollIntoView();
-        leftPage.style.cssText = "visibility:visible;position:fixed;top:0px;z-index:19999;left:" + (pageCenter - pageWidth) +"px;";
+        leftPage.style.cssText = `${cssText};left:${(pageCenter - pageWidth)}px;`;
         leftPage.style.display = (vsb) ? "" :"none";
     }
 
@@ -1320,14 +1679,31 @@ name:
 regPattForURL:
 /^https:\/\/tkj.jp\/ebook\/read\/cd\//
 script:
-document.getElementById("ControlArea").hidden = true;
-document.body.addEventListener('keydown', event => {
+keyEvent  = (event => {
   if (event.key == 'ArrowLeft') {
-    document.getElementById("GestureLeft").children[0].click();
-  } else if (event.key == 'ArrowRight') {
+    document.getElementById("GestureLeft").children[0].click()
+  }
+  if (event.key == 'ArrowRight') {
     document.getElementById("GestureRight").children[0].click();
   }
 });
+document.getElementById("ControlArea").style.display ="none";
+document.body.removeEventListener('keyup', keyEvent);
+document.body.addEventListener('keyup', keyEvent);
+name:
+しおり｜Gitの基礎
+regPattForURL:
+/^https:\/\/git\-scm\.com\/book\/ja\/v2/
+script:
+//URLの最後の部分が、遷移時に変化するパターンの場合に有効
+//呼び出しショートカットの最後に、`/`は付けない事
+const curPage = localStorage.getItem('curPage');
+console.log(decodeURI(curPage));
+const parentPage = curPage.split(`/`).slice(0,-1).join(`/`);
+console.log(decodeURI(parentPage));
+
+if (location.href == parentPage) { location.href = curPage; } 
+else {localStorage.setItem('curPage', location.href)}
 name:
 働かないふたり
 regPattForURL:
@@ -1335,6 +1711,8 @@ regPattForURL:
 script:
 var ab = function(){
   if (!(/^働かないふたり/.test(document.getElementsByTagName(`title`)[0].innerText))) {return;}
+
+  document.body.style.overflow = "hidden";
 
   document.body.style.zoom='75%';
   let pageWidth = 844;
@@ -1485,4 +1863,14 @@ var ab = function(){
 function fillscreen() {
     document.documentElement.webkitRequestFullScreen();
     document.getElementsByClassName("viewer-btn-fullscreen js-viewer-btn-start-fullscreen js-hidden-on-disabled-fullscreen")[0].click();
+}
+name:
+駿河屋｜お気に入り
+regPattForURL:
+/^https:\/\/www\.suruga\-ya\.jp\/pcmypage\/action_favorite_list\/detail\//
+script:
+var source_elements = document.getElementsByClassName(`item-list`);
+if (source_elements.length < 2 ) {
+  var target_element = document.getElementsByClassName(`favorite-action-wrapper`)[0];
+  target_element.before(source_elements[0].cloneNode(true));
 }
