@@ -1,28 +1,29 @@
-// const curkey = String.fromCharCode(189);
-const systemDataKey = `'System data : excluded URLs & Script template'`;
+// const curKey = String.fromCharCode(189);
+const systemDataKey = `${String.fromCharCode(1)}System data : excluded URLs & Script template${String.fromCharCode(1)}`;
+console.log(systemDataKey);
 
 // Fired when the active tab in a window changes.
-chrome.tabs.onActivated.addListener(function (activeInfo) {
+chrome.tabs.onActivated.addListener(activeInfo => {
   // console.log(activeInfo.tabId);
   setTimeout(onChangedActiveTab, 200);
 });
 
 // Fired when a tab is closed.
-chrome.tabs.onRemoved.addListener(function (tabId, removeInfo) {
+chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
   // if (removeInfo.status == "complete" && tab.active) {
     setTimeout(onChangedActiveTab, 200);
     // }
 });
 
 // Fired when a tab is updated.
-chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status == "complete" && tab.active) {
     setTimeout(onChangedActiveTab, 200);
   }
 });
 
 // 機能拡張のインストール・アップデート時に実行
-chrome.runtime.onInstalled.addListener(function (details) {
+chrome.runtime.onInstalled.addListener(details => {
   console.log("onInstalled: " + details.reason);
   // if (details.reason = 'install') {
   //   initialLoad();
@@ -35,16 +36,16 @@ chrome.runtime.onInstalled.addListener(function (details) {
 });
 
 // // 機能拡張の起動時に実行
-// chrome.runtime.onStartup.addListener(function () {
+// chrome.runtime.onStartup.addListener(() => {
 //   console.log("onStartup");
 
 // });
 
 function onChangedActiveTab(){ // This function is a recursive function.
-  chrome.storage.sync.get(null, function(items) {
+  chrome.storage.sync.get(null, items => {
     let keys = Object.keys(items);
     // localstorage('dispMatchedRegPattsCode')が空の場合に、各storageの初期値を設定
-    chrome.tabs.query({ currentWindow: true, active: true }, function (tabs) {
+    chrome.tabs.query({ currentWindow: true, active: true }, tabs => {
       if ((tabs == undefined) || (tabs.length < 1)) {
         console.log(`tabs error !`);
         setTimeout(onChangedActiveTab, 100);
@@ -91,7 +92,7 @@ function onChangedActiveTab(){ // This function is a recursive function.
               execScript = execScript.replace(/\*\*script\*\*/, item.script);
               // console.log(`execScript : ` + execScript);
               var response = executeScript(tabId, execScript);
-              localStorage.setItem('curkey', key);
+              localStorage.setItem('curKey', key);
             }
           }
           if (matchedRegPatts) {
@@ -120,7 +121,7 @@ function executeScript(tabId, execScript) {
     {
       code: execScript,
     },
-    function (response) {
+    (response) => {
       // console.log(`typeof(response) :"` + typeof(response) + `"`);
       // console.log(`response[0] :"` + response[0] + `"`);
       // console.log(`response :"` + response + `"`);
@@ -132,136 +133,107 @@ function executeScript(tabId, execScript) {
 
 
 function initialLoad() {
-//   const arr = [
-// {
-// name : systemDataKey,
-// regPattForURL :
-// `/^file:\\/\\/\\//
-// /^https:\\/\\/bitbucket\.org\\//
-// /^chrome.+$/
-// /^.+(docs|translate|calendar|mail)\\.google.+$/
-// /^.+github.+$/
-// /^.+amazon.+$/
-// /^.+rakuten.+$/`,
-// script :
-// `// The part enclosed in ** is replaced.
-// (window.onload=function(){
-// function onScroll() {
-//   document.addEventListener('scroll',  function() {
-//     const scrollHeight = Math.max(
-//       document.body.scrollHeight, document.documentElement.scrollHeight,
-//       document.body.offsetHeight, document.documentElement.offsetHeight,
-//       document.body.clientHeight, document.documentElement.clientHeight
-//     );
-//     let scrollTop =
-//       document.documentElement.scrollTop || // IE、Firefox、Opera
-//       document.body.scrollTop;              // Chrome、Safari
-//       console.log(parseInt(scrollHeight - window.innerHeight - scrollTop));
-//     if (parseInt(scrollHeight - window.innerHeight - scrollTop) < 10) {
-//       scriptAtBottom();
-//     };
-//   });
-// }
+  const arr = [
+{
+name : systemDataKey,
+regPattForURL :
+`/^file:\\/\\/\\//
+/^https:\\/\\/bitbucket\.org\\//
+/^chrome.+$/
+/^.+(docs|translate|calendar|mail)\\.google.+$/
+/^.+github.+$/
+/^.+amazon.+$/
+/^.+rakuten.+$/`,
+script :
+`// The part enclosed in ** is replaced.
+(window.onload = () => {
+function onScroll() {
+  document.addEventListener('scroll', () => {
+    const scrollHeight = Math.max(
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight, document.documentElement.offsetHeight,
+      document.body.clientHeight, document.documentElement.clientHeight
+    );
+    let scrollTop =
+      document.documentElement.scrollTop || // IE、Firefox、Opera
+      document.body.scrollTop;              // Chrome、Safari
+      console.log(parseInt(scrollHeight - window.innerHeight - scrollTop));
+    if (parseInt(scrollHeight - window.innerHeight - scrollTop) < 10) {
+      scriptAtBottom();
+    };
+  });
+}
 
-// function dispPosition() {
-//   let a=document.createElement("div");
-//   a.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);background:silver;padding:10px;text-align:center;z-index:19999;";
-//   a.onclick=function(){
-//     document.body.removeEventListener("mousemove", dispPosition);
-//     a.parentNode.removeChild(a);
-//   };
-//   a.style.fontSize = '12px';
-//   x=document.createElement("input");
-//   x.type="text";
-//   x.size="3"
-//   x.id="xxx";
-//   y=document.createElement("input");
-//   y.type="text";
-//   y.size="3"
-//   y.id="yyy";
-//   a.appendChild(x);
-//   a.appendChild(y);
-//   document.body.appendChild(a);
+function dispPosition() {
+  let a=document.createElement("div");
+  a.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);background:silver;padding:10px;text-align:center;z-index:19999;";
+  a.onclick = () => {
+    document.body.removeEventListener("mousemove", dispPosition);
+    a.parentNode.removeChild(a);
+  };
+  a.style.fontSize = '12px';
+  x=document.createElement("input");
+  x.type="text";
+  x.size="3"
+  x.id="xxx";
+  y=document.createElement("input");
+  y.type="text";
+  y.size="3"
+  y.id="yyy";
+  a.appendChild(x);
+  a.appendChild(y);
+  document.body.appendChild(a);
 
-//   document.body.addEventListener("mousemove", dispPosition);
-//   function dispPosition(e){
-//     document.getElementById("xxx").value = "x : " + e.clientX;
-//     document.getElementById("yyy").value = "y : " + e.clientY;
-//   };
+  document.body.addEventListener("mousemove", dispPosition);
+  function dispPosition(e){
+    document.getElementById("xxx").value = "x : " + e.clientX;
+    document.getElementById("yyy").value = "y : " + e.clientY;
+  };
 
-// }
+}
 
-// function floatBox_to(text) {
+function floatBox_to(text) {
 
-//   var mbox=document.createElement("div");
-//   mbox.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:10px;text-align:center;z-index:19999;";
-//   mbox.style.opacity = '0.8';
-//   mbox.style.background = 'silver';
-//   mbox.style.border = '1px solid #aaa';
-//   mbox.style.fontSize = '20px';
-//   text.split(/\\r\\n|\\r|\\n/).forEach(element => {
-//     mbox.appendChild(document.createTextNode(element));
-//     mbox.appendChild(document.createElement('br'));
-//     mbox.appendChild(document.createElement('br'));
-//   });
-//   document.body.appendChild(mbox);
+  var mbox=document.createElement("div");
+  mbox.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:10px;text-align:center;z-index:19999;";
+  mbox.style.opacity = '0.8';
+  mbox.style.background = 'silver';
+  mbox.style.border = '1px solid #aaa';
+  mbox.style.fontSize = '20px';
+  text.split(/\\r\\n|\\r|\\n/).forEach(element => {
+    mbox.appendChild(document.createTextNode(element));
+    mbox.appendChild(document.createElement('br'));
+    mbox.appendChild(document.createElement('br'));
+  });
+  document.body.appendChild(mbox);
 
-//   /* setTimeout(closenode, 1500);
-//     function closenode(){mbox.parentNode.removeChild(mbox);}*/
+  /* setTimeout(closenode, 1500);
+    function closenode() {mbox.parentNode.removeChild(mbox);}*/
 
-//   setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 1000);
+  setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 1000);
 
-// }
+}
 
-// function curclepoint(x, y) {
-//   //x-=10;y-=10;
-//   let cp=document.createElement("div");
-//   cp.style.cssText="position:fixed;top:"+ y +"px;left:"+ x +"px;width: 20px;height:20px;border-radius:50%;background-color:#f00;";
-//   document.body.appendChild(cp);
-//   setTimeout(() =>{cp.parentNode.removeChild(cp);}, 2000)
-// }
+function curclepoint(x, y) {
+  //x-=10;y-=10;
+  let cp=document.createElement("div");
+  cp.style.cssText="position:fixed;top:"+ y +"px;left:"+ x +"px;width: 20px;height:20px;border-radius:50%;background-color:#f00;";
+  document.body.appendChild(cp);
+  setTimeout(() =>{cp.parentNode.removeChild(cp);}, 2000)
+}
 
-// const regPattForURL = **regular expression pattern for url matching**;
-// console.log(location.href.match(regPattForURL));
-// const matchedPartInURL = location.href.match(regPattForURL)[0];
-// **script**
-// //floatBox_to("**name**");
-// })();`
-// },
-// {
-// name : `Open the link for the next article starting with /次|>|＞|next|→/`,
-// regPattForURL :
-// `/^https:\\/\\/seiga\\.nicovideo\\.jp\\/watch\\/mg\\d{6}\\?track=/
-// /^https:\\/\\/toyokeizai\\.net\\/articles\\/\\-\\/\\d+\\?page=/
-// /^https:\\/\\/ncode.syosetu.com\\/n\\d{4}[a-z]{2}\\//
-// /^https:\\/\\/book.dmm.com\\/library\\//`,
-// script :
-// `const linkTextStartingWith= /次|>|＞|next|→/;
-// var nextArticle = '';
-// console.log("matchedPartInURL : " + matchedPartInURL);
-// const dlinks = document.links;
-// for (var i = dlinks.length-1; i >= 0; i--){
-//   var dlink = dlinks[i];
-//   var dlinkPath = dlink.href;
-//   console.log("dlink.textContent.search : " + dlink.textContent.search(linkTextStartingWith));
-//   console.log("dlinkPath.match : " + dlinkPath.match(regPattForURL));
-//   if(('textContent' in dlink ) && (dlink.textContent.search(linkTextStartingWith) == 0) &&
-//     (dlinkPath.match(regPattForURL) == matchedPartInURL)) {
-//     console.log("dlinkPath : " + dlinkPath);
-//     nextArticle = dlinkPath;
-//     onScroll();
-//     break;
-//   }
-// }
-// function scriptAtBottom() {
-//   location.href = nextArticle;
-// }`
-// }
-// ];
+const regPattForURL = **regular expression pattern for url matching**;
+console.log(location.href.match(regPattForURL));
+const matchedPartInURL = location.href.match(regPattForURL)[0];
+**script**
+//floatBox_to("**name**");
+})();`
+  }
+];
 
   localStorage.clear();
   localStorage.setItem('systemDataKey', systemDataKey);
-  localStorage.setItem('curkey', systemDataKey);
+  localStorage.setItem('curKey', systemDataKey);
   localStorage.setItem('dispMatchedRegPattsCode',
 `javascript:(function(){
   var text = \`**matchedRegPatts**\`;
@@ -288,7 +260,7 @@ function initialLoad() {
 
   for (let i = 0; i < arr.length; i++) {
     var obj = {[arr[i].name]: {regPattForURL: arr[i].regPattForURL, script: arr[i].script, match: ``}};
-    chrome.storage.sync.set(obj, function () {});
+    chrome.storage.sync.set(obj, () => {});
   }
-  chrome.storage.sync.get(null, function (data) { console.info(data) });
+  chrome.storage.sync.get(null, data => { console.info(data) });
 }

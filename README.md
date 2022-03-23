@@ -10,6 +10,8 @@ Register the JavaScript to be executed at the bottom of the page with the URL th
 
 
 ### Version history
+- ver 1.5 : Save when focus moved.(Delete Save Button) & Coloring the background of focus element.
+- ver 1.4 : Used JSON for the in/out file format.
 - ver 1.3 : Significantly changed imp/exp function.(read file is yet.)
 - ver 1.2 : The implementation of the import function is complete.
 - ver 1.1 : Fixed URL consistency check process.
@@ -17,9 +19,7 @@ Register the JavaScript to be executed at the bottom of the page with the URL th
 - ver 0.1 : Single function selection method.
 
 
-
-
-以下、参考転載
+<!--
 # DEMO
 
 You can learn how to making cute physics simulations (looks retro game).
@@ -87,3 +87,4 @@ I don't test environments under Linux and Mac.
 Enjoy making cute physics simulations!
 
 Thank you!
+-->

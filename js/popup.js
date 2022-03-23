@@ -19,12 +19,12 @@
 // document.getElementById('send').addEventListener('click', sendToContents);
 
 function popup() {
-    chrome.tabs.query({currentWindow: true, active: true}, function (tabs){
+  chrome.tabs.query({currentWindow: true, active: true}, tabs => {
     var activeTab = tabs[0];
     chrome.tabs.sendMessage(activeTab.id, {"message": "start"});
-   });
+  });
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("button1").addEventListener("click", popup);
 });
