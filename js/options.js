@@ -9,31 +9,34 @@ chrome.storage.sync.get(null, items => {
   itemsOnMemory = items;
   const keys = Object.keys(items);
   // make items of listbox
-  const SelectItem = document.getElementById('select');
+  const selectItem = document.getElementById('select');
   keys.forEach(key => {
     let option = document.createElement('option');
     option.setAttribute('value', key);
     option.innerHTML = '<xmp>' + key + '</xmp>';
-    SelectItem.appendChild(option);
+    selectItem.appendChild(option);
   });
-  let curKey = localStorage.getItem('curKey');
-  SelectItem.value = curKey;
+  const curKey = localStorage.getItem('curKey');
+  selectItem.value = curKey;
 
-  document.getElementById("expand-toggle").addEventListener('change', onModeButtonClick);
-  SelectItem.addEventListener('change', onSellectMenuChange);
+  // document.getElementById("expand-toggle").addEventListener('change', onModeButtonClick);
+  selectItem.addEventListener('change', onSellectMenuChange);
+  const nameItem = document.getElementById('name');
+  nameItem.addEventListener("input", (e) => {
+    if (e.inputType === `insertLineBreak`) {nameItem.value = nameItem.value.trim();}
+  }, false);
   document.getElementById('new').addEventListener('click', onNewButtonClick);
   // document.getElementById('save').addEventListener('click', onSaveButtonClick);
   document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
   document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
 
-  document.getElementById('readFile').addEventListener('change', onReadFileButtonClick);
+  document.getElementById('import').addEventListener('change', onImportInputChange);
   document.getElementById('export').addEventListener('click', onExportButtonClick);
-  document.getElementById('import').addEventListener('click', onImportButtonClick);
 
   if (!localStorage.getItem('curFocusId')) {localStorage.setItem('curFocusId', `name`);}
 
   const formElement = document.getElementById('form');
-  
+
   formElement.addEventListener('focusout', (event) => {
     event.target.style.background = '';
     onSaveButtonClick();
@@ -42,12 +45,13 @@ chrome.storage.sync.get(null, items => {
 
   formElement.addEventListener('focusin', (event) => {
     event.target.style.background = 'honeydew';
-    let focusId = document.activeElement.id;
-    let oldFocusId = localStorage.getItem('curFocusId');
-    let isRecordingTargetId = /^(name|regPattForURL|script)$/.test(focusId);
+    const focusId = document.activeElement.id;
+    const oldFocusId = localStorage.getItem('curFocusId');
+    const isRecordingTargetId = /^(select|name|regPattForURL|script)$/.test(focusId);
     console.log(`focus in : "${focusId}"`, isRecordingTargetId);
     if (isRecordingTargetId) {
       localStorage.setItem('curFocusId', focusId);
+      document.getElementById(focusId).focus();
     } else {
       document.getElementById(oldFocusId).focus();
     }
@@ -58,9 +62,11 @@ chrome.storage.sync.get(null, items => {
 
 });
 
-function onModeButtonClick() {
-  if (!document.getElementById("expand-toggle").checked) {reDrow();}
-}
+// function onModeButtonClick() {
+//   if (!document.getElementById("expand-toggle").checked) {reDrow();}
+//   // else {document.getElementById(`scripts`).focus();}
+// }
+
 // From here, single function processing for each button
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, items => {
@@ -79,7 +85,7 @@ function onSellectMenuChange() {
     const isSystemData = (curKey == systemDataKey);
     document.getElementById('name').disabled = isSystemData;
     document.getElementById('remove').disabled = isSystemData;
-    let curFocusId = localStorage.getItem('curFocusId');
+    const curFocusId = localStorage.getItem('curFocusId');
     document.getElementById((isSystemData && curFocusId == `name`) ? `script` : curFocusId).focus();
 
   });
@@ -94,10 +100,10 @@ function onNewButtonClick() {
 }
 
 function onSaveButtonClick() {
-  let slelctValue = document.getElementById('select').value;
+  const slelctValue = document.getElementById('select').value;
   let nameValue = document.getElementById('name').value;
   // if (document.getElementById('select').value) {onRemoveButtonClick();}
-  let isNoName = (nameValue.length == 0);
+  const isNoName = (nameValue.length == 0);
   if (isNoName) {nameValue = new Date().toLocaleString();}
   else {onRemoveButtonClick();}
   // if (/\"/g.test(nameValue)) {nameValue = nameValue.replace(/\"/g,`'`);};
@@ -120,11 +126,11 @@ function onRemoveButtonClick() {
 }
 
 function onConvRegExpButtonClick() {
-  let regPattForURL = document.getElementById('regPattForURL');
-  let regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
-  let sourceURL = regPattForURLarr[0];
+  const regPattForURL = document.getElementById('regPattForURL');
+  const regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
+  const sourceURL = regPattForURLarr[0];
   if (/^\//.test(sourceURL)) {return;}
-  let targetURL = convURLtoRegExp(sourceURL);
+  const targetURL = convURLtoRegExp(sourceURL);
   regPattForURL.value = regPattForURL.value.replace(sourceURL, targetURL);
   onSaveButtonClick();
 
@@ -145,61 +151,100 @@ function convURLtoRegExp(sourceURL) {
 
 }
 
-function onReadFileButtonClick (evt) {
-  let input = evt.target;
+function onImportInputChange (event) {
+  // var obj = document.activeElement;
+  // obj.nextElementSibling.focus();
+  const input = event.target;
   if (input.files.length == 0) {/*alert('No file selected');*/ return;}
 
   const file = input.files[0];
   const reader = new FileReader();
   reader.onload = () => {
-    document.getElementById('scripts').innerHTML = reader.result;
-  };
-  reader.readAsText(file);
+    console.log(`onImportInputChange:reader.onload`);
+    const scripts = reader.result;
+    if (!scripts.includes(systemDataKey.split(String.fromCharCode(1)).join(`\\u0001`))) {alert(`Invalid file.`);return;}
+    const obj = JSON.parse(scripts);
+    Object.keys(obj).forEach(key => obj[key].update = true);
+    chrome.storage.sync.set(obj, () => {});
   
-}
-
-function onImportButtonClick () {
-  const scripts = document.getElementById('scripts').value;
-  // const arr = scripts.split(/name:\n/);
-  if (scripts.length == 0) {return;}
-  // if (scripts.charAt(0) == `{`) {
-  let obj = JSON.parse(scripts);
-  Object.keys(obj).forEach(key => obj[key].update = true);
-  chrome.storage.sync.set(obj, () => {});
-  /*} else {
-    for (let item of arr) {
-      if (item != '') {
-        let itemarr = item.split(`regPattForURL:\n`);
-        let name = itemarr[0].trim();
-        if (name == '') {name = systemDataKey;}
-        let itemarr1 = itemarr[1].split(`script:\n`)
-        let regPattForURL = itemarr1[0].trim();
-        let script = itemarr1[1].trim();
-
-        var obj = {[name]: {regPattForURL: regPattForURL, script: script, update: 'true'}};
-        chrome.storage.sync.set(obj, () => {});
-      }
-    }
-  }*/
-
-  chrome.storage.sync.get(null, items => {
-    Object.keys(items).forEach(key => {
-      let item = items[key];
-      if (item.update) {
-        delete item.update;
-      } else {
-        chrome.storage.sync.remove(key, () => {console.log(`removed "${key}"`);});
-        delete items[key];
-        items[`${String.fromCharCode(2)}(added?)${key}`] = item;
-        // obj = {[String.fromCharCode(2) + '(added?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
-      }
-    })
-    chrome.storage.sync.set(items, () => {});
-    localStorage.setItem('curKey', systemDataKey);
-
-  });
+    chrome.storage.sync.get(null, items => {
+      Object.keys(items).forEach(key => {
+        let item = items[key];
+        if (item.update) {
+          delete item.update;
+        } else {
+          chrome.storage.sync.remove(key, () => {console.log(`removed "${key}"`);});
+          delete items[key];
+          items[`${String.fromCharCode(2)}(added?)${key}`] = item;
+          // obj = {[String.fromCharCode(2) + '(added?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
+        }
+      })
+      chrome.storage.sync.set(items, () => {});
+      localStorage.setItem('curKey', systemDataKey);
+      reDrow();
+    });
+  }
+  reader.readAsText(file);
 
 }
+
+
+// function onReadFileButtonClick (event) {
+//   const input = event.target;
+//   if (input.files.length == 0) {/*alert('No file selected');*/ return;}
+
+//   const file = input.files[0];
+//   const reader = new FileReader();
+//   reader.onload = () => {
+//     document.getElementById('scripts').innerHTML = reader.result;
+//   };
+//   reader.readAsText(file);
+
+// }
+
+// function onImportButtonClick () {
+//   const scripts = document.getElementById('scripts').value;
+//   if (!scripts.includes(systemDataKey.split(String.fromCharCode(1)).join(`\\u0001`))) {alert(`Invalid file.`);return;}
+//   // const arr = scripts.split(/name:\n/);
+//   if (scripts.length == 0) {return;}
+//   // if (scripts.charAt(0) == `{`) {
+//   const obj = JSON.parse(scripts);
+//   Object.keys(obj).forEach(key => obj[key].update = true);
+//   chrome.storage.sync.set(obj, () => {});
+//   /*} else {
+//     for (let item of arr) {
+//       if (item != '') {
+//         let itemarr = item.split(`regPattForURL:\n`);
+//         let name = itemarr[0].trim();
+//         if (name == '') {name = systemDataKey;}
+//         let itemarr1 = itemarr[1].split(`script:\n`)
+//         let regPattForURL = itemarr1[0].trim();
+//         let script = itemarr1[1].trim();
+
+//         var obj = {[name]: {regPattForURL: regPattForURL, script: script, update: 'true'}};
+//         chrome.storage.sync.set(obj, () => {});
+//       }
+//     }
+//   }*/
+
+//   chrome.storage.sync.get(null, items => {
+//     Object.keys(items).forEach(key => {
+//       let item = items[key];
+//       if (item.update) {
+//         delete item.update;
+//       } else {
+//         chrome.storage.sync.remove(key, () => {console.log(`removed "${key}"`);});
+//         delete items[key];
+//         items[`${String.fromCharCode(2)}(added?)${key}`] = item;
+//         // obj = {[String.fromCharCode(2) + '(added?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
+//       }
+//     })
+//     chrome.storage.sync.set(items, () => {});
+//     localStorage.setItem('curKey', systemDataKey);
+
+//   });
+
+// }
 
 function onExportButtonClick() {
   chrome.storage.sync.get(null, items => {

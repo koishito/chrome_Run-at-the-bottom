@@ -136,7 +136,7 @@ function initialLoad() {
   const arr = [
 {
 name : systemDataKey,
-regPattForURL :
+regPattForURL : 
 `/^file:\\/\\/\\//
 /^https:\\/\\/bitbucket\.org\\//
 /^chrome.+$/
@@ -228,7 +228,7 @@ const matchedPartInURL = location.href.match(regPattForURL)[0];
 **script**
 //floatBox_to("**name**");
 })();`
-  }
+}
 ];
 
   localStorage.clear();

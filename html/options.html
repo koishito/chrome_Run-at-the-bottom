@@ -9,37 +9,52 @@
 </head>
 <body>
     <form id="form">
-        <input type="checkbox" id="expand-toggle" hidden>
-        <label for="expand-toggle" id="expand-btn">edit mode</label>
-        <label for="expand-toggle" id="expand-btn2">imp/exp mode</label>
-        <h2><u>Run at the bottom</u></h2>
-
-        <div class="edit_mode">
+        <!--<div class="imp/exp">
+            <input type="checkbox" id="expand-toggle" hidden>
+            <label for="expand-toggle" id="expand-btn">edit mode</label>
+            <label for="expand-toggle" id="expand-btn2">imp/exp mode</label>
+        </div>-->
+        <table width="100%">
+            <td>
+                <h2><u>Run at the bottom</u></h2>
+            </td><td align="right" valign="bottom">
+                <input type="file" id="import" hidden>
+                <label for="import" id="selectFile">import</label>&emsp;
+                <button id="export">export</button>
+            </td>
+        </table>
+        <!-- <div class="edit_mode"> -->
             <b>select name</b>
             <select size="5" name="select" id="select"></select>
             <b>name</b>
-            <input type="text" id="name"></input>
+            <!-- <input type="text" id="name" tabindex="1"></input> -->
+            <textarea type="text" id="name" tabindex="1" style="overflow:hidden;" wrap="off"></textarea> <!--disable LineBreak, use JS-->
             <b>regular expression pattern for url matching</b>
-            <textarea type="text" id="regPattForURL"></textarea>
+            <textarea type="text" id="regPattForURL" tabindex="2"></textarea>
             <b>script</b><!--   <font size="2">(Editable) *Add commented title on the first line</font> -->
-            <textarea id="script"></textarea>
-            <button id="new">new</button>&emsp;
-            <!--<button id="save" style="visibility:hidden">save</button>-->
-            <font size="2">*Save when focus moved. If name is the same, it will be overwritten.</font>&emsp;
-            <button id="remove">remove</button>&emsp;
-            <button id="ConvRegExp">convReg</button>
-        </div>
+            <textarea id="script" tabindex="3"></textarea>
+            <table width="100%">
+                <td>
+                    <button id="new">new</button>&emsp;
+                    <!--<button id="save" style="visibility:hidden">save</button>-->
+                    <font size="2">*Save when focus leaved. If name is the same, it will be overwritten.</font>
+                </td><td align="right">
+                    <button id="remove">remove</button>&emsp;
+                    <button id="ConvRegExp">convReg</button>
+                </td>
+            </table>
+    <!-- </div> -->
 
-        <div class="impexp_mode" hidden>
+        <!-- <div class="impexp_mode" hidden>
             <b>scripts</b>
             <textarea id="scripts"></textarea>
-            <!-- <input type="file" id="read_file"></input>&emsp;&emsp; -->
-            <input type="file" id="readFile" hidden>
+            <input type="file" id="read_file"></input>&emsp;&emsp; -->
+            <!--<input type="file" id="readFile" hidden>
             <label for="readFile" id="select_file">read file</label>&emsp;&emsp;
             <button id="export">export</button>&emsp;&emsp;
             <button id="import">import</button>&emsp;&emsp;
-            <!-- <button id="json">json</button>&emsp;&emsp; -->
-        </div>
+            <button id="json">json</button>&emsp;&emsp;
+        </div> -->
     </form>
 </body>
 </html>

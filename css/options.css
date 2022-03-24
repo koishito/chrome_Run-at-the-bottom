@@ -2,9 +2,66 @@
 :root {
   --light_border: solid 2px #767676;
   --shadow_border: solid 2px #212121;
+  user-select: none; /* 選択を禁止する */
+  /* font-family: Verdana; */
 }
 
-#expand-btn, #expand-btn2{
+#selectFile{
+  /* font-size: 112.6px; */
+  /* font-weight: normal; */
+  text-align: center;
+  margin-top: 30px;
+  padding: 1.5px 6px;
+  border: solid 2px;
+  background-color: silver;
+  border-top : var(--light_border);
+  border-left : var(--light_border);
+  border-right : var(--shadow_border);
+  border-bottom : var(--shadow_border);
+}
+
+form{
+  width: 700px;
+  background-color: #eaeaea;
+  padding: 10px 20px;
+  margin: 0 auto;
+}
+
+#select, #name, #regPattForURL, #script, #scripts{
+  resize: none;
+  width: 700px;
+  box-sizing: border-box;
+}
+
+#select{
+  height: 94px;
+}
+
+#name{
+  height: 20px;
+  font-family: Verdana;
+}
+
+#regPattForURL{
+  height: 53px;
+  font-family: Verdana;
+}
+
+#script{
+  height: 237px;
+  font-family: Verdana;
+}
+
+button{
+  background-color: silver;
+}
+
+#scripts{
+  height: 460px;
+  font-family: Verdana;
+}
+
+/*#expand-btn, #expand-btn2{
   float: right;
   width: 100px;
   text-align: center;
@@ -46,51 +103,4 @@
   display: inline-block;
 }
 /*~ toggle */
-
-form{
-    width: 700px;
-    background-color: #eaeaea;
-    padding: 10px 20px;
-    margin: 0 auto;
-    font-family: Verdana;
-    user-select: none;
-}
-
-#select, #name, #regPattForURL, #script, #scripts{
-  resize: none;
-  width: 700px;
-  box-sizing: border-box;
-  font-family: Verdana;
-}
-
-#select{
-  height: 112px;
-}
-
-#regPattForURL{
-  height: 54px;
-}
-
-#script{
-  height: 234px;
-}
-
-button{
-  background-color: silver;
-}
-
-#scripts{
-  height: 460px;
-}
-
-#select_file{
-  /* width: 100px; */
-  text-align: center;
-  margin-top: 30px;
-  padding: 2px 4px;
-  border: solid 2px #717171;
-  background-color: silver;
-  user-select: none;
-  /* align-items: flex-end; */
-}
 
