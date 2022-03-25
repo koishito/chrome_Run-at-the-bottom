@@ -1,23 +1,9 @@
 /* toggle ~*/
 :root {
-  --light_border: solid 2px #767676;
-  --shadow_border: solid 2px #212121;
+  --light_border: solid 2.3px #767676;
+  --shadow_border: solid 2.3px #212121;
   user-select: none; /* 選択を禁止する */
   /* font-family: Verdana; */
-}
-
-#selectFile{
-  /* font-size: 112.6px; */
-  /* font-weight: normal; */
-  text-align: center;
-  margin-top: 30px;
-  padding: 1.5px 6px;
-  border: solid 2px;
-  background-color: silver;
-  border-top : var(--light_border);
-  border-left : var(--light_border);
-  border-right : var(--shadow_border);
-  border-bottom : var(--shadow_border);
 }
 
 form{
@@ -38,7 +24,7 @@ form{
 }
 
 #name{
-  height: 20px;
+  height: 17pt;
   font-family: Verdana;
 }
 
@@ -48,7 +34,7 @@ form{
 }
 
 #script{
-  height: 237px;
+  height: 230px;
   font-family: Verdana;
 }
 
@@ -56,9 +42,23 @@ button{
   background-color: silver;
 }
 
-#scripts{
+/* #scripts{
   height: 460px;
   font-family: Verdana;
+} */
+
+#selectFile{
+  font-size: 11.8px;
+  /* font-weight: normal; */
+  text-align: center;
+  /* margin-top: 50px; */
+  /* margin: 0%;*/
+  padding: 0px 6px 1.5px 6px;
+  background-color: silver;
+  border-top : var(--light_border);
+  border-left : var(--light_border);
+  border-right : var(--shadow_border);
+  border-bottom : var(--shadow_border);
 }
 
 /*#expand-btn, #expand-btn2{

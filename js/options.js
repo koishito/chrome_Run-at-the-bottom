@@ -9,40 +9,34 @@ chrome.storage.sync.get(null, items => {
   itemsOnMemory = items;
   const keys = Object.keys(items);
   // make items of listbox
-  const selectItem = document.getElementById('select');
+  const selectElement = document.getElementById('select');
   keys.forEach(key => {
     let option = document.createElement('option');
     option.setAttribute('value', key);
     option.innerHTML = '<xmp>' + key + '</xmp>';
-    selectItem.appendChild(option);
+    selectElement.appendChild(option);
   });
   const curKey = localStorage.getItem('curKey');
-  selectItem.value = curKey;
+  selectElement.value = curKey;
 
-  // document.getElementById("expand-toggle").addEventListener('change', onModeButtonClick);
-  selectItem.addEventListener('change', onSellectMenuChange);
-  const nameItem = document.getElementById('name');
-  nameItem.addEventListener("input", (e) => {
-    if (e.inputType === `insertLineBreak`) {nameItem.value = nameItem.value.trim();}
-  }, false);
+  document.getElementById('importFile').addEventListener('change', onImportInputChange);
+  document.getElementById('export').addEventListener('click', onExportButtonClick);
+  
+  selectElement.addEventListener('change', onSellectMenuChange);
+  document.getElementById('name').addEventListener("input", function () {this.value = this.value.replace(`\n`, ``);}, false);
   document.getElementById('new').addEventListener('click', onNewButtonClick);
   // document.getElementById('save').addEventListener('click', onSaveButtonClick);
   document.getElementById('remove').addEventListener('click', onRemoveButtonClick);
   document.getElementById('ConvRegExp').addEventListener('click', onConvRegExpButtonClick);
 
-  document.getElementById('import').addEventListener('change', onImportInputChange);
-  document.getElementById('export').addEventListener('click', onExportButtonClick);
-
   if (!localStorage.getItem('curFocusId')) {localStorage.setItem('curFocusId', `name`);}
 
   const formElement = document.getElementById('form');
-
   formElement.addEventListener('focusout', (event) => {
     event.target.style.background = '';
     onSaveButtonClick();
 
   });
-
   formElement.addEventListener('focusin', (event) => {
     event.target.style.background = 'honeydew';
     const focusId = document.activeElement.id;
@@ -57,37 +51,30 @@ chrome.storage.sync.get(null, items => {
     }
 
   });
-  
+
   onSellectMenuChange();
 
 });
 
-// function onModeButtonClick() {
-//   if (!document.getElementById("expand-toggle").checked) {reDrow();}
-//   // else {document.getElementById(`scripts`).focus();}
-// }
-
 // From here, single function processing for each button
 function onSellectMenuChange() {
   chrome.storage.sync.get(null, items => {
-    // var keys = Object.keys(items);
     const curKey = document.getElementById('select').value;
     console.log(`curKey : "${curKey}"`);
+    const nameElement = document.getElementById('name');
     if (curKey.length > 0) {
       const curItem = items[curKey];
-      document.getElementById('name').value = curKey;
+      nameElement.value = curKey;
       document.getElementById('regPattForURL').value = curItem.regPattForURL;
       document.getElementById('script').value = curItem.script;
       localStorage.setItem('curKey', curKey);
       console.log(`Selected : set current "${curKey}"`);
     }
-
     const isSystemData = (curKey == systemDataKey);
-    document.getElementById('name').disabled = isSystemData;
+    nameElement.disabled = isSystemData;
     document.getElementById('remove').disabled = isSystemData;
     const curFocusId = localStorage.getItem('curFocusId');
     document.getElementById((isSystemData && curFocusId == `name`) ? `script` : curFocusId).focus();
-
   });
 
 }
@@ -138,15 +125,13 @@ function onConvRegExpButtonClick() {
 
 function convURLtoRegExp(sourceURL) {
   for (let singlestring of [...`\'".*+?^$-|/{}()[]`]) {
-    sourceURL = sourceURL.replace(new RegExp(`\\${singlestring}`, "g") , `\\${singlestring}`);
+    sourceURL = sourceURL.replace(new RegExp(`\\${singlestring}`, `g`) , `\\${singlestring}`);
   }
-
   for (let parts of sourceURL.split(/\D/)) {
     if (parts.length > 3) {
       sourceURL = sourceURL.replace(parts, `\\d\{${parts.length}\}`);
     }
   }
-
   return `/^${sourceURL}/\r`;
 
 }
@@ -176,7 +161,6 @@ function onImportInputChange (event) {
           chrome.storage.sync.remove(key, () => {console.log(`removed "${key}"`);});
           delete items[key];
           items[`${String.fromCharCode(2)}(added?)${key}`] = item;
-          // obj = {[String.fromCharCode(2) + '(added?)' + key]: {regPattForURL: item.regPattForURL, script: item.script}};
         }
       })
       chrome.storage.sync.set(items, () => {});
@@ -188,6 +172,20 @@ function onImportInputChange (event) {
 
 }
 
+function onExportButtonClick() {
+  chrome.storage.sync.get(null, items => {
+    //export json
+    const json = JSON.stringify(items, undefined, 4);
+    blob = new Blob([json],{type:"text/plain"});
+    link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+
+    link.download = "export.json";
+    link.click();
+
+  });
+
+}
 
 // function onReadFileButtonClick (event) {
 //   const input = event.target;
@@ -246,37 +244,37 @@ function onImportInputChange (event) {
 
 // }
 
-function onExportButtonClick() {
-  chrome.storage.sync.get(null, items => {
-    /*const keys = Object.keys(items);
-    let text = "";
-    for (let i = 0; i < keys.length; i++) {
-      let key = keys[i];
-      let item = items[key];
-      if (isContainedReservedWord(key + `\n` + item.regPattForURL + `\n` + item.script, [`name:`, `regPattForURL:`, `script:`])) {return;}
-      if (key != systemDataKey) {
-        text += "\nname:\n" + key;
-      }
-      text += "\nregPattForURL:\n" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
-      text += "\nscript:\n" + item.script;//.replace(/\\/g, /\\\\/);
-    }
-    text = text.slice(1);
-    let blob = new Blob([text],{type:"text/plain"});
-    let link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
+// function onExportButtonClick() {
+//   chrome.storage.sync.get(null, items => {
+//     /*const keys = Object.keys(items);
+//     let text = "";
+//     for (let i = 0; i < keys.length; i++) {
+//       let key = keys[i];
+//       let item = items[key];
+//       if (isContainedReservedWord(key + `\n` + item.regPattForURL + `\n` + item.script, [`name:`, `regPattForURL:`, `script:`])) {return;}
+//       if (key != systemDataKey) {
+//         text += "\nname:\n" + key;
+//       }
+//       text += "\nregPattForURL:\n" + item.regPattForURL;//.replace(/\\/g, /\\\\/);
+//       text += "\nscript:\n" + item.script;//.replace(/\\/g, /\\\\/);
+//     }
+//     text = text.slice(1);
+//     let blob = new Blob([text],{type:"text/plain"});
+//     let link = document.createElement('a');
+//     link.href = window.URL.createObjectURL(blob);
 
-    link.download = "export.txt";
-    link.click();*/
+//     link.download = "export.txt";
+//     link.click();*/
 
-    //export json
-    const json = JSON.stringify(items, undefined, 4);
-    blob = new Blob([json],{type:"text/plain"});
-    link = document.createElement('a');
-    link.href = window.URL.createObjectURL(blob);
+//     //export json
+//     const json = JSON.stringify(items, undefined, 4);
+//     blob = new Blob([json],{type:"text/plain"});
+//     link = document.createElement('a');
+//     link.href = window.URL.createObjectURL(blob);
 
-    link.download = "export.json";
-    link.click();
+//     link.download = "export.json";
+//     link.click();
 
-  });
+//   });
 
-}
+// }
