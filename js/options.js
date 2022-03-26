@@ -19,6 +19,10 @@ chrome.storage.sync.get(null, items => {
   const curKey = localStorage.getItem('curKey');
   selectElement.value = curKey;
 
+  document.getElementById('body').addEventListener('click', () => {
+    document.getElementById(localStorage.getItem('curFocusId')).focus();
+  });
+
   document.getElementById('importFile').addEventListener('change', onImportInputChange);
   document.getElementById('export').addEventListener('click', onExportButtonClick);
   
