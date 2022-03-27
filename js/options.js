@@ -1,7 +1,7 @@
 // const curKey = String.fromCharCode(189);
 const systemDataKey = localStorage.getItem('systemDataKey');
 const reDrow = () => window.location.reload();
-if (systemDataKey == null) {initialLoad();}
+if (!localStorage.getItem('curKey')) {initialLoad();}
 // const QuotationMark = `\b` //String.fromCharCode(8);
 var itemsOnMemory;
 
@@ -100,7 +100,7 @@ function onSaveButtonClick() {
   // if (/\"/g.test(nameValue)) {nameValue = nameValue.replace(/\"/g,`'`);};
   const regPattForURLvalue = document.getElementById('regPattForURL').value;
   const scriptvalue = document.getElementById('script').value;
-  const obj = {[nameValue.trim()]: {regPattForURL: regPattForURLvalue.trim(), script: scriptvalue.trim(), match: ``}};
+  const obj = {[nameValue.trim()]: {regPattForURL: regPattForURLvalue.trim(), script: scriptvalue.trim()/*, match: ``*/}};
   chrome.storage.sync.set(obj, () => {console.log(`saved "${nameValue}"`)});
   localStorage.setItem('curKey', nameValue);
   console.log(`saved : set current "${nameValue}"`);
@@ -148,6 +148,7 @@ function onImportInputChange (event) {
 
   const file = input.files[0];
   const reader = new FileReader();
+  reader.readAsText(file);
   reader.onload = () => {
     console.log(`onImportInputChange:reader.onload`);
     const scripts = reader.result;
@@ -172,7 +173,6 @@ function onImportInputChange (event) {
       reDrow();
     });
   }
-  reader.readAsText(file);
 
 }
 
