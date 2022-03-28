@@ -5,11 +5,8 @@ const dispMatchedRegPattsCode = `
 (window.onload = function(){
   var text = \`**matchedRegPatts**\`;
   var mbox=document.createElement("div");
-  mbox.style.cssText="font-size:30px;position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:10px;text-align:left;z-index:19999;";
-  //mbox.style.opacity = '0.8';
-  mbox.style.background = 'black';
-  mbox.style.border = '1px solid #aaa';
-  mbox.style.fontSize = '14px';
+  mbox.style.cssText="font-weight:bold;font-size:50px;background:white;opacity:1;border:100px solid silver;"
+                    +"position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:50px;text-align:left;z-index:19999;";
   text.split(/\\r\\n|\\r|\\n/).forEach(element => {
     mbox.appendChild(document.createElement('br'));
     mbox.appendChild(document.createTextNode(element));
@@ -17,9 +14,6 @@ const dispMatchedRegPattsCode = `
   });
   mbox.appendChild(document.createElement('br'));
   document.body.appendChild(mbox);
-
-  /* setTimeout(closenode, 3000);
-    function closenode(){mbox.parentNode.removeChild(mbox);}*/
 
   setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 1500);
 
@@ -55,13 +49,11 @@ chrome.runtime.onInstalled.addListener(details => {
     initialLoad();
   }
   setTimeout(onChangedActiveTab(0), 200);
-
 });
 
 // // 機能拡張の起動時に実行
 // chrome.runtime.onStartup.addListener(() => {
 //   console.log("onStartup");
-
 // });
 
 function onChangedActiveTab() {
@@ -87,6 +79,7 @@ function checkCurrentTabMatched(curTab) {
       let item = items[key];
       let matchPattern = checkUrlMatched(curTab.url, item.regPattForURL);
       if (matchPattern) {
+        localStorage.setItem('curKey', key);
         console.log(`matchPattern : ${matchPattern}`);
         if (key == systemDataKey) {
           setIcon(`excpt`, `${key}\n${matchPattern}`);
@@ -105,78 +98,9 @@ function checkCurrentTabMatched(curTab) {
       scriptText += `\n${dispMatchedRegPattsCode}`.replace(/\*\*matchedRegPatts\*\*/, floatText.slice(1,-1));
       // console.log(`${c.red}toolTip : ${toolTip + c.green}\nscriptText : ${scriptText + c.magenta}\nfloatText : ${floatText}`);
       let response = executeScript(curTab.id, scriptText);
-      localStorage.setItem('curKey', key);
     }
-    // return;
-    
-    // const keys = Object.keys(items);
-    // const tabId = curTab.id;
-    // const url = curTab.url;
-    // const title = curTab.title;
-    // setIcon(``, `Unmatched` );
-    // // Check URL
-    // for (let i = 0 ; i < keys.length; i++) {
-    //   var key = keys[i];
-    //   var item = items[key];
-    //   var regPattForURLArray = item.regPattForURL.split(/\r\n|\r|\n/)
-    //   var matchedRegPatts = "";
-    //   for (let j = 0; j < regPattForURLArray.length; j++) {
-    //     var regPattForURL = regPattForURLArray[j];
-    //     var matchedURL = url.match(RegExp(regPattForURL.substr( 1, regPattForURL.length - 2 )));
-    //     if ((/\/.+\//.test(regPattForURL)) && (matchedURL)) {
-    //       console.log(i, j, url, matchedURL);
-    //       matchedRegPatts += '\n' + regPattForURL;
-    //     }
-    //   }
-    //   item.match = (matchedRegPatts) ? `\n` + key + matchedRegPatts : ``;
-    // }
-    // // Processing based on the check result
-    // const excludedMatch = items[systemDataKey].match;
-    // let errorPage = !(/^http/.test(title)) && (url.indexOf(title) >= 0);
-
-    // if (excludedMatch || errorPage) {
-    //   setIcon(`excpt`, excludedMatch.slice(1));
-    // } else {
-    //   // make matchedRegPatts
-    //   var matchedRegPatts = "";
-    //   for (let i = 0 ; i < keys.length; i++) {
-    //     var key = keys[i];
-    //     var item = items[key];
-    //     var match = item.match;
-    //     if ((key != systemDataKey) && (match)) {
-    //       matchedRegPatts += match;
-    //       var execScript = items[systemDataKey].script;
-    //       execScript = execScript.replace(/\*\*name\*\*/, key);
-    //       var curregPattForURL = match.split(/\r\n|\r|\n/)[2]; //[0] is .[1] is name.
-    //       execScript = execScript.replace(/\*\*regular expression pattern for url matching\*\*/, curregPattForURL);
-    //       execScript = execScript.replace(/\*\*script\*\*/, item.script);
-    //       // console.log(`execScript : ` + execScript);
-    //       console.log(`execScript : ${execScript}`);
-    //       var response = executeScript(tabId, execScript);
-    //       localStorage.setItem('curKey', key);
-    //     }
-    //   }
-    //   if (matchedRegPatts) {
-    //     setIcon(`set`, matchedRegPatts.slice(1));
-    //     // dispFloatBox(matchedRegPatts, tabId);
-        
-    //     // var execScript = localStorage.getItem('dispMatchedRegPattsCode');
-    //     // var matchedKeys = matchedRegPatts.split(/\r\n|\r|\n/)
-    //     //   .reduce((acc, val, idx) => acc += (idx % 2 == 1) ? `\n` + val: ``).slice(1);
-    //     // execScript = execScript.replace(/\*\*matchedRegPatts\*\*/, matchedKeys);
-    //     // var response = executeScript(tabId, execScript);
-    //   }
-    // }
-
   })
 }
-
-// function dispFloatBox(matchedRegPatts, tabId) {
-//   var matchedKeys = matchedRegPatts.split(/\r\n|\r|\n/)
-//     .reduce((acc, val, idx) => acc += (idx % 2 == 1) ? `\n` + val: ``).slice(1);
-//   execScript = dispMatchedRegPattsCode.replace(/\*\*matchedRegPatts\*\*/, matchedKeys);
-//   var response = executeScript(tabId, execScript);
-// }
 
 function checkUrlMatched(url, urlPatterns) {
   for (pattern of urlPatterns.split(/\r\n|\r|\n/)) {
@@ -210,9 +134,8 @@ function executeScript(tabId, execScript) {
 
 
 function initialLoad() {
-  const arr = [
-{
-name : systemDataKey,
+  const initialObj = {
+[systemDataKey]: {
 regPattForURL : 
 `/^file:\\/\\/\\//
 /^https:\\/\\/bitbucket\.org\\//
@@ -272,20 +195,14 @@ function dispPosition() {
 function floatBox_to(text) {
 
   var mbox=document.createElement("div");
-  mbox.style.cssText="position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:10px;text-align:center;z-index:19999;";
-  mbox.style.opacity = '0.8';
-  mbox.style.background = 'silver';
-  mbox.style.border = '1px solid #aaa';
-  mbox.style.fontSize = '20px';
+  mbox.style.cssText="font-weight:bold;font-size:20px;background:white;opacity:1;border:100px solid silver;"
+                    +"position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:10px;text-align:center;z-index:19999;";
   text.split(/\\r\\n|\\r|\\n/).forEach(element => {
     mbox.appendChild(document.createTextNode(element));
     mbox.appendChild(document.createElement('br'));
     mbox.appendChild(document.createElement('br'));
   });
   document.body.appendChild(mbox);
-
-  /* setTimeout(closenode, 1500);
-    function closenode() {mbox.parentNode.removeChild(mbox);}*/
 
   setTimeout(() =>{mbox.parentNode.removeChild(mbox);}, 1000);
 
@@ -306,15 +223,12 @@ const matchedPartInURL = location.href.match(regPattForURL)[0];
 //floatBox_to("**name**");
 })();`
 }
-];
+};
 
   localStorage.clear();
   localStorage.setItem('systemDataKey', systemDataKey);
   localStorage.setItem('curKey', systemDataKey);
 
-  for (let i = 0; i < arr.length; i++) {
-    var obj = {[arr[i].name]: {regPattForURL: arr[i].regPattForURL, script: arr[i].script/*, match: ``*/}};
-    chrome.storage.sync.set(obj, () => {});
-  }
+  chrome.storage.sync.set(initialObj, () => {});
   chrome.storage.sync.get(null, data => { console.info(data) });
 }
