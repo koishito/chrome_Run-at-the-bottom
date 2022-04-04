@@ -5,8 +5,8 @@ const dispMatchedRegPattsCode = `
 (window.onload = function(){
   var text = \`**matchedRegPatts**\`;
   var mbox=document.createElement("div");
-  mbox.style.cssText="font-weight:bold;font-size:50px;background:white;opacity:1;border:100px solid silver;"
-                    +"position:fixed;top:50%;left:50%;transform:translate(-50%, -50%);padding:50px;text-align:left;z-index:19999;";
+  mbox.style.cssText="color:black;font-weight:bold;font-size:30px;background:aquamarine;opacity:0.5;border:20px solid silver;width:70%;"
+                    +"position:fixed;top:0%;left:50%;transform:translate(-50%, 0%);padding:50px;text-align:center;z-index:19999;";
   text.split(/\\r\\n|\\r|\\n/).forEach(element => {
     mbox.appendChild(document.createElement('br'));
     mbox.appendChild(document.createTextNode(element));

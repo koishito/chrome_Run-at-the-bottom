@@ -1,12 +1,9 @@
 // const curKey = String.fromCharCode(189);
 const systemDataKey = localStorage.getItem('systemDataKey');
 const reDrow = () => window.location.reload();
-if (!localStorage.getItem('curKey')) {initialLoad();}
-// const QuotationMark = `\b` //String.fromCharCode(8);
-var itemsOnMemory;
+// if (!localStorage.getItem('curKey')) {initialLoad();}
 
 chrome.storage.sync.get(null, items => {
-  itemsOnMemory = items;
   const keys = Object.keys(items);
   // make items of listbox
   const selectElement = document.getElementById('select');
@@ -38,6 +35,7 @@ chrome.storage.sync.get(null, items => {
   const formElement = document.getElementById('form');
   formElement.addEventListener('focusout', (event) => {
     event.target.style.background = '';
+    onConvRegExpButtonClick();
     onSaveButtonClick();
 
   });
@@ -120,7 +118,7 @@ function onConvRegExpButtonClick() {
   const regPattForURL = document.getElementById('regPattForURL');
   const regPattForURLarr = regPattForURL.value.split(/\r\n|\r|\n/);
   const sourceURL = regPattForURLarr[0];
-  if (/^\//.test(sourceURL)) {return;}
+  if (/^\//.test(sourceURL) || sourceURL == ``) {return;}
   const targetURL = convURLtoRegExp(sourceURL);
   regPattForURL.value = regPattForURL.value.replace(sourceURL, targetURL);
   onSaveButtonClick();
