@@ -1,58 +1,61 @@
-/* toggle ~*/
 :root {
   --light_border: solid 2.3px #767676;
   --shadow_border: solid 2.3px #212121;
   user-select: none; /* 選択を禁止する */
-  /* font-family: Verdana; */
 }
 
-form{
-  width: 700px;
-  background-color: #eaeaea;
-  padding: 10px 20px;
-  margin: 0 auto;
-}
-
-#select, #name, #regPattForURL, #script, #scripts{
-  resize: none;
-  width: 700px;
+*{
   box-sizing: border-box;
 }
 
-#select{
-  height: 94px;
+html, body, form{
+  height: 100%;
+  min-height: 600px;
+  margin: 0;
+}
+
+
+form{
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  min-width: 700px;
+  background-color: #eaeaea;
+  border: solid 5px white;
+  padding: 5px 20px;
+  margin: 0 auto;
+}
+
+table, #select, #name, #regPattForURL, #script{
+  font-family: Verdana;
+  resize: none;
+  width: 100%;
+}
+
+table{
+  padding: 5px 0 0 0;
 }
 
 #name{
   height: 17pt;
-  font-family: Verdana;
 }
 
 #regPattForURL{
-  height: 53px;
-  font-family: Verdana;
+  height: 72px;
 }
 
 #script{
-  height: 230px;
-  font-family: Verdana;
+  flex: auto;
+  /* height: 120px; */
 }
 
 button{
   background-color: silver;
 }
 
-/* #scripts{
-  height: 460px;
-  font-family: Verdana;
-} */
-
 #selectFile{
   font-size: 11.8px;
-  /* font-weight: normal; */
   text-align: center;
-  /* margin-top: 50px; */
-  /* margin: 0%;*/
   padding: 0px 6px 1.5px 6px;
   background-color: silver;
   border-top : var(--light_border);
@@ -60,47 +63,3 @@ button{
   border-right : var(--shadow_border);
   border-bottom : var(--shadow_border);
 }
-
-/*#expand-btn, #expand-btn2{
-  float: right;
-  width: 100px;
-  text-align: center;
-  margin-top: 3px;
-  padding: 0px 3px;
-  background-color: silver;
-  user-select: none;
-  align-items: flex-end;
-}
-
-#expand-btn {
-  display: inline-block;
-  border-top : var(--light_border);
-  border-left : var(--light_border);
-  border-right : var(--shadow_border);
-  border-bottom : var(--shadow_border);
-}
-
-#expand-btn2 {
-  display: none;
-  border-top : var(--shadow_border);
-  border-left : var(--shadow_border);
-  border-right : var(--light_border);
-  border-bottom : var(--light_border);
-}
-
-#expand-toggle:checked ~ #expand-btn {
-  display: none;
-}
-#expand-toggle:checked ~ #expand-btn2 {
-  display: inline-block;
-}
-
-#expand-toggle:checked ~ .edit_mode {
-  display: none;
-}
-
-#expand-toggle:checked ~ .impexp_mode {
-  display: inline-block;
-}
-/*~ toggle */
-
