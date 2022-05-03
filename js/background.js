@@ -113,7 +113,7 @@ function checkUrlMatched(url, urlPatterns) {
 
 function setIcon(badgeText, toolTip) {
   chrome.browserAction.setBadgeText({ text: badgeText });
-  chrome.browserAction.setTitle({ title: toolTip });
+  chrome.browserAction.setTitle({ title: toolTip + `\n` });
 }
 
 function executeScript(tabId, execScript) {
